@@ -1,0 +1,20 @@
+# docker-compose.yml
+version: '3'
+services:
+  database:
+    image: "postgres"
+    env_file:
+      - database.env 
+    volumes:
+      - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+  webapp:
+    depends_on: 
+      - database
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "3000:3000"
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose
