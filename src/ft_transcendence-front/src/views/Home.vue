@@ -3,9 +3,7 @@
     <img alt="Vue logo" src="../assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
   </div> -->
-  <h1>FT_TRANSCENDENCE</h1>
   <div id="main">
-    <h3>Launch game</h3>
     <div id="leaderboard">
       <h3>Leaderbord du cul</h3>
     </div>
@@ -19,6 +17,9 @@
 </template>
 
 <style scoped>
+template {
+  height: 100%;
+}
 #main {
   background: rgba(0, 0, 0, 0.1);
   font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -33,7 +34,7 @@
 #leaderboard {
   background: rgba(255, 0, 255, 1);
   width: 30%;
-  height: 60%;
+  height: 80%;
   float: right;
 }
 
