@@ -1,18 +1,51 @@
 <template>
-  <div class="home">
+  <!-- <div class="home">
     <img alt="Vue logo" src="../assets/logo.png" />
     <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  </div> -->
+  <h1>FT_TRANSCENDENCE</h1>
+  <div id="main">
+    <h3>Launch game</h3>
+    <div id="leaderboard">
+      <h3>Leaderbord du cul</h3>
+    </div>
+    <div id="global">
+      <h3>Launch game, historics et petits trucs sympa</h3>
+    </div>
+    <div id="chat">
+      <h3>Chat</h3>
+    </div>
   </div>
 </template>
 
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+<style scoped>
+#main {
+  background: rgba(0, 0, 0, 0.1);
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  border-radius: 5px;
+  height: 1000px;
+}
 
-@Options({
-  components: {
-    HelloWorld,
-  },
-})
-export default class Home extends Vue {}
-</script>
+#leaderboard {
+  background: rgba(255, 0, 255, 1);
+  width: 30%;
+  height: 60%;
+  float: right;
+}
+
+#global {
+  background-color: rgb(255, 0, 0);
+  width: 60%;
+   height: 30%;
+}
+
+#chat {
+  background-color: rgb(0, 255, 0);
+   width: 60%;
+   height: 40%;
+}
+</style>
