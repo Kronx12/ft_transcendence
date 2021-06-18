@@ -97,6 +97,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  /* background-color: rgba(0, 0, 0, 0.1); */
 }
 
 #nav {
@@ -110,6 +111,8 @@ export default {
   font-weight: bold;
   color: #2c3e50;
 }
+
+
 
 #nav a.router-link-exact-active {
   color: #2c3e50;
