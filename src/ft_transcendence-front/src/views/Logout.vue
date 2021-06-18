@@ -1,0 +1,12 @@
+<script>
+
+export default {
+    mounted: function() {
+        this.$store.state.user.id = -1
+        this.$store.state.user.login = ""
+        this.$store.state.status = ''
+        localStorage.setItem('ft_token', '')
+        this.$router.push('/')
+    },
+}
+</script>

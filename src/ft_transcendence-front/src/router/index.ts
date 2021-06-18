@@ -1,5 +1,10 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import Home from "../views/Home.vue";
+import Login from "../components/Login.vue"
+import Logout from "../views/Logout.vue";
+import Game from '../components/Game.vue'
+import Queue from '../views/Queue.vue'
+import Settings from "../views/Settings.vue";
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -8,14 +13,35 @@ const routes: Array<RouteRecordRaw> = [
     component: Home,
   },
   {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    path: "/login",
+    name: "Login",
+    component: Login,
   },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Login,
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: Settings,
+  },
+  {
+    path: "/logout",
+    name: "Logout",
+    component: Logout,
+  },
+  {
+    path: '/game', 
+    name: 'Game',
+    component: Game 
+  },
+  { 
+    path: '/queue', 
+    name: 'Queue',
+    component: Queue 
+  }
 ];
 
 const router = createRouter({

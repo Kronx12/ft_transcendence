@@ -1,18 +1,16 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+  <div>
+    <h1>Bonjour</h1>
+	<router-link v-if="this.$store.state.user.id != -1" to="/queue">Join Game</router-link>
   </div>
 </template>
 
-<script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import HelloWorld from "@/components/HelloWorld.vue"; // @ is an alias to /src
+<script>
 
-@Options({
-  components: {
-    HelloWorld,
-  },
-})
-export default class Home extends Vue {}
+export default {
+  mounted: function() {
+    if (this.$store.state.user.id == -1)
+      this.$router.push('/login')
+  }
+}
 </script>

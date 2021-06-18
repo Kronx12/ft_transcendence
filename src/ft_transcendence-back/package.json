@@ -24,6 +24,9 @@
     "@nestjs/common": "^7.6.15",
     "@nestjs/core": "^7.6.15",
     "@nestjs/platform-express": "^7.6.15",
+    "@nestjs/platform-ws": "^7.6.18",
+    "@nestjs/schedule": "^0.4.3",
+    "@nestjs/websockets": "^7.6.18",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6"
