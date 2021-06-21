@@ -46,9 +46,7 @@ export default {
 				self.count = data.content.count
 			} else if (data.type === "emit_start") {
 				self.$root.in_queue = false;
-                console.log("EMIT_START");
-                console.log(data.content);
-				self.$router.push({path: '/game', query: {room_id: data.content.room_id}});
+				self.$router.push({path: '/game', query: {room_id: data.content.room_id}, params: {serverwidth: data.content.server_width, serverheight: data.content.server_height}});
 			}
 		}
 	},

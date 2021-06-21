@@ -40,6 +40,9 @@ export class Client {
 export class Room {
     _id: string;
 
+    _scorea: number;
+    _scoreb: number;
+
     _playerax: number;
     _playeray: number;
 
@@ -49,10 +52,26 @@ export class Room {
     _playera: Client;
     _playerb: Client;
 
+    _bx: number;
+    _by: number;
+    _br: number;
+
+    _vx: number;
+    _vy: number;
+
     _spectators: Client[]; // TODO
+
+    _canvas_w: number;
+    _canvas_h: number;
 
     constructor(p1: Client, p2: Client) {
         this._id = uuidv4();
+
+        this._canvas_w = 1000
+        this._canvas_h = 562
+
+        this._scorea = 0;
+        this._scoreb = 0;
 
         this._playera = p1;
         this._playerb = p2;
@@ -62,23 +81,55 @@ export class Room {
 
         this._playerbx = 0;
         this._playerby = 0;
+    
+        this._spectators = [];
+
+        this._vx = 1;
+        this._vy = 1;
+    
+        this._br = 5;
+        this._bx = this._canvas_w / 2;
+        this._by = this._canvas_h / 2;
     }
 
     setup() {
-        console.log("EMIT_START");
-        send(this._playera._socket, "emit_start", {room_id: this._id});
-        send(this._playerb._socket, "emit_start", {room_id: this._id});
+        send(this._playera._socket, "emit_start", {room_id: this._id, server_width: this._canvas_w, server_height: this._canvas_h});
+        send(this._playerb._socket, "emit_start", {room_id: this._id, server_width: this._canvas_w, server_height: this._canvas_h});
     }
 
-    update(user: any, x: number, y: number) {
-        if (user.id === this._playerb._user.id) {
-            this._playerbx = x;
-            this._playerby = y;
-            send(this._playera._socket, "ack_key", { x: this._playerbx, y: this._playerby });
-        } else if (user.id === this._playera._user.id) {
-            this._playerax = x;
-            this._playeray = y;
-            send(this._playerb._socket, "ack_key", { x: this._playerax, y: this._playeray });
+    async update_game() {
+        let fps = 30;
+        while (true) {
+            // Update ball
+
+            // TODO Check racket + victory
+            if (this._vx + this._bx < this._br || this._vx + this._bx > this._canvas_w - this._br)
+                this._vx *= -1;
+            if (this._vy + this._by < this._br || this._vy + this._by > this._canvas_h - this._br)
+                this._vy *= -1;
+            this._bx += this._vx;
+            this._by += this._vy;
+
+            // Broadcast
+            send(this._playerb._socket, "ack_loop", { sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pay: this._playeray, pby: this._playerby });
+            send(this._playera._socket, "ack_loop", { sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pay: this._playeray, pby: this._playerby });
+            this._spectators.forEach(spec => { send(spec._socket, "ack_loop", { sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pay: this._playeray, pby: this._playerby }); });
+            await new Promise(resolve => setTimeout(resolve, 1000 / 30));
+        }
+    }
+
+    update(user: any, key: number) {
+        let speed = 3;
+        if (user.id === this._playera._user.id) {
+            if (key == 38) // up
+                this._playeray -= speed;
+            if (key == 40) // down
+                this._playeray += speed;
+        } else if (user.id === this._playerb._user.id) {
+            if (key == 38) // up
+                this._playerby -= speed;
+            if (key == 40) // down
+                this._playerby += speed;
         }
     }
 

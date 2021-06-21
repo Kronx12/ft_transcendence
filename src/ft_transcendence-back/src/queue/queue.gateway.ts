@@ -35,7 +35,6 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             
             // Recois le user
             if (data.type === 'ack_user') {
-                console.log("ACK_USER");
                 // Si utilisateur deja dans la liste, mettre a jour le client sinon fillUser
                 if (self.getClientByUser(data.content.user) === null)
                     self.fillUser(client, data.content.user);
@@ -49,20 +48,25 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                 }
             // Rejoins la file d'attente
             } else if (data.type === 'emit_join') {
-                console.log("EMIT_JOIN");
                 self.queue.push(self.getClientByUser(data.content.user));
                 send(client, "ack_join");
             // Quitte la file d'attente
             } else if (data.type === 'emit_leave') {
-                console.log("EMIT_LEAVE");
                 self.queue.removeByUser(data.content.user);
                 send(client, "ack_leave");
             // Update coord
             } else if (data.type === 'emit_key') {
-                console.log("EMIT_KEY");
                 for (let i = 0; i < self.rooms.length; i++)
                     if (self.rooms[i]._id === data.content.room_id)
-                        self.rooms[i].update(data.content.user, data.content.x, data.content.y);
+                        self.rooms[i].update(data.content.user, data.content.key);
+            } else if (data.type === 'emit_checkid') {
+                let find = false;
+                self.rooms.forEach(room => {
+                    if (data.content.room_id === room._id)
+                        find = true;
+                });
+                if (!find)
+                    send(client, "ack_redirect", {});
             }
         });
         console.log("Connecté : " + this.queue._store.length);
@@ -75,7 +79,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
         console.log("Déconnecté : " + this.queue._store.length);
     }
 
-    @Cron(CronExpression.EVERY_5_SECONDS)
+    @Cron("* * * * * *")
     handleCron() {
         // Update des timeouts
         for (let i = 0; i < this.timeoutList.length; i++)
@@ -104,20 +108,11 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
         if (this.queue._store.length >= 2) {
             let new_room = new Room(this.queue._store[0], this.queue._store[1]);
             new_room.setup();
+            new_room.update_game();
             this.rooms.push(new_room);
             this.queue.pop();
             this.queue.pop();
         }
-
-        // console.log("Count clients : " + this.clients.length);
-        // console.log("clients : ");
-        // console.log(this.clients);
-        // console.log("Count queue : " + this.queue._store.length);
-        // console.log("queue : ");
-        // console.log(this.queue._store);
-        // console.log("Count timeoutlist : " + this.timeoutList.length);
-        // console.log("timeoutlist : ");
-        // console.log(this.timeoutList);
     }
 
     getClientBySocket(s: Socket): Client {
@@ -154,7 +149,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     removeFromTimeout(user: any) {
-        this.timeoutList = this.timeoutList.filter(obj => obj._client._user.id !== user.id);
+        this.timeoutList = this.timeoutList.filter(obj => (obj._client._user && obj._client._user.id !== user.id));
     }
 
     removeFromClientsBySocket(client: Socket) {
@@ -162,6 +157,6 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     removeFromClientsByUser(user: any) {
-        this.clients = this.clients.filter(obj => obj._user.id !== user.id);
+        this.clients = this.clients.filter(obj => (obj._user && obj._user.id !== user.id));
     }
 }
