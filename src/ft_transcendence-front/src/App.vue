@@ -34,7 +34,8 @@ export default {
       connection: null,
 			state:  false,
 			id: this.$store.state.user.id,
-			in_queue: false
+			in_queue: false,
+			in_bonus: false
     }
   },
   methods: {

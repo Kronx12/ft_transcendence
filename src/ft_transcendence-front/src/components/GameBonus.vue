@@ -30,6 +30,8 @@ export default {
 			fontBold: null,
 			isA: false,
 			isB: false,
+			cooldowna: 0,
+			cooldownb: 0,
 		}
 	},
 	components: {
@@ -62,6 +64,7 @@ export default {
 				this.linedash(sk, sk.width / 2, 0, sk.width / 2, sk.height, 10, '_');
 
 				sk.fill('white');
+				//sk.textFont(this.fontBold);
 				sk.textSize(50);
 				sk.textAlign(sk.CENTER, sk.CENTER);
 				sk.text(this.scorea, sk.width / 2 - 100, sk.height / 20 * 3);
@@ -72,8 +75,13 @@ export default {
 					key = 38;
 				else if (sk.keyIsDown(40) && !sk.keyIsDown(38))
 					key = 40;
-				if (key != 0)
-					this.$root.connection.send(JSON.stringify({type: 'emit_key', content: { room_id: this.$route.query.room_id, user: this.$store.state.user, key: key }}));
+
+				let space = false;
+				if (sk.keyIsDown(32))
+					space = true;
+
+				if (key != 0 || space)
+					this.$root.connection.send(JSON.stringify({type: 'emit_key', content: { room_id: this.$route.query.room_id, user: this.$store.state.user, key: key, space: space }}));
 
 
 				sk.stroke('white');
@@ -93,6 +101,10 @@ export default {
 						(this.rwidth * sk.width / this.server_width),
 						(this.rheight * sk.height / this.server_height));
 
+				// Draw PlayerA Cooldown
+				sk.rect(0, 0, (sk.width / 2) - ((sk.width / 2) * this.cooldowna / 100), sk.height / 80);
+
+
 				if (this.isB) {
 					sk.stroke(0, 150, 200);
 					sk.fill(0, 150, 200);
@@ -106,7 +118,10 @@ export default {
 						(this.yb * sk.height / this.server_height),
 						(this.rwidth * sk.width / this.server_width),
 						(this.rheight * sk.height / this.server_height));
+				// Draw PlayerB Cooldown				
+				sk.rect(sk.width / 2 + ((sk.width / 2) * this.cooldownb / 100), 0, sk.width / 2, sk.height / 80);
 
+				// Draw Ball
 				sk.stroke('white');
 				sk.fill('white');
 				sk.ellipse(	this.ballx * sk.width / this.server_width,
@@ -172,6 +187,9 @@ export default {
 				
 				self.isA = data.content.isA;
 				self.isB = data.content.isB;
+				
+				self.cooldowna = data.content.cooldowna;
+				self.cooldownb = data.content.cooldownb;
 			} else if (data.type === "ack_redirect") {
 				console.log("redirect");
 				self.$router.push({path: '/'});
