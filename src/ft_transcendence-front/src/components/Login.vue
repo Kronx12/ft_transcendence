@@ -1,16 +1,6 @@
 <template>
     <div>
-        <div v-if="status == 'logged'">
-            <h1>Connected as {{ this.$store.state.user.login }}</h1>
-            <div class="container">
-             <img @click="goSettings()" @mouseenter="hoverimageMouse()" @mouseout="hoverimageMouse()" v-if="picture != ''" id="avatar-profile" v-bind:src=picture />
-             <div @click="goSettings()"  class="hoverImage" v-if="hoverimage">Edit Avatar</div>
-            </div>
-            <div id="stats">
-                <h1>Stats</h1>
-            </div>
-        </div>
-        <div v-else-if="status == 'error'">
+        <div v-if="status == 'error'">
             <h1>Connection error</h1>
             <button @click="connect">Connect with 42 Intra</button>
         </div>
@@ -44,6 +34,7 @@ export default({
             const self = this;
             this.$store.dispatch('getToken', code)
             .then(function(response) {
+                console.log(response)
                self.tokenAuth(localStorage.getItem("ft_token"))
             })
             .catch(function(error) {
@@ -55,17 +46,16 @@ export default({
             this.$store.dispatch('getLogin', token)
             .then(function(response) {
                 self.picture = self.$store.state.user.avatarURL;
+                localStorage.setItem('ft_token', '')
             })
             .catch(function(error) {
                 console.log(error)
                 self.connect();
             });
         },
-        goSettings: function() {
-            this.$router.push("/settings")
-        },
         connect: function()
         {
+            this.$store.dispatch('waitIntra')
             window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=24505a193a1387501b4477352c3a949680f317d28f3354226ed21b6f294d3f13&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Flogin%2F&response_type=code";
         }
     },
@@ -73,14 +63,12 @@ export default({
         if(this.$store.state.user.id == -1)
         {
             if (this.$route.query.code)
+            {
+                this.$store.dispatch('waitIntra')
                 this.tryLogin(this.$route.query.code)
+            }
             if(localStorage.getItem("ft_token") != "")
                 this.tokenAuth(localStorage.getItem("ft_token"))
-        }
-        else
-        {
-            this.login = this.$store.state.user.login
-            this.picture = this.$store.state.user.avatarURL
         }
     },
     updated() {

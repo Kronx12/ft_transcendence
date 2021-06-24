@@ -5,6 +5,7 @@ const axios = require('axios');
 const instance = axios.create({
   baseURL: 'http://localhost:3000/',
 });
+const jwt = require('jsonwebtoken');
 
 export default createStore({
   state: {
@@ -25,6 +26,9 @@ export default createStore({
     },
   },
   actions: {
+    waitIntra: ({commit}) => {
+      commit('setStatus', 'loading')
+    },
     getToken: ({commit}, code) => {
       commit('setStatus', 'loading')
       return new Promise((resolve, reject) => {
@@ -49,6 +53,8 @@ export default createStore({
       .then(function(response: any) {
         commit('setStatus', 'logged')
         commit('logUser', {id: response.data.intra_id, login: response.data.login, avatarURL: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg'})
+        const token = jwt.sign({id: response.data.intra_id, login: response.data.login, avatarURL: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg'}, 'shhhhh',{ expiresIn: '1h' });
+        localStorage.setItem("jwtToken", token);
         resolve(response.data)
       })
       .catch(function(error: any) {

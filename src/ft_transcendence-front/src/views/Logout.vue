@@ -5,7 +5,8 @@ export default {
         this.$store.state.user.id = -1
         this.$store.state.user.login = ""
         this.$store.state.status = ''
-        localStorage.setItem('ft_token', '')
+        localStorage.setItem('jwtToken', '')
+        
         this.$router.push('/')
     },
 }

@@ -3,6 +3,8 @@
      <span id="state" style="position: absolute; left:  10px;">{{ state ? 'Connected' : 'Disconnected' }} | {{ this.$store.state.user.id }}<br></span>
     <div class="container-fluid">
 
+    <input class="search-bar" v-if="this.$store.state.user.id != -1" type="search" v-model="search" placeholder="search login...">
+    <button class="search-button" v-if="this.$store.state.user.id != -1" @click="searchUser()">Search</button>
     <router-link @click="checkOpenProfile()" to="/">Home</router-link>
     <span v-if="this.$store.state.user.id == -1"> | </span>
     <router-link v-if="this.$store.state.user.id == -1" to="/login">Login</router-link> 
@@ -12,7 +14,7 @@
       <div id="avatar-bootstrap">
         <span @click="openProfile()" id="login">{{ this.$store.state.user.login }}</span> 
           <img @click="openProfile()" id="avatar" v-if="this.$store.state.user.id != -1" v-bind:src=this.$store.state.user.avatarURL />
-          <ul v-if="showProfile" @mouseout="openProfile()" class="dropdown-menu text-small shadow show" aria-labelledby="dropdownUser2" data-popper-placement="bottom-end" style="position: absolute; inset: 0px auto auto 0px; margin: 10px; transform: translate3d(-110px, 34px, 0px);">
+          <ul v-if="showProfile" @mouseleave="openProfile()" class="dropdown-menu text-small shadow show" aria-labelledby="dropdownUser2" data-popper-placement="bottom-end" style="position: absolute; inset: 0px auto auto 0px; margin: 10px; transform: translate3d(-110px, 34px, 0px);">
             <li @click="openProfile()" class="dropdown-item" for="li-drop1"><router-link id="li-drop1" to="/profile">Profile</router-link></li>
             <li @click="openProfile()" class="dropdown-item" for="li-drop1"><router-link id="li-drop1" to="/settings">Settings</router-link></li>
             <li><hr class="dropdown-divider"></li>
@@ -21,12 +23,15 @@
         </div>
       </div>
     </div>
+    </header>
   <router-view />
-  </header>
+
 </template>
 
 <script>
 import {server} from './helper'
+const jwt = require('jsonwebtoken');
+import { mapState } from 'vuex';
 export default {
   data() {
     return {
@@ -35,7 +40,8 @@ export default {
 			state:  false,
 			id: this.$store.state.user.id,
 			in_queue: false,
-			in_bonus: false
+      in_bonus: false,
+      search: ''
     }
   },
   methods: {
@@ -45,9 +51,33 @@ export default {
     checkOpenProfile: function(){
       if (this.showProfile)
         this.showProfile = !this.showProfile
+    },
+    searchUser: function(){
+      if (this.search == this.$store.state.user.login)
+        this.$router.push('/profile')
+      else
+       this.$router.push(`/user/${this.search}`);
+      this.search = '';
     }
   },
+  computed: {
+        ...mapState(['status'])
+    },
+  mounted() {
+    const self = this;
+    jwt.verify(localStorage.getItem('jwtToken'), 'shhhhh', function(err, decoded) {
+    if (err)
+      console.log("Not logged in, go /login")
+    else
+    {
+      self.$store.state.user.id = decoded.id;
+      self.$store.state.user.login = decoded.login;
+      self.$store.state.user.avatarURL = decoded.avatarURL;
+    }
+});
+  },
   updated() {
+
     if (this.$store.state.user.id != -1 && this.connection == null) {
       this.connection = new WebSocket(server.socketURL);
 
@@ -169,5 +199,16 @@ export default {
       display: block;
 }
 
+#li-drop1::selection { background: transparent; } 
+#li-drop1::-moz-selection { background: transparent; }
+
+.search-button {
+  position: absolute;
+  left: 500px;
+}
+.search-bar {
+    position: absolute;
+  left: 300px;
+}
 
 </style>

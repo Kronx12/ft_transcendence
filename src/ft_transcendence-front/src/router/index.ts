@@ -6,7 +6,8 @@ import Game from '../components/Game.vue'
 import GameBonus from '../components/GameBonus.vue'
 import Queue from '../views/Queue.vue'
 import Settings from "../views/Settings.vue";
-
+import Profile from "..//views/Profile.vue";
+import User from "../components/Users.vue"
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
@@ -47,6 +48,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/queue', 
     name: 'Queue',
     component: Queue 
+  },
+  {
+    path: '/user/:user',
+    name: 'User',
+    component: User
+  },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: Profile,
   }
 ];
 
