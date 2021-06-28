@@ -30,10 +30,12 @@ export default {
   methods: {
     editUsername: function() {
       this.$store.state.user.login = this.name
+      this.$store.dispatch("editUsername", {id: this.$store.state.user.id, username: this.name})
       this.name = ''
     },
     editAvatar: function() {
       this.$store.state.user.avatarURL = this.avatar
+      this.$store.dispatch("editAvatar", {id: this.$store.state.user.id, avatar: this.avatar})
       this.avatar = ''
     }
   }

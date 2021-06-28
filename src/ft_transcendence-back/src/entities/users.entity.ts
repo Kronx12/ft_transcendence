@@ -13,4 +13,9 @@ export class Users {
 
     @Column()
     public avatar: string;
+
+    @Column()
+    public status: number;
+
+
 }

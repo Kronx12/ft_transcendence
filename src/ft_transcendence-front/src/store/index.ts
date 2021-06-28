@@ -51,10 +51,33 @@ export default createStore({
     return new Promise((resolve, reject) => {
       instance.post(`/login/${token}`)
       .then(function(response: any) {
-        commit('setStatus', 'logged')
-        commit('logUser', {id: response.data.intra_id, login: response.data.login, avatarURL: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg'})
-        const token = jwt.sign({id: response.data.intra_id, login: response.data.login, avatarURL: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg'}, 'shhhhh',{ expiresIn: '1h' });
-        localStorage.setItem("jwtToken", token);
+        
+        instance.get(`/database/user/${response.data.intra_id}`)
+        .then(function(user: any) {
+          if(!user.data.id)
+          {
+            instance.post(`/database/user`, {
+              intra_id: response.data.intra_id, 
+              username: response.data.login,
+              avatar: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg',
+              status: 1
+            }).then(function(created: any) {
+              const token = jwt.sign({id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar}, 'shhhhh',{ expiresIn: '1h' });
+              localStorage.setItem("jwtToken", token);
+              commit('setStatus', 'logged')
+              commit('logUser', {id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar})
+              resolve(created.data)
+            })
+          }
+          else
+          {
+            const token = jwt.sign({id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar}, 'shhhhh',{ expiresIn: '1h' });
+            localStorage.setItem("jwtToken", token);
+            commit('setStatus', 'logged')
+            commit('logUser', {id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar})
+            resolve(user.data)
+          }
+        })
         resolve(response.data)
       })
       .catch(function(error: any) {
@@ -63,7 +86,13 @@ export default createStore({
         reject(error)
     });
   });
-  }
+  },
+  editUsername: ({commit}, params) => {
+    instance.patch(`/database/user/${params.id}`, {username: params.username});
+  },
+  editAvatar: ({commit}, params) => {
+    instance.patch(`/database/user/${params.id}`, {avatar: params.avatar});
+  },
 },
   modules: {},
 });
