@@ -16,6 +16,6 @@ COPY run.sh /run.sh
 RUN chmod +x /run.sh
 
 
-EXPOSE 80 3000
+EXPOSE 8080 3000 4001
 
 ENTRYPOINT ["sh", "/run.sh"]
