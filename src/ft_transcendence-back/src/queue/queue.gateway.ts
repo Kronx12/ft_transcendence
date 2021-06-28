@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocketGateway, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Socket } from "dgram";
 import { Server } from "http";
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 
 import { Client, Room, RoomBonus, Queue, send, ClientTimeout, State } from "../class/Utils";
 

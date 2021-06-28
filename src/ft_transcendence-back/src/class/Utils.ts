@@ -1,4 +1,6 @@
+import { Redirect } from "@nestjs/common";
 import { Socket } from "dgram";
+import fetch from 'node-fetch';
 
 export enum State {
     NEED_USER,
@@ -151,7 +153,15 @@ export class Room {
                     this._start_chrono = 5000;
                     this._end = true;
                     this._winner = (this._scorea == this._scorelimit || this._scoreb == -1) ? this._playera._user : this._playerb._user;
-                    //TODO SAVE RESULT IN DB !
+                    await saveGame({
+                        "uuid": this._id,
+                        "player_1": this._playera._user.id,
+                        "player_2": this._playerb._user.id,
+                        "score_1": this._scorea,
+                        "score_2": this._scoreb,
+                        "victory": this._winner.id,
+                        "type": 0
+                    });
                 }
 
                 this._bx += this._vx;
@@ -391,7 +401,15 @@ export class RoomBonus {
                     this._start_chrono = 5000;
                     this._end = true;
                     this._winner = (this._scorea == this._scorelimit || this._scoreb == -1) ? this._playera._user : this._playerb._user;
-                    //TODO SAVE RESULT IN DB !
+                    await saveGame({
+                        "uuid": this._id,
+                        "player_1": this._playera._user.id,
+                        "player_2": this._playerb._user.id,
+                        "score_1": this._scorea,
+                        "score_2": this._scoreb,
+                        "victory": this._winner.id,
+                        "type": 1
+                    });
                 }
 
                 this._bx += this._vx;
@@ -651,4 +669,18 @@ export function RectCircleColliding(circle,rect){
 
 export function getTanFromDegrees(degrees) {
     return Math.tan(degrees * Math.PI / 180);
+}
+
+export async function saveGame(content) {
+    console.log("Pre request:")
+    console.log(content)
+    const response = await fetch("http://localhost:3000/game_database", {
+        method: 'POST',
+        body: JSON.stringify(content),
+        headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+    });
+
+    console.log(response)
+    if (response.ok) { console.log("Game store in database success") }
+    else { console.log("Failed to store game in database") }
 }
