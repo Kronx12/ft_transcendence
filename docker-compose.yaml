@@ -7,14 +7,25 @@ services:
       - database.env 
     volumes:
       - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+    networks:
+      - database
+    ports:
+      - "5432:5432"
   webapp:
     depends_on: 
       - database
+    links:
+      - database:database
     build:
       context: ./src
       dockerfile: Dockerfile
     ports:
-      - "80:80"
+      - "8080:8080"
       - "3000:3000"
+    networks:
+      - database
 volumes:
   database-data: # named volumes can be managed easier using docker-compose
+networks:
+  database:
+    driver: bridge
