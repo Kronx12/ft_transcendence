@@ -17,6 +17,12 @@ export class DatabaseController {
         return this.databaseServ.findOne(id);
     }
 
+    @Get("user/search/:name")
+    async searchUser(@Param('name') name)
+    {
+        return this.databaseServ.searchUser(name);
+    }
+
     @Post("user")
     async create(@Body() newUser: Users){
         return this.databaseServ.create(newUser);

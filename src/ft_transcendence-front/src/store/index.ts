@@ -75,6 +75,7 @@ export default createStore({
             localStorage.setItem("jwtToken", token);
             commit('setStatus', 'logged')
             commit('logUser', {id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar})
+            instance.patch(`/database/user/${user.data.intra_id}`, {status: 1});
             resolve(user.data)
           }
         })
@@ -93,6 +94,27 @@ export default createStore({
   editAvatar: ({commit}, params) => {
     instance.patch(`/database/user/${params.id}`, {avatar: params.avatar});
   },
+  editStatus: ({commit}, params) => {
+    instance.patch(`/database/user/${params.id}`, {status: params.status});
+  },
+  searchUser: ({commit}, name) => {
+    return new Promise((resolve, reject) => {
+    instance.get(`/database/user/search/${name}`)
+    .then((result: any) => {
+
+      const response = {
+        type: '',
+        data: result.data
+      }
+
+      if (result.data.id != undefined)
+        response.type = 'unique';
+      else
+        response.type = 'multiple';
+      resolve(response);
+    })
+  })
+  }
 },
   modules: {},
 });
