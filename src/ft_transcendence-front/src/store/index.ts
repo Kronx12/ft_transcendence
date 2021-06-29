@@ -56,18 +56,38 @@ export default createStore({
         .then(function(user: any) {
           if(!user.data.id)
           {
-            instance.post(`/database/user`, {
-              intra_id: response.data.intra_id, 
-              username: response.data.login,
-              avatar: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg',
-              status: 1
-            }).then(function(created: any) {
-              const token = jwt.sign({id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar}, 'shhhhh',{ expiresIn: '1h' });
-              localStorage.setItem("jwtToken", token);
-              commit('setStatus', 'logged')
-              commit('logUser', {id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar})
-              resolve(created.data)
-            })
+            instance
+              .post(`/database/user`, {
+                intra_id: response.data.intra_id,
+                username: response.data.login,
+                avatar:
+                  "https://cdn.intra.42.fr/users/small_" +
+                  response.data.login +
+                  ".jpg",
+                status: 1,
+                friends: "",
+                friends_request: "",
+                asked: ""
+              })
+              .then(function (created: any) {
+                const token = jwt.sign(
+                  {
+                    id: created.data.intra_id,
+                    login: created.data.username,
+                    avatarURL: created.data.avatar,
+                  },
+                  "shhhhh",
+                  { expiresIn: "1h" }
+                );
+                localStorage.setItem("jwtToken", token);
+                commit("setStatus", "logged");
+                commit("logUser", {
+                  id: created.data.intra_id,
+                  login: created.data.username,
+                  avatarURL: created.data.avatar,
+                });
+                resolve(created.data);
+              });
           }
           else
           {
