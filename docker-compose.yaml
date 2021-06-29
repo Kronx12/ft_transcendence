@@ -14,8 +14,10 @@ services:
   webapp:
     depends_on: 
       - database
-    links:
-      - database:database
+    # links:
+    #   - database:database
+    volumes:
+      - ./src:/ft_transcendence
     build:
       context: ./src
       dockerfile: Dockerfile
@@ -25,8 +27,11 @@ services:
       - "3000:3000"
     networks:
       - database
+    environment: 
+      - CHOKIDAR_USEPOLLING=true
 volumes:
   database-data: # named volumes can be managed easier using docker-compose
+  src:
 networks:
   database:
     driver: bridge
