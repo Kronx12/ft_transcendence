@@ -17,5 +17,6 @@ export class Users {
     @Column()
     public status: number;
 
-
+    @Column({default: ""})
+    public game_history: string;
 }

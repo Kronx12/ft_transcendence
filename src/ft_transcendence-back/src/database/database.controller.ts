@@ -32,4 +32,16 @@ export class DatabaseController {
     {
         return this.databaseServ.editUser(id, content);
     }
+
+    @Get('user/game/:id/')
+    async getGameHistory(@Param('id') id)
+    {
+        return this.databaseServ.getGameHistory(id);
+    }
+
+    @Patch('user/game/:id/:gameid')
+    async addGameToUser(@Param('id') id, @Param('gameid') gameid)
+    {
+        return this.databaseServ.addGameToUser(id, gameid);
+    }
 }
