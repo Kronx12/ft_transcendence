@@ -58,11 +58,17 @@ export default {
       else
        this.$router.push(`/user/${this.search}`);
       this.search = '';
+    },
+    editStatus: function(){
+      this.$store.dispatch("editStatus", {id: this.id, status: 0})
     }
   },
   computed: {
         ...mapState(['status'])
     },
+  created() {
+    document.addEventListener('beforeunload', this.editStatus)
+  },
   mounted() {
     const self = this;
     jwt.verify(localStorage.getItem('jwtToken'), 'shhhhh', function(err, decoded) {
@@ -73,6 +79,7 @@ export default {
       self.$store.state.user.id = decoded.id;
       self.$store.state.user.login = decoded.login;
       self.$store.state.user.avatarURL = decoded.avatarURL;
+      self.$store.dispatch("editStatus", {id: decoded.id, status: 1})
     }
 });
   },

@@ -56,18 +56,38 @@ export default createStore({
         .then(function(user: any) {
           if(!user.data.id)
           {
-            instance.post(`/database/user`, {
-              intra_id: response.data.intra_id, 
-              username: response.data.login,
-              avatar: 'https://cdn.intra.42.fr/users/small_' + response.data.login + '.jpg',
-              status: 1
-            }).then(function(created: any) {
-              const token = jwt.sign({id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar}, 'shhhhh',{ expiresIn: '1h' });
-              localStorage.setItem("jwtToken", token);
-              commit('setStatus', 'logged')
-              commit('logUser', {id: created.data.intra_id, login: created.data.username, avatarURL: created.data.avatar})
-              resolve(created.data)
-            })
+            instance
+              .post(`/database/user`, {
+                intra_id: response.data.intra_id,
+                username: response.data.login,
+                avatar:
+                  "https://cdn.intra.42.fr/users/small_" +
+                  response.data.login +
+                  ".jpg",
+                status: 1,
+                friends: "",
+                friends_request: "",
+                asked: ""
+              })
+              .then(function (created: any) {
+                const token = jwt.sign(
+                  {
+                    id: created.data.intra_id,
+                    login: created.data.username,
+                    avatarURL: created.data.avatar,
+                  },
+                  "shhhhh",
+                  { expiresIn: "1h" }
+                );
+                localStorage.setItem("jwtToken", token);
+                commit("setStatus", "logged");
+                commit("logUser", {
+                  id: created.data.intra_id,
+                  login: created.data.username,
+                  avatarURL: created.data.avatar,
+                });
+                resolve(created.data);
+              });
           }
           else
           {
@@ -75,6 +95,7 @@ export default createStore({
             localStorage.setItem("jwtToken", token);
             commit('setStatus', 'logged')
             commit('logUser', {id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar})
+            instance.patch(`/database/user/${user.data.intra_id}`, {status: 1});
             resolve(user.data)
           }
         })
@@ -93,6 +114,27 @@ export default createStore({
   editAvatar: ({commit}, params) => {
     instance.patch(`/database/user/${params.id}`, {avatar: params.avatar});
   },
+  editStatus: ({commit}, params) => {
+    instance.patch(`/database/user/${params.id}`, {status: params.status});
+  },
+  searchUser: ({commit}, name) => {
+    return new Promise((resolve, reject) => {
+    instance.get(`/database/user/search/${name}`)
+    .then((result: any) => {
+
+      const response = {
+        type: '',
+        data: result.data
+      }
+
+      if (result.data.id != undefined)
+        response.type = 'unique';
+      else
+        response.type = 'multiple';
+      resolve(response);
+    })
+  })
+  }
 },
   modules: {},
 });
