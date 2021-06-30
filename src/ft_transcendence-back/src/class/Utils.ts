@@ -161,7 +161,7 @@ export class Room {
                         "score_2": this._scoreb,
                         "victory": this._winner.id,
                         "type": 0
-                    });
+                    }, this._id, this._playera._user.id, this._playerb._user.id);
                 }
 
                 this._bx += this._vx;
@@ -409,7 +409,7 @@ export class RoomBonus {
                         "score_2": this._scoreb,
                         "victory": this._winner.id,
                         "type": 1
-                    });
+                    }, this._id, this._playera._user.id, this._playerb._user.id);
                 }
 
                 this._bx += this._vx;
@@ -671,7 +671,7 @@ export function getTanFromDegrees(degrees) {
     return Math.tan(degrees * Math.PI / 180);
 }
 
-export async function saveGame(content) {
+export async function saveGame(content, uuid:string, p1:number, p2:number) {
     console.log("Pre request:")
     console.log(content)
     const response = await fetch("http://localhost:3000/game_database", {
@@ -679,8 +679,18 @@ export async function saveGame(content) {
         body: JSON.stringify(content),
         headers: { 'Content-Type': 'application/json; charset=UTF-8' }
     });
-
-    console.log(response)
-    if (response.ok) { console.log("Game store in database success") }
-    else { console.log("Failed to store game in database") }
+    const response_getid = await fetch("http://localhost:3000/game_database/getid/" + uuid)
+    .then(res => res.json())
+    .then(json => {    
+        fetch("http://localhost:3000/database/user/game/" + p1.toString() + "/" + json.id.toString(), {
+            method: 'PATCH',
+            body: JSON.stringify(content),
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+        });
+        fetch("http://localhost:3000/database/user/game/" + p2.toString() + "/" + json.id.toString(), {
+            method: 'PATCH',
+            body: JSON.stringify(content),
+            headers: { 'Content-Type': 'application/json; charset=UTF-8' }
+        });
+    });
 }

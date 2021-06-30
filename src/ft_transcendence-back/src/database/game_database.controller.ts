@@ -16,6 +16,11 @@ export class GameDatabaseController {
         return this.databaseServ.findOne(+id);
     }
 
+    @Get('/getid/:uuid')
+    async getId(@Param('uuid') id: string) {
+        return this.databaseServ.getId(id);
+    }
+
     @Post()
     async addGame(@Body() game: Games) {
         console.log("Body:");

@@ -18,6 +18,10 @@ export class GameDatabaseService {
         return this.gamesRepo.findOne(id);
     }
 
+    getId(id: string): Promise<Games> {
+        return this.gamesRepo.findOne({ where: `uuid = '${id}'` });
+    }
+
     addGame(game: Games): Promise<Games[]> {
         console.log("Game receive : ")
         console.log(game)

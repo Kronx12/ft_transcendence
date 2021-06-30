@@ -5,70 +5,69 @@ import { Users } from '../entities/users.entity';
 
 @Injectable()
 export class DatabaseService {
-  constructor(
-    @InjectRepository(Users)
-    private usersRepo: Repository<Users>,
-  ) {}
+    constructor(
+        @InjectRepository(Users)
+        private usersRepo: Repository<Users>,
+    ) { }
 
-  findAll(): Promise<Users[]> {
-    return this.usersRepo.find();
-  }
-
-  findOne(intra_id: string): Promise<Users | undefined> {
-    return this.usersRepo.findOne({ where: `intra_id = ${intra_id}` });
-  }
-
-  findByName(name: string): Promise<Users | undefined> {
-    return this.usersRepo.findOne({ where: `username = '${name}'` });
-  }
-
-  findByMatch(match: string): Promise<Users[]> {
-    return this.usersRepo.find({ where: `username LIKE '%${match}%'` });
-  }
-
-async searchUser(name: string): Promise<Users | Users[] | undefined> {
-    let user;
-    await this.findByName(name).then(function (found) {
-        user = found;
-    });
-    if(user != undefined)
-        return user;
-
-    let users;
-    await this.findByMatch(name).then(function (found) {
-            users = found
-    });
-    if(users != undefined)
-        return users;
-    return undefined;
-  }
-  async create(newUser: Users) {
-    await this.usersRepo.save(newUser);
-    return this.findOne(String(newUser.intra_id));
-  }
-
-  async delete(id: string) {
-    await this.usersRepo.delete(id);
-    return { ok: true };
-  }
-  async editUser(id: string, content: any) {
-    const self = this;
-    let user;
-    await this.findOne(id).then(function (edit) {
-      user = edit;
-    });
-    if (content.avatar) user.avatar = content.avatar;
-    if (content.username) user.username = content.username;
-    if (content.hasOwnProperty('status')) user.status = content.status;
-    this.usersRepo.update(user.id, user);
-    return { user };
+    findAll(): Promise<Users[]> {
+        return this.usersRepo.find();
     }
-    
-    async requestFriend(from: string, to: string)
-    {
+
+    findOne(intra_id: string): Promise<Users | undefined> {
+        return this.usersRepo.findOne({ where: `intra_id = ${intra_id}` });
+    }
+
+    findByName(name: string): Promise<Users | undefined> {
+        return this.usersRepo.findOne({ where: `username = '${name}'` });
+    }
+
+    findByMatch(match: string): Promise<Users[]> {
+        return this.usersRepo.find({ where: `username LIKE '%${match}%'` });
+    }
+
+    async searchUser(name: string): Promise<Users | Users[] | undefined> {
+        let user;
+        await this.findByName(name).then(function (found) {
+            user = found;
+        });
+        if (user != undefined)
+            return user;
+
+        let users;
+        await this.findByMatch(name).then(function (found) {
+            users = found
+        });
+        if (users != undefined)
+            return users;
+        return undefined;
+    }
+    async create(newUser: Users) {
+        await this.usersRepo.save(newUser);
+        return this.findOne(String(newUser.intra_id));
+    }
+
+    async delete(id: string) {
+        await this.usersRepo.delete(id);
+        return { ok: true };
+    }
+    async editUser(id: string, content: any) {
+        const self = this;
+        let user;
+        await this.findOne(id).then(function (edit) {
+            user = edit;
+        });
+        if (content.avatar) user.avatar = content.avatar;
+        if (content.username) user.username = content.username;
+        if (content.hasOwnProperty('status')) user.status = content.status;
+        this.usersRepo.update(user.id, user);
+        return { user };
+    }
+
+    async requestFriend(from: string, to: string) {
         let user_from;
         await this.findOne(from).then(function (found) {
-          user_from = found;
+            user_from = found;
         });
 
         let user_to;
@@ -80,11 +79,11 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
             user_to.friends_request = user_from.intra_id
         else
             user_to.friends_request += `:${user_from.intra_id}`;
-        
+
         this.usersRepo.update(user_to.id, user_to);
 
         if (user_from.asked == '')
-          user_from.asked = user_to.intra_id;
+            user_from.asked = user_to.intra_id;
         else user_from.asked += `:${user_to.intra_id}`;
 
         this.usersRepo.update(user_from.id, user_from);
@@ -93,17 +92,17 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
     }
 
     async acceptFriend(id: string, accept: string) {
-         let user;
-         await this.findOne(id).then(function (found) {
-           user = found;
-         });
+        let user;
+        await this.findOne(id).then(function (found) {
+            user = found;
+        });
         let friends = user.friends_request.split(':')
- 
+
 
         for (var i = 0; i < friends.length; i++) {
-    
+
             if (friends[i] === accept) {
-    
+
                 friends.splice(i, 1);
             }
         }
@@ -115,7 +114,7 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
         else {
             for (let str in friends)
                 new_req += `${str}:`;
-          new_req = new_req.slice(0, -1);
+            new_req = new_req.slice(0, -1);
         }
         user.friends_request = new_req;
 
@@ -128,13 +127,12 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
 
         let user_asker;
         await this.findOne(accept).then(function (found) {
-        user_asker = found;
+            user_asker = found;
         });
         friends = user_asker.asked.split(':');
         for (var i = 0; i < friends.length; i++) {
-    
+
             if (friends[i] === id) {
-    
                 friends.splice(i, 1);
             }
         }
@@ -144,13 +142,12 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
             new_req = ""
         else if (friends.length == 1)
             new_req = friends[0];
-        else
-        {
+        else {
             for (let str in friends)
                 new_req += `${str}:`;
             new_req = new_req.slice(0, -1);
         }
-        
+
         user_asker.asked = new_req;
 
         if (user_asker.friends == '')
@@ -159,16 +156,16 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
             user_asker.friends += `:${id}`;
         this.usersRepo.update(user_asker.id, user_asker);
 
-        return {accept: user.friends, asked: user_asker.friends}
+        return { accept: user.friends, asked: user_asker.friends }
     }
 
     async getGameHistory(id: number) {
         return (await this.usersRepo.findOne(id)).game_history;
     }
 
-    async addGameToUser(id: number, gameid:number) {
+    async addGameToUser(id: number, gameid: number) {
         let user: Users;
-        await this.usersRepo.findOne(id).then(function(edit) { user = edit; });
+        await this.usersRepo.findOne({ where: `intra_id = '${id}'` }).then(function (edit) { user = edit; });
         let tmp = this.deserialize(user.game_history);
         if (gameid !== NaN)
             tmp.push(gameid);
@@ -186,11 +183,11 @@ async searchUser(name: string): Promise<Users | Users[] | undefined> {
         return (res);
     }
 
-    deserialize(str: string) : number[] {
+    deserialize(str: string): number[] {
         let res: number[] = [];
         str.split(";").forEach(e => {
-            if (parseInt(e) != NaN)
-            res.push(parseInt(e));
+            if (e != "" && e != "NaN" && parseInt(e) != NaN)
+                res.push(parseInt(e));
         });
         return (res);
     }
