@@ -17,124 +17,142 @@ export default createStore({
     }
   },
   mutations: {
-    setStatus: function(state, status) {
+    setStatus: function (state, status) {
       state.status = status;
     },
-    logUser: function(state, user) {
+    logUser: function (state, user) {
       state.user = user;
       console.log(state.user)
     },
   },
   actions: {
-    waitIntra: ({commit}) => {
+    waitIntra: ({ commit }) => {
       commit('setStatus', 'loading')
     },
-    getToken: ({commit}, code) => {
+    getToken: ({ commit }, code) => {
       commit('setStatus', 'loading')
       return new Promise((resolve, reject) => {
         instance.get(`/login/${code}`)
-        .then(function(response: any) {
-          commit('setStatus', 'done')
-          localStorage.setItem("ft_token", response.data.token)
-          console.log("token", localStorage.getItem("ft_token"));
-         resolve(response);
-        })
-        .catch(function(error: any) {
-          commit('setStatus', 'error')
-          reject(error)
-        });
-    });
-  },
-  getLogin: ({commit}, token) => {
-    
-    commit('setStatus', 'loading')
-    return new Promise((resolve, reject) => {
-      instance.post(`/login/${token}`)
-      .then(function(response: any) {
-        
-        instance.get(`/database/user/${response.data.intra_id}`)
-        .then(function(user: any) {
-          if(!user.data.id)
-          {
-            instance
-              .post(`/database/user`, {
-                intra_id: response.data.intra_id,
-                username: response.data.login,
-                avatar:
-                  "https://cdn.intra.42.fr/users/small_" +
-                  response.data.login +
-                  ".jpg",
-                status: 1,
-                friends: "",
-                friends_request: "",
-                asked: ""
+          .then(function (response: any) {
+            commit('setStatus', 'done')
+            localStorage.setItem("ft_token", response.data.token)
+            console.log("token", localStorage.getItem("ft_token"));
+            resolve(response);
+          })
+          .catch(function (error: any) {
+            commit('setStatus', 'error')
+            reject(error)
+          });
+      });
+    },
+    getLogin: ({ commit }, token) => {
+
+      commit('setStatus', 'loading')
+      return new Promise((resolve, reject) => {
+        instance.post(`/login/${token}`)
+          .then(function (response: any) {
+
+            instance.get(`/database/user/${response.data.intra_id}`)
+              .then(function (user: any) {
+                if (!user.data.id) {
+                  instance
+                    .post(`/database/user`, {
+                      intra_id: response.data.intra_id,
+                      username: response.data.login,
+                      avatar:
+                        "https://cdn.intra.42.fr/users/small_" +
+                        response.data.login +
+                        ".jpg",
+                      status: 1,
+                      friends: "",
+                      friends_request: "",
+                      asked: ""
+                    })
+                    .then(function (created: any) {
+                      const token = jwt.sign(
+                        {
+                          id: created.data.intra_id,
+                          login: created.data.username,
+                          avatarURL: created.data.avatar,
+                        },
+                        "shhhhh",
+                        { expiresIn: "1h" }
+                      );
+                      localStorage.setItem("jwtToken", token);
+                      commit("setStatus", "logged");
+                      commit("logUser", {
+                        id: created.data.intra_id,
+                        login: created.data.username,
+                        avatarURL: created.data.avatar,
+                      });
+                      resolve(created.data);
+                    });
+                }
+                else {
+                  const token = jwt.sign({ id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar }, 'shhhhh', { expiresIn: '1h' });
+                  localStorage.setItem("jwtToken", token);
+                  commit('setStatus', 'logged')
+                  commit('logUser', { id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar })
+                  instance.patch(`/database/user/${user.data.intra_id}`, { status: 1 });
+                  resolve(user.data)
+                }
               })
-              .then(function (created: any) {
-                const token = jwt.sign(
-                  {
-                    id: created.data.intra_id,
-                    login: created.data.username,
-                    avatarURL: created.data.avatar,
-                  },
-                  "shhhhh",
-                  { expiresIn: "1h" }
-                );
-                localStorage.setItem("jwtToken", token);
-                commit("setStatus", "logged");
-                commit("logUser", {
-                  id: created.data.intra_id,
-                  login: created.data.username,
-                  avatarURL: created.data.avatar,
-                });
-                resolve(created.data);
-              });
-          }
-          else
-          {
-            const token = jwt.sign({id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar}, 'shhhhh',{ expiresIn: '1h' });
-            localStorage.setItem("jwtToken", token);
-            commit('setStatus', 'logged')
-            commit('logUser', {id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar})
-            instance.patch(`/database/user/${user.data.intra_id}`, {status: 1});
-            resolve(user.data)
-          }
-        })
-        resolve(response.data)
+            resolve(response.data)
+          })
+          .catch(function (error: any) {
+            commit('setStatus', 'invalid_token')
+            console.log(error)
+            reject(error)
+          });
+      });
+    },
+    editUsername: ({ commit }, params) => {
+      instance.patch(`/database/user/${params.id}`, { username: params.username });
+    },
+    editAvatar: ({ commit }, params) => {
+      instance.patch(`/database/user/${params.id}`, { avatar: params.avatar });
+    },
+    editStatus: ({ commit }, params) => {
+      instance.patch(`/database/user/${params.id}`, { status: params.status });
+    },
+    searchUser: ({ commit }, name) => {
+      return new Promise((resolve, reject) => {
+        instance.get(`/database/user/search/${name}`)
+          .then((result: any) => {
+
+            const response = {
+              type: '',
+              data: result.data
+            }
+
+            if (result.data.id != undefined)
+              response.type = 'unique';
+            else
+              response.type = 'multiple';
+            resolve(response);
+          })
       })
-      .catch(function(error: any) {
-        commit('setStatus', 'invalid_token')
-        console.log(error)
-        reject(error)
-    });
-  });
-  },
-  editUsername: ({commit}, params) => {
-    instance.patch(`/database/user/${params.id}`, {username: params.username});
-  },
-  editAvatar: ({commit}, params) => {
-    instance.patch(`/database/user/${params.id}`, {avatar: params.avatar});
-  },
-  editStatus: ({commit}, params) => {
-    instance.patch(`/database/user/${params.id}`, {status: params.status});
-  },
-  searchUser: ({commit}, name) => {
-    return new Promise((resolve, reject) => {
-    instance.get(`/database/user/search/${name}`)
-    .then((result: any) => {
+    },
+    getMessagesFromAuthor: ({ commit }, author) => {
+      return new Promise((resolve, reject) => {
+        instance.get(`/chat/search/thjacque`)
+          .then((result: any) => {
 
-      const response = {
-        type: '',
-        data: result.data
-      }
-
-      if (result.data.id != undefined)
-        response.type = 'unique';
-      else
-        response.type = 'multiple';
-      resolve(response);
-    })
-  })
-  }
-},
+            let i = 0;
+            const messages = [];
+            while (i < result.data.length) {
+              messages.push({
+                id: result.data[i].id,
+                author: result.data[i].author,
+                message: result.data[i].message
+              });
+              i++;
+            }
+            console.log(" la response = " + messages[0].id);
+            resolve(messages);
+          })
+      })
+    }
+  },
   modules: {},
 });
