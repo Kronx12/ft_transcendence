@@ -475,6 +475,7 @@ template {
   margin-left: 20%;
 }
 
+
 #input-chat {
   position: relative;
   margin-top: 7%;
