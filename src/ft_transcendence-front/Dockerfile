@@ -7,4 +7,6 @@ RUN npm install -g @vue/cli
 
 WORKDIR /front
 
+COPY package.json /front/package.json
+RUN npm install
 ENTRYPOINT ["sh", "./launch.sh"]

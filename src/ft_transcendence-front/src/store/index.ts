@@ -14,7 +14,12 @@ export default createStore({
       id: -1,
       login: '',
       avatarURL: '',
-    }
+    },
+    friends: {
+      list: "",
+      request: "",
+      asked: "",
+    },
   },
   mutations: {
     setStatus: function (state, status) {
@@ -23,6 +28,9 @@ export default createStore({
     logUser: function (state, user) {
       state.user = user;
       console.log(state.user)
+    },
+    updateFriend: function (state, list) {
+      state.friends = list;
     },
   },
   actions: {
@@ -43,6 +51,14 @@ export default createStore({
             commit('setStatus', 'error')
             reject(error)
           });
+      });
+    },
+    getUser: ({ commit }, id) => {
+      return new Promise((resolve, reject) => {
+        instance.get(`/database/user/${id}`).then(function (user: any) {
+          console.log(user.data);
+          resolve(user.data);
+        });
       });
     },
     getLogin: ({ commit }, token) => {
@@ -148,11 +164,61 @@ export default createStore({
               });
               i++;
             }
-            console.log(" la response = " + messages[0].id);
+            //console.log(" la response = " + messages[0].id);
             resolve(messages);
           })
       })
-    }
+    },
+    askFriend: ({ commit }, request) => {
+      instance.post(`/database/ask/${request.asker}/${request.asked}`);
+    },
+     acceptFriend:({ commit }, request) => {
+      return new Promise((resolve, reject) => {
+        instance
+          .post(`/database/accept/${request.id}/${request.new}`)
+          .then(() => {
+            console.log("yes")
+            instance
+              .get(`/database/friends/${request.id}`)
+              .then((result: any) => {
+                console.log("get friend", result.data);
+                commit("updateFriend", {
+                  list: result.data.friends,
+                  request: result.data.request,
+                  asked: result.data.asked,
+                });
+                resolve(result.data.friends);
+              })
+              .catch((err: any) => {
+                reject(err);
+              });
+          });
+           })
+    },
+    removeFriend: ({ commit }, request) => {
+      instance.post(`/database/remove/${request.id}/${request.new}`);
+    },
+    refuseFriend: ({ commit }, request) => {
+      instance.post(`/database/refuse/${request.id}/${request.new}`);
+    },
+    getFriend: ({ commit }, asker) => {
+      return new Promise((resolve, reject) => {
+        instance
+          .get(`/database/friends/${asker}`)
+          .then((result: any) => {
+            console.log("get friend",result.data);
+            commit("updateFriend", {
+              list: result.data.friends,
+              request: result.data.request,
+              asked: result.data.asked,
+            });
+            resolve(result.data);
+          })
+          .catch((err: any) => {
+            reject(err);
+          });
+      });
+    },
   },
   modules: {},
 });

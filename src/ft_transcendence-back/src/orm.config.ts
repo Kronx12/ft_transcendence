@@ -6,6 +6,6 @@ export const config: TypeOrmModuleOptions = {
     username: 'gros_pd_user',
     password: 'pas_ce_word',
     database: 'dans_ta_base',
-    entities: [ __dirname + '/../**/*.entity.js',],
+    entities: [ __dirname + '/entities/*.entity.js',],
     synchronize: true,
 }

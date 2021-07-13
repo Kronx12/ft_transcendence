@@ -24,7 +24,7 @@
       <router-link v-if="this.$store.state.user.id == -1" to="/login"
         >Login</router-link
       >
-      <a class="fixedButton">
+      <a v-if="this.$store.state.user.id != -1" class="fixedButton">
         <button
           id="roundedFixedBtn"
           @click="chatAppear()"
@@ -37,6 +37,19 @@
 
       <div class="flex-shrink-0 dropdown" id="header">
         <div id="avatar-bootstrap">
+          <img
+            @click="openFriends()"
+            v-if="this.$store.state.user.id != -1"
+            id="commu"
+            src="https://image.flaticon.com/icons/png/512/417/417723.png"
+          />
+          <div id="notif" v-if="haveRequest()"></div>
+          <ul v-if="showFriends" class="dropdown-menu text-small shadow show" data-popper-placement="bottom-end" style="position: absolute; inset: 0px auto auto 0px; margin: 10px; transform: translate3d(-110px, 34px, 0px);">
+          <li   v-for="item in request" :key="item"><router-link :key="item" id="li-drop2" class="dropdown-item2" @click="openFriends()" :to="`/user/${item.username}`">{{ item.username }}</router-link> <button :key="item" style=" margin-left: 5px;color:white; background-color: green;"  @click="accept(item.id)" v-if="item.id != ''">✓</button><button  :key="item" @click="refuse(item.id)" style="color:white; background-color: red;" v-if="item.id != ''">x</button></li>
+          <li v-if="haveRequest()"><hr class="dropdown-divider"></li>
+          <li v-if="friend == ''">You have no friends...</li>
+          <li v-else v-for="item in friend" :key="item" ><router-link :key="item" @click="openFriends()" class="dropdown-item" id="li-drop1" :to="`/user/${item.username}`">{{ item.username }}</router-link></li>
+        </ul>
           <span @click="openProfile()" id="login">{{
             this.$store.state.user.login
           }}</span>
@@ -83,9 +96,11 @@
         <div
           v-for="message in messages"
           :key="message"
-          :class="message.author == 'thallard' ? 'message-current-user' : 'message'"
+          :class="
+            message.author == 'thallard' ? 'message-current-user' : 'message'
+          "
         >
-            <div class="username" :key="message">{{ message.author }}</div>
+          <div class="username" :key="message">{{ message.author }}</div>
           <div class="message-inner">
             <div class="content" :key="message">{{ message.message }}</div>
           </div>
@@ -114,6 +129,7 @@ export default {
   data() {
     return {
       showProfile: 0,
+      showFriends: 0,
       connection: null,
       state: false,
       id: this.$store.state.user.id,
@@ -122,14 +138,45 @@ export default {
       inputMessage: ref(""),
       messages: [],
       search: "",
+      request: [],
+      friend: [],
     };
   },
   methods: {
+    accept: async function (id) {
+      for (var i = 0; i < this.request.length; i++) {
+        if (this.request[i].id === id) {
+          this.request.splice(i, 1);
+        }
+      }
+        const self = this;
+        console.log({asker: self.$store.state.user.id, asked: id})
+      await self.$store.dispatch("acceptFriend", {id: self.$store.state.user.id, new: id});
+      await this.updateFriend();
+      
+    },
+    refuse: async function (id) {
+      for (var i = 0; i < this.request.length; i++) {
+        if (this.request[i].id === id) {
+          this.request.splice(i, 1);
+        }
+      }
+      this.$store.dispatch("refuseFriend", {
+        id: this.$store.state.user.id,
+        new: id,
+      });
+      await this.updateFriend();
+    },
     openProfile: function () {
       this.showProfile = !this.showProfile;
     },
     checkOpenProfile: function () {
       if (this.showProfile) this.showProfile = !this.showProfile;
+    },
+    openFriends: async function () {
+      console.log("firends console: ", this.friend)
+      console.log("requ console: ", this.request)
+      this.showFriends = !this.showFriends;
     },
     searchUser: function () {
       if (this.search == this.$store.state.user.login)
@@ -137,8 +184,10 @@ export default {
       else this.$router.push(`/user/${this.search}`);
       this.search = "";
     },
-    editStatus: function () {
-      this.$store.dispatch("editStatus", { id: this.id, status: 0 });
+    editStatus: async function handler(event) {
+      console.log("yo ca quitte", event);
+      if (this.id != -1)
+        await this.$store.dispatch("editStatus", { id: this.id, status: 0 });
     },
     chatAppear: async function () {
       const self = this;
@@ -147,8 +196,6 @@ export default {
       if (chat.style.display === "block") chat.style.display = "none";
       else chat.style.display = "block";
 
-     
-
       return {};
     },
     messageSubmit: function () {
@@ -156,38 +203,116 @@ export default {
         console.log(this.inputMessage.value);
       return;
     },
+    haveRequest: function () {
+      if (this.$store.state.user.id == -1) return false;
+      const friends = this.$store.state.friends.request;
+      console.log(friends);
+      if (friends == "") return false;
+      return true;
+    },
+    updateFriend: async function() {
+      const self = this;
+        await self.$store.dispatch("getFriend", self.$store.state.user.id);
+          const request = self.$store.state.friends.request.split(":");
+          const schema = { id: "", username: "" };
+          if (request != "")
+          {
+            for (const x in request) {
+              schema.id = request[x];
+              await self.$store.dispatch("getUser", request[x]).then(function(data) {
+                schema.username = data.username;
+              });
+              self.request[x] = schema;
+              console.log(x, schema)
+            }
+          }
+          console.log(self.request);
+          self.friend = self.$store.state.friends.list.split(":");
+          if (self.friend != "")
+          {
+            for (const x in self.friend) {
+              schema.id = self.friend[x];
+              await self.$store.dispatch(
+                "getUser",
+                self.friend[x]
+              ).then(function(data) {
+                schema.username = data.username;
+              });
+              self.friend[x] = schema;
+              console.log(x, schema)
+            }
+          }
+    }
   },
   computed: {
-    ...mapState(["status"]),
+    ...mapState(["status", "friends"]),
   },
   created() {
-    document.addEventListener("beforeunload", this.editStatus);
+    window.addEventListener("beforeunload", this.editStatus);
+  },
+  async beforeMount() {
+    if (this.$store.state.user.id != -1) {
+      await this.$store.dispatch("getFriend", this.$store.state.user.id);
+    }
   },
   async mounted() {
+    var chat = document.getElementById("chat");
+    chat.style.display = "none";
     const self = this;
     jwt.verify(
       localStorage.getItem("jwtToken"),
       "shhhhh",
-      function (err, decoded) {
+      async function (err, decoded) {
         if (err) console.log("Not logged in, go /login");
         else {
           self.$store.state.user.id = decoded.id;
           self.$store.state.user.login = decoded.login;
           self.$store.state.user.avatarURL = decoded.avatarURL;
           self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
+          await self.$store.dispatch("getFriend", self.$store.state.user.id);
+          const request = self.$store.state.friends.request.split(":");
+          const schema = { id: "", username: "" };
+          if (request != "")
+          {
+            for (const x in request) {
+              schema.id = request[x];
+              await self.$store.dispatch("getUser", request[x]).then(function(data) {
+                schema.username = data.username;
+              });
+              self.request[x] = schema;
+              console.log(x, schema)
+            }
+          }
+          console.log(self.request);
+          self.friend = self.$store.state.friends.list.split(":");
+          if (self.friend != "")
+          {
+            for (const x in self.friend) {
+              schema.id = self.friend[x];
+              await self.$store.dispatch(
+                "getUser",
+                self.friend[x]
+              ).then(function(data) {
+                schema.username = data.username;
+              });
+              self.friend[x] = schema;
+              console.log(x, schema)
+            }
+          }
+          console.log("friends:", self.friend);
         }
-        
       }
     );
-     await self.$store
-        .dispatch("getMessagesFromAuthor", "thallard")
-        .then(function (result) {
-          console.log("ID = " + result[0].id);
-          self.messages = result;
-        });
-        console.log(" ca monte mon cochon " + self.messages);
+    await self.$store
+      .dispatch("getMessagesFromAuthor", "thallard")
+      .then(function (result) {
+        console.log("ID = " + result[0].id);
+        self.messages = result;
+      });
+    console.log(" ca monte mon cochon " + self.messages);
   },
-  updated() {
+  async updated() {
+    
     if (this.$store.state.user.id != -1 && this.connection == null) {
       this.connection = new WebSocket(server.socketURL);
 
@@ -323,6 +448,25 @@ export default {
   background: transparent;
 }
 
+#li-drop2 {
+  text-decoration: none;
+}
+
+#li-drop2::selection {
+  background: transparent;
+}
+#li-drop2::-moz-selection {
+  background: transparent;
+}
+
+#commu {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 10px;
+  right: 200px;
+  cursor: pointer;
+}
 .search-button {
   position: absolute;
   left: 500px;
@@ -332,6 +476,22 @@ export default {
   left: 300px;
 }
 
+.dropdown-item2 {
+  display: initial;
+  width: 100%;
+  padding: 0.25rem 1rem;
+  clear: both;
+  font-weight: 400;
+  color: #212529;
+  text-align: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+}
+.dropdown-item2:hover {
+  background-color: grey;
+}
 #nav {
   z-index: 2 !important;
 }
@@ -475,7 +635,6 @@ template {
   margin-left: 20%;
 }
 
-
 #input-chat {
   position: relative;
   margin-top: 7%;
@@ -513,5 +672,14 @@ template {
   color: rgb(240, 240, 240);
   font-size: 18px;
   font-weight: 700;
+}
+#notif {
+  background: red;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  position: absolute;
+  top: 45px;
+  right: 195px;
 }
 </style>

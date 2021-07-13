@@ -90,7 +90,9 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleDisconnect(client: Socket) {
         console.log("DISCONNECTION");
-        this.getClientBySocket(client).setState(State.WAITING);
+        if (this.getClientBySocket(client) == null)
+            return;
+          this.getClientBySocket(client).setState(State.WAITING);
         this.timeoutList.push(new ClientTimeout(this.getClientBySocket(client)));
         this.rooms.forEach(room => {
             if (room._playera._socket == client) room.stopPA();

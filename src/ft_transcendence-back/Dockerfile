@@ -7,4 +7,6 @@ RUN npm install -g @nestjs/cli
 
 WORKDIR /back
 
+COPY package.json /back/package.json
+RUN npm install
 ENTRYPOINT ["sh", "./launch.sh"]

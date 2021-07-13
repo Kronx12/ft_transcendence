@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Delete, Param, Body, Patch } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Param,
+  Body,
+  Patch,
+} from '@nestjs/common';
 import { Users } from 'src/entities/users.entity';
 import { DatabaseService } from './database.service';
 
@@ -13,12 +21,18 @@ export class DatabaseController {
 
   @Get('user/:intra')
   async findOne(@Param('intra') id) {
-    return this.databaseServ.findOne(id);
+    if(id != "-1")
+      return this.databaseServ.findOne(id);
   }
 
   @Get('user/search/:name')
   async searchUser(@Param('name') name) {
     return this.databaseServ.searchUser(name);
+  }
+
+  @Get('friends/:id')
+  async getFirends(@Param('id') id) {
+    if (id != '-1') return this.databaseServ.getFriends(id);
   }
 
   @Post('user')
@@ -36,6 +50,16 @@ export class DatabaseController {
     return this.databaseServ.acceptFriend(id, accept);
   }
 
+  @Post('remove/:id/:remove')
+  async removeFriend(@Param('id') id, @Param('remove') remove) {
+    return this.databaseServ.removeFriend(id, remove, 0);
+  }
+
+  @Post('refuse/:id/:refuse')
+  async refuseFriends(@Param('id') id, @Param('refuse') refuse) {
+    return this.databaseServ.refuseFriend(id, refuse);
+  }
+
   @Delete('user/:id')
   async delete(@Param('id') id) {
     return this.databaseServ.delete(id);
@@ -44,17 +68,5 @@ export class DatabaseController {
   @Patch('user/:id')
   async editUser(@Param('id') id, @Body() content) {
     return this.databaseServ.editUser(id, content);
-  }
-
-  @Get('user/game/:id/')
-  async getGameHistory(@Param('id') id)
-  {
-      return this.databaseServ.getGameHistory(id);
-  }
-
-  @Patch('user/game/:id/:gameid')
-  async addGameToUser(@Param('id') id, @Param('gameid') gameid)
-  {
-      return this.databaseServ.addGameToUser(id, gameid);
   }
 }
