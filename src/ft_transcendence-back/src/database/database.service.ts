@@ -241,4 +241,37 @@ export class DatabaseService {
       asked: client.asked,
     };
   }
+
+  async getGameHistory(id: number) {
+      return (await this.usersRepo.findOne(id)).game_history;
+  }
+
+  async addGameToUser(id: number, gameid: number) {
+      let user: Users;
+      await this.usersRepo.findOne({ where: `intra_id = '${id}'` }).then(function (edit) { user = edit; });
+      let tmp = this.deserialize(user.game_history);
+      if (gameid !== NaN)
+          tmp.push(gameid);
+      user.game_history = this.serialize(tmp);
+      this.usersRepo.update(user.id, user);
+  }
+
+  serialize(lst: number[]): string {
+      let res = "";
+      lst.forEach(e => {
+          if (e != NaN)
+              res += e + ";";
+      });
+      res.slice(0, -1);
+      return (res);
+  }
+
+  deserialize(str: string): number[] {
+      let res: number[] = [];
+      str.split(";").forEach(e => {
+          if (e != "" && e != "NaN" && parseInt(e) != NaN)
+              res.push(parseInt(e));
+      });
+      return (res);
+  }
 }
