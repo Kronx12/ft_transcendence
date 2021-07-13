@@ -231,10 +231,9 @@ export default {
       else this.$router.push(`/user/${this.search}`);
       this.search = "";
     },
-    editStatus: async function handler(event) {
-      console.log("yo ca quitte", event);
-      if (this.id != -1)
-        await this.$store.dispatch("editStatus", { id: this.id, status: 0 });
+    disconnectStatus: async function handler(e) {
+      if (this.$store.state.user.id != -1)
+        await this.$store.dispatch("editStatus", { id: this.$store.state.user.id, status: 0 });
     },
     chatAppear: async function () {
       const self = this;
@@ -307,7 +306,8 @@ export default {
     ...mapState(["status", "friends"]),
   },
   created() {
-    window.addEventListener("beforeunload", this.editStatus);
+    window.addEventListener("beforeunload", this.disconnectStatus);
+    window.addEventListener("onunload", this.disconnectStatus);
   },
   async beforeMount() {
     if (this.$store.state.user.id != -1) {

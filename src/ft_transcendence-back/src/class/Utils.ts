@@ -672,8 +672,6 @@ export function getTanFromDegrees(degrees) {
 }
 
 export async function saveGame(content, uuid:string, p1:number, p2:number) {
-    console.log("Pre request:")
-    console.log(content)
     const response = await fetch("http://localhost:3000/game_database", {
         method: 'POST',
         body: JSON.stringify(content),
