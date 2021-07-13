@@ -1,3 +1,4 @@
+import { resolveComponent } from "@vue/runtime-core";
 import { createStore } from "vuex";
 
 const axios = require('axios');
@@ -82,7 +83,8 @@ export default createStore({
                       status: 1,
                       friends: "",
                       friends_request: "",
-                      asked: ""
+                      asked: "",
+                      canals: ""
                     })
                     .then(function (created: any) {
                       const token = jwt.sign(
@@ -151,7 +153,7 @@ export default createStore({
     },
     getMessagesFromAuthor: ({ commit }, author) => {
       return new Promise((resolve, reject) => {
-        instance.get(`/chat/search/thjacque`)
+        instance.get(`/chat/search/${author}`)
           .then((result: any) => {
 
             let i = 0;
@@ -160,7 +162,8 @@ export default createStore({
               messages.push({
                 id: result.data[i].id,
                 author: result.data[i].author,
-                message: result.data[i].message
+                message: result.data[i].message,
+                canalid: result.data[i].canalid
               });
               i++;
             }
@@ -169,6 +172,9 @@ export default createStore({
           })
       })
     },
+    // addMessage: ({ commit }, content, author, canalid) => {
+    //   return ;
+    // },
     askFriend: ({ commit }, request) => {
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
     },

@@ -28,6 +28,19 @@ export class ChatController {
 
     @Post()
     async addMessage(@Body() chat: Chat) {
+        console.log(chat);
         return this.chatServ.addMessage(chat);
     }
+
+    // @Post('/:author/:message/:canal')
+    // async addMessage(@Param('author') author, @Param('message') message, @Param('canal') canal)
+    // {
+    //     var chat : Chat = {
+    //         id: null,
+    //         author: author,
+    //         message: message,
+    //         canalid: canal
+    //     };
+    //     return this.chatServ.addMessage(chat);
+    // }
 }

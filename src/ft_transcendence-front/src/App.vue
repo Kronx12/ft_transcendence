@@ -44,12 +44,55 @@
             src="https://image.flaticon.com/icons/png/512/417/417723.png"
           />
           <div id="notif" v-if="haveRequest()"></div>
-          <ul v-if="showFriends" class="dropdown-menu text-small shadow show" data-popper-placement="bottom-end" style="position: absolute; inset: 0px auto auto 0px; margin: 10px; transform: translate3d(-110px, 34px, 0px);">
-          <li   v-for="item in request" :key="item"><router-link :key="item" id="li-drop2" class="dropdown-item2" @click="openFriends()" :to="`/user/${item.username}`">{{ item.username }}</router-link> <button :key="item" style=" margin-left: 5px;color:white; background-color: green;"  @click="accept(item.id)" v-if="item.id != ''">✓</button><button  :key="item" @click="refuse(item.id)" style="color:white; background-color: red;" v-if="item.id != ''">x</button></li>
-          <li v-if="haveRequest()"><hr class="dropdown-divider"></li>
-          <li v-if="friend == ''">You have no friends...</li>
-          <li v-else v-for="item in friend" :key="item" ><router-link :key="item" @click="openFriends()" class="dropdown-item" id="li-drop1" :to="`/user/${item.username}`">{{ item.username }}</router-link></li>
-        </ul>
+          <ul
+            v-if="showFriends"
+            class="dropdown-menu text-small shadow show"
+            data-popper-placement="bottom-end"
+            style="
+              position: absolute;
+              inset: 0px auto auto 0px;
+              margin: 10px;
+              transform: translate3d(-110px, 34px, 0px);
+            "
+          >
+            <li v-for="item in request" :key="item">
+              <router-link
+                :key="item"
+                id="li-drop2"
+                class="dropdown-item2"
+                @click="openFriends()"
+                :to="`/user/${item.username}`"
+                >{{ item.username }}</router-link
+              >
+              <button
+                :key="item"
+                style="margin-left: 5px; color: white; background-color: green"
+                @click="accept(item.id)"
+                v-if="item.id != ''"
+              >
+                ✓</button
+              ><button
+                :key="item"
+                @click="refuse(item.id)"
+                style="color: white; background-color: red"
+                v-if="item.id != ''"
+              >
+                x
+              </button>
+            </li>
+            <li v-if="haveRequest()"><hr class="dropdown-divider" /></li>
+            <li v-if="friend == ''">You have no friends...</li>
+            <li v-else v-for="item in friend" :key="item">
+              <router-link
+                :key="item"
+                @click="openFriends()"
+                class="dropdown-item"
+                id="li-drop1"
+                :to="`/user/${item.username}`"
+                >{{ item.username }}</router-link
+              >
+            </li>
+          </ul>
           <span @click="openProfile()" id="login">{{
             this.$store.state.user.login
           }}</span>
@@ -101,6 +144,7 @@
           "
         >
           <div class="username" :key="message">{{ message.author }}</div>
+          <img class="user-image" :src="avatarURL" style="border-radius:50%; width: 30px; height: 30px;" />
           <div class="message-inner">
             <div class="content" :key="message">{{ message.message }}</div>
           </div>
@@ -135,11 +179,12 @@ export default {
       id: this.$store.state.user.id,
       in_queue: false,
       in_bonus: false,
-      inputMessage: ref(""),
+      inputMessage: null,
       messages: [],
       search: "",
       request: [],
       friend: [],
+      avatarURL: this.$store.state.user.avatarURL,
     };
   },
   methods: {
@@ -149,11 +194,13 @@ export default {
           this.request.splice(i, 1);
         }
       }
-        const self = this;
-        console.log({asker: self.$store.state.user.id, asked: id})
-      await self.$store.dispatch("acceptFriend", {id: self.$store.state.user.id, new: id});
+      const self = this;
+      console.log({ asker: self.$store.state.user.id, asked: id });
+      await self.$store.dispatch("acceptFriend", {
+        id: self.$store.state.user.id,
+        new: id,
+      });
       await this.updateFriend();
-      
     },
     refuse: async function (id) {
       for (var i = 0; i < this.request.length; i++) {
@@ -174,8 +221,8 @@ export default {
       if (this.showProfile) this.showProfile = !this.showProfile;
     },
     openFriends: async function () {
-      console.log("firends console: ", this.friend)
-      console.log("requ console: ", this.request)
+      console.log("firends console: ", this.friend);
+      console.log("requ console: ", this.request);
       this.showFriends = !this.showFriends;
     },
     searchUser: function () {
@@ -198,9 +245,11 @@ export default {
 
       return {};
     },
+    // Submit messages data to database
     messageSubmit: function () {
-      if (this.inputMessage.value != null || this.inputMessage.value != "")
-        console.log(this.inputMessage.value);
+      if (this.inputMessage == null && this.inputMessage == "") return;
+      console.log("le message " + this.inputMessage);
+      console.log("le user " + this.$store.state.user.login);
       return;
     },
     haveRequest: function () {
@@ -210,39 +259,49 @@ export default {
       if (friends == "") return false;
       return true;
     },
-    updateFriend: async function() {
+    refreshChat: function () {
       const self = this;
-        await self.$store.dispatch("getFriend", self.$store.state.user.id);
-          const request = self.$store.state.friends.request.split(":");
-          const schema = { id: "", username: "" };
-          if (request != "")
-          {
-            for (const x in request) {
-              schema.id = request[x];
-              await self.$store.dispatch("getUser", request[x]).then(function(data) {
-                schema.username = data.username;
-              });
-              self.request[x] = schema;
-              console.log(x, schema)
-            }
-          }
-          console.log(self.request);
-          self.friend = self.$store.state.friends.list.split(":");
-          if (self.friend != "")
-          {
-            for (const x in self.friend) {
-              schema.id = self.friend[x];
-              await self.$store.dispatch(
-                "getUser",
-                self.friend[x]
-              ).then(function(data) {
-                schema.username = data.username;
-              });
-              self.friend[x] = schema;
-              console.log(x, schema)
-            }
-          }
-    }
+      setInterval(function () {
+        if (self.$store != undefined && self.$store != null)
+          self.$store
+            .dispatch("getMessagesFromAuthor", "thallard")
+            .then(function (result) {
+              self.messages = result;
+            });
+      }, 5000);
+    },
+    updateFriend: async function () {
+      const self = this;
+      await self.$store.dispatch("getFriend", self.$store.state.user.id);
+      const request = self.$store.state.friends.request.split(":");
+      const schema = { id: "", username: "" };
+      if (request != "") {
+        for (const x in request) {
+          schema.id = request[x];
+          await self.$store
+            .dispatch("getUser", request[x])
+            .then(function (data) {
+              schema.username = data.username;
+            });
+          self.request[x] = schema;
+          console.log(x, schema);
+        }
+      }
+      console.log(self.request);
+      self.friend = self.$store.state.friends.list.split(":");
+      if (self.friend != "") {
+        for (const x in self.friend) {
+          schema.id = self.friend[x];
+          await self.$store
+            .dispatch("getUser", self.friend[x])
+            .then(function (data) {
+              schema.username = data.username;
+            });
+          self.friend[x] = schema;
+          console.log(x, schema);
+        }
+      }
+    },
   },
   computed: {
     ...mapState(["status", "friends"]),
@@ -270,53 +329,48 @@ export default {
           self.$store.state.user.avatarURL = decoded.avatarURL;
           self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
           await self.$store.dispatch("getFriend", self.$store.state.user.id);
-          const request = self.$store.state.friends.request.split(":");
+          let request;
+          if (self.$store.state.friends.request != undefined)
+            request = self.$store.state.friends.request.split(":");
           const schema = { id: "", username: "" };
-          if (request != "")
-          {
+          if (request != "") {
             for (const x in request) {
               schema.id = request[x];
-              await self.$store.dispatch("getUser", request[x]).then(function(data) {
-                schema.username = data.username;
-              });
+              await self.$store
+                .dispatch("getUser", request[x])
+                .then(function (data) {
+                  schema.username = data.username;
+                });
               self.request[x] = schema;
-              console.log(x, schema)
+              console.log(x, schema);
             }
           }
           console.log(self.request);
-          self.friend = self.$store.state.friends.list.split(":");
-          if (self.friend != "")
-          {
+          if (self.$store.state.friends.request != undefined)
+            self.friend = self.$store.state.friends.list.split(":");
+          if (self.friend != "") {
             for (const x in self.friend) {
               schema.id = self.friend[x];
-              await self.$store.dispatch(
-                "getUser",
-                self.friend[x]
-              ).then(function(data) {
-                schema.username = data.username;
-              });
+              await self.$store
+                .dispatch("getUser", self.friend[x])
+                .then(function (data) {
+                  schema.username = data.username;
+                });
               self.friend[x] = schema;
-              console.log(x, schema)
+              console.log(x, schema);
             }
           }
           console.log("friends:", self.friend);
         }
       }
     );
-    await self.$store
-      .dispatch("getMessagesFromAuthor", "thallard")
-      .then(function (result) {
-        console.log("ID = " + result[0].id);
-        self.messages = result;
-      });
-    console.log(" ca monte mon cochon " + self.messages);
+    self.refreshChat();
   },
   async updated() {
-    
+    const self = this;
+
     if (this.$store.state.user.id != -1 && this.connection == null) {
       this.connection = new WebSocket(server.socketURL);
-
-      const self = this;
 
       this.connection.onopen = function (event) {
         console.log(event);

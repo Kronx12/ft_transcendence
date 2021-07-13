@@ -29,4 +29,6 @@ export class Users {
   @Column()
     public asked: string;
 
+  @Column()
+    public canals: string;
 }

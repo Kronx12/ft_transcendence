@@ -11,4 +11,6 @@ export class Chat {
   @Column()
   public message: string;
 
+  @Column()
+  public canalid: number;
 }
