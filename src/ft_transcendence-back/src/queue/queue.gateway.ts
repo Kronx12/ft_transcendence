@@ -73,9 +73,13 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                         self.rooms_bonus[i].update(data.content.user, data.content.key, data.content.space);
             } else if (data.type === 'emit_checkid') {
                 let find = false;
+                console.log("EMIT CHECKID");
                 self.rooms.forEach(room => {
-                    if (data.content.room_id === room._id)
+                    if (data.content.room_id === room._id) {
                         find = true;
+                        console.log("Add spectator");
+                        room.addSpectator(client);
+                    }
                 });
                 self.rooms_bonus.forEach(room => {
                     if (data.content.room_id === room._id)
@@ -96,7 +100,8 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
         this.timeoutList.push(new ClientTimeout(this.getClientBySocket(client)));
         this.rooms.forEach(room => {
             if (room._playera._socket == client) room.stopPA();
-            else room.stopPB();
+            else if (room._playerb._socket == client) room.stopPB();
+            room.removeSpectator(client);
         });
         console.log("Déconnecté : " + this.queue._store.length);
     }
