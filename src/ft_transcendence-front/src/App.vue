@@ -83,14 +83,19 @@
             <li v-if="haveRequest()"><hr class="dropdown-divider" /></li>
             <li v-if="friend == ''">You have no friends...</li>
             <li v-else v-for="item in friend" :key="item">
+              
               <router-link
                 :key="item"
                 @click="openFriends()"
                 class="dropdown-item"
                 id="li-drop1"
                 :to="`/user/${item.username}`"
-                >{{ item.username }}</router-link
+                >{{ item.username }}
+                <div class="ingame" :key="item" v-if="item.status == 2" ></div>
+                <div class="online" :key="item" v-if="item.status == 1"></div>
+                <div class="offline" :key="item" v-if="item.status == 0" ></div></router-link
               >
+              
             </li>
           </ul>
           <span @click="openProfile()" id="login">{{
@@ -216,14 +221,15 @@ export default {
     },
     openProfile: function () {
       this.showProfile = !this.showProfile;
+      this.showFriends = 0;
     },
     checkOpenProfile: function () {
-      if (this.showProfile) this.showProfile = !this.showProfile;
+      if (this.showProfile) this.showProfile = 0;
+      if (this.showFriends) this.showFriends = 0;
     },
     openFriends: async function () {
-      console.log("firends console: ", this.friend);
-      console.log("requ console: ", this.request);
       this.showFriends = !this.showFriends;
+      this.showProfile = 0;
     },
     searchUser: function () {
       if (this.search == this.$store.state.user.login)
@@ -273,7 +279,7 @@ export default {
       const self = this;
       await self.$store.dispatch("getFriend", self.$store.state.user.id);
       const request = self.$store.state.friends.request.split(":");
-      const schema = { id: "", username: "" };
+      const schema = { id: "", username: "", status: 0};
       if (request != "") {
         for (const x in request) {
           schema.id = request[x];
@@ -287,20 +293,28 @@ export default {
         }
       }
       console.log(self.request);
-      self.friend = self.$store.state.friends.list.split(":");
-      if (self.friend != "") {
-        for (const x in self.friend) {
-          schema.id = self.friend[x];
+      let friend = self.$store.state.friends.list.split(":");
+      if (friend != "") {
+        for (const x in friend) {
+          schema.id = friend[x];
           await self.$store
-            .dispatch("getUser", self.friend[x])
+            .dispatch("getUser", friend[x])
             .then(function (data) {
               schema.username = data.username;
+              schema.status = data.status;
             });
-          self.friend[x] = schema;
+          friend[x] = schema;
           console.log(x, schema);
         }
       }
+      self.friend = friend;
     },
+    refreshFriend: async function() {
+      const self = this;
+      setInterval( async function () {
+        await self.updateFriend();
+      },600000);
+    }
   },
   computed: {
     ...mapState(["status", "friends"]),
@@ -329,42 +343,12 @@ export default {
           self.$store.state.user.avatarURL = decoded.avatarURL;
           self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
           await self.$store.dispatch("getFriend", self.$store.state.user.id);
-          let request;
-          if (self.$store.state.friends.request != undefined)
-            request = self.$store.state.friends.request.split(":");
-          const schema = { id: "", username: "" };
-          if (request != "") {
-            for (const x in request) {
-              schema.id = request[x];
-              await self.$store
-                .dispatch("getUser", request[x])
-                .then(function (data) {
-                  schema.username = data.username;
-                });
-              self.request[x] = schema;
-              console.log(x, schema);
-            }
-          }
-          console.log(self.request);
-          if (self.$store.state.friends.request != undefined)
-            self.friend = self.$store.state.friends.list.split(":");
-          if (self.friend != "") {
-            for (const x in self.friend) {
-              schema.id = self.friend[x];
-              await self.$store
-                .dispatch("getUser", self.friend[x])
-                .then(function (data) {
-                  schema.username = data.username;
-                });
-              self.friend[x] = schema;
-              console.log(x, schema);
-            }
-          }
-          console.log("friends:", self.friend);
+          await self.updateFriend();
         }
       }
     );
     self.refreshChat();
+    self.refreshFriend();
   },
   async updated() {
     const self = this;
@@ -735,5 +719,32 @@ template {
   position: absolute;
   top: 45px;
   right: 195px;
+}
+
+.offline {
+  background: rgb(175, 174, 174);
+  border-color: black;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  position: relative;
+}
+
+.online {
+  background: rgb(51, 201, 94);
+  border-color: black;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+}
+
+.ingame {
+  background: rgb(247, 187, 77);
+  border-color: black;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
 }
 </style>

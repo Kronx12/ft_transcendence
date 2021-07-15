@@ -65,7 +65,7 @@ export class DatabaseService {
     if (content.hasOwnProperty('friends_request'))
       user.friends_request = content.friends_request;
 
-    console.log(content);
+    console.log("edit user ! ", content);
     this.usersRepo.update(user.id, user);
     return { user };
   }

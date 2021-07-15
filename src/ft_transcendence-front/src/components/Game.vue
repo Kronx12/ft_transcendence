@@ -147,9 +147,9 @@ export default {
 				}, 5);
 		}
 	},
-	created() {
+	async created() {
 		const self = this;
-
+		await this.$store.dispatch("editStatus", {id: this.$store.state.user.id, status: 2})
 		if (this.$root == null || this.$root.connection == null) {
 			this.$router.push({path: '/'});
 			return ;
