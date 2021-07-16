@@ -1,9 +1,11 @@
 <template>
+	<button v-on:click="copyToClipboard()">Share link <img src="../assets/link_icon.jpg"></button>
 	<vue-p5 v-on="{ setup, draw }"></vue-p5>
 </template>
 
 <script>
 import VueP5 from 'vue-p5';
+import $ from 'jquery'
 
 export default {
 	data() {
@@ -145,6 +147,13 @@ export default {
 					}
 
 				}, 5);
+		},
+		copyToClipboard() {
+			var $temp = $("<input>");
+			$("body").append($temp);
+			$temp.val($(window.location.href).text()).select();
+			document.execCommand("copy");
+			$temp.remove();
 		}
 	},
 	created() {
