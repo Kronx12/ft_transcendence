@@ -77,13 +77,14 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                 self.rooms.forEach(room => {
                     if (data.content.room_id === room._id) {
                         find = true;
-                        console.log("Add spectator");
                         room.addSpectator(client);
                     }
                 });
                 self.rooms_bonus.forEach(room => {
-                    if (data.content.room_id === room._id)
+                    if (data.content.room_id === room._id) {
                         find = true;
+                        room.addSpectator(client)
+                    }
                 });
                 if (!find)
                     send(client, "ack_redirect", {});
@@ -103,6 +104,11 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             else if (room._playerb._socket == client) room.stopPB();
             room.removeSpectator(client);
         });
+        this.rooms_bonus.forEach(room => {
+            if (room._playera._socket == client) room.stopPA();
+            else if (room._playerb._socket == client) room.stopPB();
+            room.removeSpectator(client);
+        });
         console.log("Déconnecté : " + this.queue._store.length);
     }
 
@@ -115,6 +121,14 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             for (let i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i]._end && this.rooms[i]._start_chrono <= 0) {
                     this.rooms.splice(i, 1);
+                    remove = true;
+                    console.log("Delete room");
+                    break;
+                }
+            }
+            for (let i = 0; i < this.rooms_bonus.length; i++) {
+                if (this.rooms_bonus[i]._end && this.rooms_bonus[i]._start_chrono <= 0) {
+                    this.rooms_bonus.splice(i, 1);
                     remove = true;
                     console.log("Delete room");
                     break;

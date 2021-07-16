@@ -148,6 +148,21 @@ export default {
 				else if (style == 'o') { sk.ellipse(xi1 - (delta / 2), yi1, delta/2); }
 				else if (style == '_') { sk.square(xi1 - (delta / 2), yi1, delta/2); }
 			}
+		},
+		waitForSocketConnection(socket, callback) {
+			const self = this
+			setTimeout(
+				function () {
+					if (socket.readyState === 1) {
+						console.log("Connection is made")
+						if (callback != null){
+							callback();
+						}
+					} else {
+						console.log("wait for connection...")
+						self.waitForSocketConnection(socket, callback);
+					}
+			}, 5);
 		}
 	},
 	created() {
@@ -158,7 +173,10 @@ export default {
 			return ;
 		}
 
-		this.$root.connection.send(JSON.stringify({type: 'emit_checkid', content: { room_id: this.$route.query.room_id }}))
+		self.waitForSocketConnection(self.$root.connection, function() {
+			self.$root.connection.send(JSON.stringify({type: 'emit_checkid', content: { room_id: self.$route.query.room_id }}));
+			console.log("EMIT CHECK CLIENT SIDE")
+		});
 		this.$root.connection.onmessage = function(event) {
 			const data = JSON.parse(event.data);
 			if (data.type === "ack_loop" && data.content.room_id == self.$route.query.room_id) {
