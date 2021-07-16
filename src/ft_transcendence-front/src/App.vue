@@ -289,10 +289,8 @@ export default {
               schema.username = data.username;
             });
           self.request[x] = schema;
-          console.log(x, schema);
         }
       }
-      console.log(self.request);
       let friend = self.$store.state.friends.list.split(":");
       if (friend != "") {
         for (const x in friend) {
@@ -304,7 +302,6 @@ export default {
               schema.status = data.status;
             });
           friend[x] = schema;
-          console.log(x, schema);
         }
       }
       self.friend = friend;
@@ -341,6 +338,8 @@ export default {
           self.$store.state.user.id = decoded.id;
           self.$store.state.user.login = decoded.login;
           self.$store.state.user.avatarURL = decoded.avatarURL;
+           self.$store.state.user.auth = decoded.auth;
+          self.$store.state.user.secret = decoded.secret;
           self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
           await self.$store.dispatch("getFriend", self.$store.state.user.id);
           await self.updateFriend();

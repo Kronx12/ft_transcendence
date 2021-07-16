@@ -62,6 +62,7 @@ export class DatabaseService {
     if (content.hasOwnProperty('status')) user.status = content.status;
     if (content.hasOwnProperty('friends')) user.friends = content.friends;
     if (content.hasOwnProperty('asked')) user.asked = content.asked;
+    if (content.hasOwnProperty('auth')) user.auth = content.auth;
     if (content.hasOwnProperty('friends_request'))
       user.friends_request = content.friends_request;
 

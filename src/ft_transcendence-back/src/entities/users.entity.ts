@@ -30,5 +30,11 @@ export class Users {
     public asked: string;
 
   @Column()
-    public canals: string;
+  public canals: string;
+  
+  @Column()
+  public secret: string;
+
+  @Column()
+  public auth: boolean;
 }
