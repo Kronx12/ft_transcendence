@@ -64,7 +64,7 @@ export default createStore({
     getUser: ({ commit }, id) => {
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/${id}`).then(function (user: any) {
-          console.log(user.data);
+          
           resolve(user.data);
         });
       });
@@ -253,11 +253,9 @@ export default createStore({
         instance
           .post(`/database/accept/${request.id}/${request.new}`)
           .then(() => {
-            console.log("yes");
             instance
               .get(`/database/friends/${request.id}`)
               .then((result: any) => {
-                console.log("get friend", result.data);
                 commit("updateFriend", {
                   list: result.data.friends,
                   request: result.data.request,
@@ -282,7 +280,6 @@ export default createStore({
         instance
           .get(`/database/friends/${asker}`)
           .then((result: any) => {
-            console.log("get friend", result.data);
             commit("updateFriend", {
               list: result.data.friends,
               request: result.data.request,
