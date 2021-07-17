@@ -202,7 +202,9 @@
 import { server } from "./helper";
 const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
-import { ref } from "vue";
+import SearchBar from './components/SearchBar.vue';
+import Friends from './components/Friends.vue';
+import ProfileMenu from './components/ProfileMenu.vue'
 export default {
 	data() {
 		return {
@@ -629,6 +631,16 @@ template {
 }
 #nav a.router-link-exact-active {
 	color: #42b983;
+}
+#fixedbutton {
+  float: right;
+  position: fixed;
+  margin-top: 50%;
+  margin-right: 500px;
+  text-decoration: none;
+  padding: 10px 40px;
+  margin: 0px 10px 10px 0px;
+  /* float: left; */
 }
 
 .fixedButton {

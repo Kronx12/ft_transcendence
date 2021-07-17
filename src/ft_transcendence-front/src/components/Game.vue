@@ -1,9 +1,11 @@
 <template>
+	<button v-on:click="copyToClipboard()">Share link <img src="../assets/link_icon.jpg"></button>
 	<vue-p5 v-on="{ setup, draw }"></vue-p5>
 </template>
 
 <script>
 import VueP5 from 'vue-p5';
+import $ from 'jquery'
 
 export default {
 	data() {
@@ -38,7 +40,6 @@ export default {
 	methods: {
 		setup(sk) {
 			sk.background('black');
-			//this.fontBold = sk.loadFont('../assets/Minecrafter.Reg.ttf');
 		},
 		draw(sk) {
 			sk.resizeCanvas(sk.windowWidth / 10 * 8, sk.windowHeight / 10 * 8);
@@ -47,14 +48,12 @@ export default {
 
 			if (!this.start && !this.end) {
 				sk.fill('white');
-				//sk.textFont(this.fontBold);
 				sk.textSize(32);
 				sk.textAlign(sk.CENTER, sk.CENTER);
 				let tmp = Math.ceil(this.start_chrono/1000);
 				sk.text(tmp, sk.width / 2, sk.height / 10 * 3);
 			} else if (!this.start) {
 				sk.fill('white');
-				//sk.textFont(this.fontBold);
 				sk.textSize(50);
 				sk.textAlign(sk.CENTER, sk.CENTER);
 				sk.text(this.win.login + " won !", sk.width / 2, sk.height / 2);
@@ -72,7 +71,7 @@ export default {
 					key = 38;
 				else if (sk.keyIsDown(40) && !sk.keyIsDown(38))
 					key = 40;
-				if (key != 0)
+				if (key != 0 && (this.isA || this.isB))
 					this.$root.connection.send(JSON.stringify({type: 'emit_key', content: { room_id: this.$route.query.room_id, user: this.$store.state.user, key: key }}));
 
 
@@ -116,7 +115,6 @@ export default {
 			}
 		},
 		linedash(sk, x1, y1, x2, y2, delta, style = '-') {
-			// delta is both the length of a dash, the distance between 2 dots/dashes, and the diameter of a round
 			let distance = sk.dist(x1,y1,x2,y2);
 			let dashNumber = distance/delta;
 			let xDelta = (x2-x1)/dashNumber;
@@ -133,18 +131,43 @@ export default {
 				else if (style == 'o') { sk.ellipse(xi1 - (delta / 2), yi1, delta/2); }
 				else if (style == '_') { sk.square(xi1 - (delta / 2), yi1, delta/2); }
 			}
+		},
+		waitForSocketConnection(socket, callback) {
+			const self = this
+			setTimeout(
+				function () {
+					if (socket.readyState === 1) {
+						console.log("Connection is made")
+						if (callback != null){
+							callback();
+						}
+					} else {
+						console.log("wait for connection...")
+						self.waitForSocketConnection(socket, callback);
+					}
+
+				}, 5);
+		},
+		copyToClipboard() {
+			var $temp = $("<input>");
+			$("body").append($temp);
+			$temp.val($(window.location.href).text()).select();
+			document.execCommand("copy");
+			$temp.remove();
 		}
 	},
-	created() {
+	async created() {
 		const self = this;
-
+		await this.$store.dispatch("editStatus", {id: this.$store.state.user.id, status: 2})
 		if (this.$root == null || this.$root.connection == null) {
 			this.$router.push({path: '/'});
 			return ;
 		}
-
-		this.$root.connection.send(JSON.stringify({type: 'emit_checkid', content: { room_id: this.$route.query.room_id }}))
-		this.$root.connection.onmessage = function(event) {
+		self.waitForSocketConnection(self.$root.connection, function() {
+			self.$root.connection.send(JSON.stringify({type: 'emit_checkid', content: { room_id: self.$route.query.room_id }}));
+			console.log("EMIT CHECK CLIENT SIDE")
+		});
+		self.$root.connection.onmessage = function(event) {
 			const data = JSON.parse(event.data);
 			if (data.type === "ack_loop" && data.content.room_id == self.$route.query.room_id) {
 				self.scorea = data.content.sa;

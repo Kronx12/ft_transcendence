@@ -2,19 +2,30 @@
   <div v-if="id != -1">
     <h1>{{ login }}</h1>
     <img class="avatar-user" :src="avatar" />
-    
+
     <button v-if="accept" @click="acceptFriend()">Accept friend !</button>
     <button v-else-if="add" @click="addFriend()">Add friend !</button>
     <button v-else-if="remove" @click="removeFriend()">Remove friend !</button>
+    <div v-if="invite">
+      <button class="button" @click="sendInviteClassic()">Invite for normal game</button>
+      <button class="button" @click="sendInviteBonus()">Invite for bonus game</button>
+    </div>
     <h1 v-else-if="aske">Request sended !</h1>
   </div>
   <div class="users-aff" v-else-if="result.length">
-      <div v-for="user in result" :key="user">
+    <div v-for="user in result" :key="user">
       <figure>
-       <img @click="goToUser(user.username)" id="avatar-user-search" :key="user.avatar" :src="user.avatar" />
-       <figcaption @click="goToUser(user.username)" :key="user.username">{{user.username}}</figcaption>
-       </figure>
-       </div>
+        <img
+          @click="goToUser(user.username)"
+          id="avatar-user-search"
+          :key="user.avatar"
+          :src="user.avatar"
+        />
+        <figcaption @click="goToUser(user.username)" :key="user.username">
+          {{ user.username }}
+        </figcaption>
+      </figure>
+    </div>
   </div>
   <div v-else>
     <h1>User not foud...</h1>
@@ -36,11 +47,11 @@ export default {
       accept: 0,
       add: 0,
       remove: 0,
-      aske: 0
+      aske: 0,
+      invite: 1,
     };
   },
   methods: {
-    
     searchUser: function () {
       const self = this;
       this.$store
@@ -57,82 +68,109 @@ export default {
           }
         });
     },
-    goToUser: function(user) {
-      this.$router.push(`/user/${user}`)
+    goToUser: function (user) {
+      this.$router.push(`/user/${user}`);
     },
-    isFriend: function() {
-      if (this.$store.state.user.id == this.id)
-        return;
-      const friends = this.$store.state.friends.list.split(':');
-      for (const x in friends)
-        if (friends[x] == this.id)
-          this.remove = 1;
-      const asked = this.$store.state.friends.asked.split(':');
-       for (const x in asked)
-        if (asked[x] == this.id)
-          this.aske = 1
-        if (!this.remove && !this.aske && !this.accept)
-          this.add = 1;
+    isFriend: function () {
+      if (this.$store.state.user.id == this.id) return;
+      const friends = this.$store.state.friends.list.split(":");
+      for (const x in friends) if (friends[x] == this.id) this.remove = 1;
+      const asked = this.$store.state.friends.asked.split(":");
+      for (const x in asked) if (asked[x] == this.id) this.aske = 1;
+      if (!this.remove && !this.aske && !this.accept) this.add = 1;
     },
-    haveAsked: function() {
+    haveAsked: function () {
+      if (this.$store.state.user.id == this.id) return;
+      const friends = this.$store.state.friends.request.split(":");
 
-       if (this.$store.state.user.id == this.id)
-        return;
-      const friends = this.$store.state.friends.request.split(':');
-      
-      for (const x in friends)
-        if (friends[x] == this.id)
-          this.accept = 1
+      for (const x in friends) if (friends[x] == this.id) this.accept = 1;
       return false;
     },
-   addFriend: async function()
-    {
-      
-       await this.$store.dispatch("askFriend", {asker: this.$store.state.user.id, asked: this.id})
-       await this.$store.dispatch('getFriend', this.$store.state.user.id).then(voi => {
-         console.log(voi)
-       })
-        this.isFriend();
-        this.haveAsked();
-        this.aske = 1;
-        this.add = 0;
+    addFriend: async function () {
+      await this.$store.dispatch("askFriend", {
+        asker: this.$store.state.user.id,
+        asked: this.id,
+      });
+      await this.$store
+        .dispatch("getFriend", this.$store.state.user.id)
+        .then((voi) => {
+          console.log(voi);
+        });
+      this.isFriend();
+      this.haveAsked();
+      this.aske = 1;
+      this.add = 0;
     },
-     acceptFriend: async function()
-    {
-      
-       await this.$store.dispatch("acceptFriend", {id: this.$store.state.user.id, new: this.id})
-       await this.$store.dispatch('getFriend', this.$store.state.user.id).then(voi => {
-         console.log(voi)
-       
-       })
-        this.accept = 0;
-        this.add = 0;
-        this.remove = 1;
+    acceptFriend: async function () {
+      await this.$store.dispatch("acceptFriend", {
+        id: this.$store.state.user.id,
+        new: this.id,
+      });
+      await this.$store
+        .dispatch("getFriend", this.$store.state.user.id)
+        .then((voi) => {
+          console.log(voi);
+        });
+      this.accept = 0;
+      this.add = 0;
+      this.remove = 1;
     },
-    removeFriend: async function()
-    {
-     
-       await this.$store.dispatch("removeFriend", {id: this.$store.state.user.id, new: this.id})
-       await this.$store.dispatch('getFriend', this.$store.state.user.id).then(voi => {
-        console.log(voi)
-       })
-        this.remove = 0;
-        this.add = 1;
+    removeFriend: async function () {
+      await this.$store.dispatch("removeFriend", {
+        id: this.$store.state.user.id,
+        new: this.id,
+      });
+      await this.$store
+        .dispatch("getFriend", this.$store.state.user.id)
+        .then((voi) => {
+          console.log(voi);
+        });
+      this.remove = 0;
+      this.add = 1;
+    },
+		waitForSocketConnection(socket, callback) {
+			const self = this
+			setTimeout(
+				function () {
+					if (socket.readyState === 1) {
+						console.log("Connection is made")
+						if (callback != null){
+							callback();
+						}
+					} else {
+						console.log("wait for connection...")
+						self.waitForSocketConnection(socket, callback);
+					}
+
+				}, 5);
+		},
+    sendInviteClassic: function() {
+      const self = this
+      console.log(this.$store.state.user.id, this.id);
+      this.waitForSocketConnection(self.$root.connection, function() {
+        self.$root.connection.send(JSON.stringify({type: 'emit_send_invite_classic', content: { transmitter: self.$store.state.user.id, receiver: self.id }}));
+      });
+    },
+    sendInviteBonus: function() {
+      const self = this
+      console.log(this.$store.state.user.id, this.id);
+      this.waitForSocketConnection(self.$root.connection, function() {
+        self.$root.connection.send(JSON.stringify({type: 'emit_send_invite_bonus', content: { transmitter: self.$store.state.user.id, receiver: self.id }}));
+      });
     }
   },
   async beforeMount() {
-    await this.$store.dispatch('getFriend', this.$store.state.user.id)
+    await this.$store.dispatch("getFriend", this.$store.state.user.id);
   },
   mounted: function () {
     if (this.$store.state.user.id == -1) this.$router.push("/login");
     this.last = this.$route.params.user;
     this.searchUser();
-   
   },
   async updated() {
     if (this.$route.params.user != this.last) {
-      const self = this
-      await this.$store.dispatch('getFriend', this.$store.state.user.id);
+      const self = this;
+      await this.$store.dispatch("getFriend", this.$store.state.user.id);
       this.last = this.$route.params.user;
       (this.id = -1), (this.login = ""), (this.avatar = ""), (this.result = []);
       this.searchUser();
@@ -148,7 +186,43 @@ export default {
   margin-right: 1rem;
   cursor: pointer;
 }
-div.user-aff{
+div.user-aff {
   float: right;
+}
+.button {
+  background-color: #008CBA;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weigth: bold;
+}
+.button:hover {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weigth: bold;
+}
+.button:focus {
+  background-color: #f44336;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  margin: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-weigth: bold;
 }
 </style>

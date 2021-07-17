@@ -8,6 +8,7 @@ import Queue from '../views/Queue.vue'
 import Settings from "../views/Settings.vue";
 import Profile from "..//views/Profile.vue";
 import User from "../components/Users.vue"
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",

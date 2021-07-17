@@ -1,20 +1,23 @@
 import { resolveComponent } from "@vue/runtime-core";
 import { createStore } from "vuex";
 
-const axios = require('axios');
+const axios = require("axios");
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: "http://localhost:3000/",
 });
-const jwt = require('jsonwebtoken');
+
+const jwt = require("jsonwebtoken");
 
 export default createStore({
   state: {
-    status: '',
+    status: "",
     user: {
       id: -1,
-      login: '',
-      avatarURL: '',
+      login: "",
+      avatarURL: "",
+      auth: false,
+      secret: ""
     },
     friends: {
       list: "",
@@ -26,9 +29,12 @@ export default createStore({
     setStatus: function (state, status) {
       state.status = status;
     },
+    setAuth: function (state, auth) {
+      state.user.auth = auth;
+    },
     logUser: function (state, user) {
       state.user = user;
-      console.log(state.user)
+      console.log(state.user);
     },
     updateFriend: function (state, list) {
       state.friends = list;
@@ -36,40 +42,79 @@ export default createStore({
   },
   actions: {
     waitIntra: ({ commit }) => {
-      commit('setStatus', 'loading')
+      commit("setStatus", "loading");
     },
     getToken: ({ commit }, code) => {
-      commit('setStatus', 'loading')
+      commit("setStatus", "loading");
       return new Promise((resolve, reject) => {
-        instance.get(`/login/${code}`)
+        instance
+          .get(`/login/${code}`)
           .then(function (response: any) {
-            commit('setStatus', 'done')
-            localStorage.setItem("ft_token", response.data.token)
+            commit("setStatus", "done");
+            localStorage.setItem("ft_token", response.data.token);
             console.log("token", localStorage.getItem("ft_token"));
             resolve(response);
           })
           .catch(function (error: any) {
-            commit('setStatus', 'error')
-            reject(error)
+            commit("setStatus", "error");
+            reject(error);
           });
       });
     },
     getUser: ({ commit }, id) => {
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/${id}`).then(function (user: any) {
-          console.log(user.data);
+          
           resolve(user.data);
         });
       });
     },
-    getLogin: ({ commit }, token) => {
-
-      commit('setStatus', 'loading')
+    authLogin: ({ commit }, token) => {
+      commit("setStatus", "loading");
       return new Promise((resolve, reject) => {
-        instance.post(`/login/${token}`)
+        instance
+          .post(`/login/${token}`)
           .then(function (response: any) {
-
-            instance.get(`/database/user/${response.data.intra_id}`)
+            instance
+              .get(`/database/user/${response.data.intra_id}`)
+              .then(function (user: any) {
+                const token = jwt.sign(
+                  {
+                    id: user.data.intra_id,
+                    login: user.data.username,
+                    avatarURL: user.data.avatar,
+                    auth: user.data.auth,
+                    secret: user.data.secret,
+                  },
+                  "shhhhh",
+                  { expiresIn: "1h" }
+                );
+                localStorage.setItem("jwtToken", token);
+                commit("setStatus", "logged");
+                commit("logUser", {
+                  id: user.data.intra_id,
+                  login: user.data.username,
+                  avatarURL: user.data.avatar,
+                  auth: user.data.auth,
+                  secret: user.data.secret,
+                });
+                instance.patch(`/database/user/${user.data.intra_id}`, {
+                  status: 1,
+                });
+                resolve(user.data);
+              })
+          })
+      })
+      
+    },
+    getLogin: ({ commit }, token) => {
+      commit("setStatus", "loading");
+      return new Promise((resolve, reject) => {
+        instance
+          .post(`/login/${token}`)
+          .then(function (response: any) {
+            instance
+              .get(`/database/user/${response.data.intra_id}`)
               .then(function (user: any) {
                 if (!user.data.id) {
                   instance
@@ -84,7 +129,9 @@ export default createStore({
                       friends: "",
                       friends_request: "",
                       asked: "",
-                      canals: ""
+                      canals: "",
+                      secret: makeid(7),
+                      auth: false
                     })
                     .then(function (created: any) {
                       const token = jwt.sign(
@@ -92,6 +139,8 @@ export default createStore({
                           id: created.data.intra_id,
                           login: created.data.username,
                           avatarURL: created.data.avatar,
+                          auth: created.data.auth,
+                          secret: created.data.secret,
                         },
                         "shhhhh",
                         { expiresIn: "1h" }
@@ -102,30 +151,57 @@ export default createStore({
                         id: created.data.intra_id,
                         login: created.data.username,
                         avatarURL: created.data.avatar,
+                        auth: created.data.auth,
+                        secret: created.data.secret,
                       });
                       resolve(created.data);
                     });
+                } else {
+                  if (user.data.auth) {
+                    console.log("need 2fa")
+                    resolve({ auth: true, secret: user.data.secret })
+                  }
+                  else {
+                    const token = jwt.sign(
+                      {
+                        id: user.data.intra_id,
+                        login: user.data.username,
+                        avatarURL: user.data.avatar,
+                        auth: user.data.auth,
+                        secret: user.data.secret,
+                      },
+                      "shhhhh",
+                      { expiresIn: "1h" }
+                    );
+                    localStorage.setItem("jwtToken", token);
+                    commit("setStatus", "logged");
+                    commit("logUser", {
+                      id: user.data.intra_id,
+                      login: user.data.username,
+                      avatarURL: user.data.avatar,
+                      auth: user.data.auth,
+                      secret: user.data.secret,
+                    });
+                    instance.patch(`/database/user/${user.data.intra_id}`, {
+                      status: 1,
+                    });
+                    resolve({ auth: false });
+                  }
                 }
-                else {
-                  const token = jwt.sign({ id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar }, 'shhhhh', { expiresIn: '1h' });
-                  localStorage.setItem("jwtToken", token);
-                  commit('setStatus', 'logged')
-                  commit('logUser', { id: user.data.intra_id, login: user.data.username, avatarURL: user.data.avatar })
-                  instance.patch(`/database/user/${user.data.intra_id}`, { status: 1 });
-                  resolve(user.data)
-                }
-              })
-            resolve(response.data)
+              });
+            ///resolve(response.data);
           })
           .catch(function (error: any) {
-            commit('setStatus', 'invalid_token')
-            console.log(error)
-            reject(error)
+            commit("setStatus", "invalid_token");
+            console.log(error);
+            reject(error);
           });
       });
     },
     editUsername: ({ commit }, params) => {
-      instance.patch(`/database/user/${params.id}`, { username: params.username });
+      instance.patch(`/database/user/${params.id}`, {
+        username: params.username,
+      });
     },
     editAvatar: ({ commit }, params) => {
       instance.patch(`/database/user/${params.id}`, { avatar: params.avatar });
@@ -135,21 +211,17 @@ export default createStore({
     },
     searchUser: ({ commit }, name) => {
       return new Promise((resolve, reject) => {
-        instance.get(`/database/user/search/${name}`)
-          .then((result: any) => {
+        instance.get(`/database/user/search/${name}`).then((result: any) => {
+          const response = {
+            type: "",
+            data: result.data,
+          };
 
-            const response = {
-              type: '',
-              data: result.data
-            }
-
-            if (result.data.id != undefined)
-              response.type = 'unique';
-            else
-              response.type = 'multiple';
-            resolve(response);
-          })
-      })
+          if (result.data.id != undefined) response.type = "unique";
+          else response.type = "multiple";
+          resolve(response);
+        });
+      });
     },
     getMessagesCanal: ({ commit }, canalid) => {
       return new Promise((resolve, reject) => {
@@ -208,11 +280,9 @@ export default createStore({
         instance
           .post(`/database/accept/${request.id}/${request.new}`)
           .then(() => {
-            console.log("yes")
             instance
               .get(`/database/friends/${request.id}`)
               .then((result: any) => {
-                console.log("get friend", result.data);
                 commit("updateFriend", {
                   list: result.data.friends,
                   request: result.data.request,
@@ -224,7 +294,7 @@ export default createStore({
                 reject(err);
               });
           });
-      })
+      });
     },
     removeFriend: ({ commit }, request) => {
       instance.post(`/database/remove/${request.id}/${request.new}`);
@@ -237,7 +307,6 @@ export default createStore({
         instance
           .get(`/database/friends/${asker}`)
           .then((result: any) => {
-            console.log("get friend", result.data);
             commit("updateFriend", {
               list: result.data.friends,
               request: result.data.request,
@@ -250,6 +319,36 @@ export default createStore({
           });
       });
     },
+    pair: ({ commit }, secret) => {
+      console.log(`${secret.username}/${secret.code}`);
+      return new Promise((resolve, reject) => {
+        instance.get(`login/2fa/${secret.username}/${secret.code}`).then((result: any) =>{
+          resolve(result);
+        });
+      })
+    },
+    validate: ({ commit }, params) => {
+      return new Promise((resolve, reject) => {
+        instance.post(`login/2fa/${params.secret}/${params.code}`).then((result: any) => {
+          resolve(result);
+        });
+      })
+    },
+    activateAuth: ({ commit }, user) => {
+      instance.patch(`/database/user/${user.id}`, { auth: true });
+      commit("setAuth", true);
+    }
   },
   modules: {},
 });
+
+function makeid(length: number) {
+  let result = "";
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+}

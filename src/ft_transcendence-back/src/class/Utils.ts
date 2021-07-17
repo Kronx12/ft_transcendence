@@ -64,7 +64,7 @@ export class Room {
     _vx: number;
     _vy: number;
 
-    _spectators: Client[]; // TODO
+    _spectators: Socket[]; // TODO
 
     _canvas_w: number;
     _canvas_h: number;
@@ -96,7 +96,6 @@ export class Room {
 
         this.resetRacket();
 
-    
         this._spectators = [];
 
         this.resetBall();
@@ -110,6 +109,21 @@ export class Room {
     setup() {
         send(this._playera._socket, "emit_start_standard", {room_id: this._id});
         send(this._playerb._socket, "emit_start_standard", {room_id: this._id});
+        this._spectators.forEach(e => {
+            send(e, "emit_start_standard", {room_id: this._id});
+        });
+    }
+
+    addSpectator(s: Socket) {
+        if (s != this._playera._socket && s != this._playerb._socket)
+            this._spectators.push(s)
+    }
+
+    removeSpectator(s: Socket) {
+        const index = this._spectators.indexOf(s, 0);
+        if (index > -1) {
+            this._spectators.splice(index, 1);
+        }
     }
 
     async update_game() {
@@ -175,7 +189,7 @@ export class Room {
                     console.log(this._winner);
                     send(this._playerb._socket, "ack_leave", { room_id: this._id });
                     send(this._playera._socket, "ack_leave", { room_id: this._id });
-                    this._spectators.forEach(spec => { send(spec._socket, "ack_leave", { room_id: this._id }); });
+                    this._spectators.forEach(spec => { send(spec, "ack_leave", { room_id: this._id }); });
                     break;
                 }
             }
@@ -183,7 +197,7 @@ export class Room {
             // Broadcast
             send(this._playerb._socket, "ack_loop", { room_id: this._id, isA: false, isB: true, server_width: this._canvas_w, server_height: this._canvas_h, end: this._end, start: this._start, start_chrono: this._start_chrono, sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pax: this._playerax, pbx: this._playerbx, pay: this._playeray, pby: this._playerby, rw: this._racket_w, rh: this._racket_h, win: this._winner });
             send(this._playera._socket, "ack_loop", { room_id: this._id, isA: true, isB: false, server_width: this._canvas_w, server_height: this._canvas_h, end: this._end, start: this._start, start_chrono: this._start_chrono, sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pax: this._playerax, pbx: this._playerbx, pay: this._playeray, pby: this._playerby, rw: this._racket_w, rh: this._racket_h, win: this._winner });
-            this._spectators.forEach(spec => { send(spec._socket, "ack_loop", { room_id: this._id, isA: false, isB: false, server_width: this._canvas_w, server_height: this._canvas_h, end: this._end, start: this._start, start_chrono: this._start_chrono, sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pax: this._playerax, pbx: this._playerbx, pay: this._playeray, pby: this._playerby, rw: this._racket_w, rh: this._racket_h, win: this._winner }); });
+            this._spectators.forEach(spec => { send(spec, "ack_loop", { room_id: this._id, isA: false, isB: false, server_width: this._canvas_w, server_height: this._canvas_h, end: this._end, start: this._start, start_chrono: this._start_chrono, sa: this._scorea, sb: this._scoreb, bx: this._bx, by: this._by, pax: this._playerax, pbx: this._playerbx, pay: this._playeray, pby: this._playerby, rw: this._racket_w, rh: this._racket_h, win: this._winner }); });
             
             await new Promise(resolve => setTimeout(resolve, 1000 / fps));
         }
@@ -281,7 +295,7 @@ export class RoomBonus {
     _vx: number;
     _vy: number;
 
-    _spectators: Client[]; // TODO
+    _spectators: Socket[];
 
     _racket_speed: number;
     _racket_freeze_speed: number;
@@ -352,6 +366,21 @@ export class RoomBonus {
     setup() {
         send(this._playera._socket, "emit_start_bonus", {room_id: this._id});
         send(this._playerb._socket, "emit_start_bonus", {room_id: this._id});
+        this._spectators.forEach(e => {
+            send(e, "emit_start_bonus", {room_id: this._id});
+        });
+    }
+
+    addSpectator(s: Socket) {
+        if (s != this._playera._socket && s != this._playerb._socket)
+            this._spectators.push(s)
+    }
+
+    removeSpectator(s: Socket) {
+        const index = this._spectators.indexOf(s, 0);
+        if (index > -1) {
+            this._spectators.splice(index, 1);
+        }
     }
 
     async update_game() {
@@ -447,7 +476,7 @@ export class RoomBonus {
                     console.log(this._winner);
                     send(this._playerb._socket, "ack_leave", { room_id: this._id });
                     send(this._playera._socket, "ack_leave", { room_id: this._id });
-                    this._spectators.forEach(spec => { send(spec._socket, "ack_leave", { room_id: this._id }); });
+                    this._spectators.forEach(spec => { send(spec, "ack_leave", { room_id: this._id }); });
                     break;
                 }
             }
@@ -499,7 +528,7 @@ export class RoomBonus {
                 rh: this._racket_h, 
                 win: this._winner
             });
-            this._spectators.forEach(spec => { send(spec._socket, "ack_loop", { 
+            this._spectators.forEach(spec => { send(spec, "ack_loop", { 
                 room_id: this._id,
                 isA: false, 
                 isB: false, 

@@ -4,6 +4,7 @@ import { Server } from "http";
 import { Cron } from '@nestjs/schedule';
 
 import { Client, Room, RoomBonus, Queue, send, ClientTimeout, State } from "../class/Utils";
+import { GameType, Invitation, InvitationState } from "../class/Invitation";
 
 @WebSocketGateway(4001, { transports: ['websocket'] })
 export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
@@ -15,6 +16,8 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     rooms: Room[] = [];
     rooms_bonus: RoomBonus[] = [];
     clients: Client[] = [];
+
+    invitations: Invitation[] = [];
 
     timeoutList: ClientTimeout[] = [];
 
@@ -73,16 +76,39 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                         self.rooms_bonus[i].update(data.content.user, data.content.key, data.content.space);
             } else if (data.type === 'emit_checkid') {
                 let find = false;
+                console.log("EMIT CHECKID");
                 self.rooms.forEach(room => {
-                    if (data.content.room_id === room._id)
+                    if (data.content.room_id === room._id) {
                         find = true;
+                        room.addSpectator(client);
+                    }
                 });
                 self.rooms_bonus.forEach(room => {
-                    if (data.content.room_id === room._id)
+                    if (data.content.room_id === room._id) {
                         find = true;
+                        room.addSpectator(client)
+                    }
                 });
                 if (!find)
                     send(client, "ack_redirect", {});
+            } else if (data.type == 'emit_send_invite_classic') {
+                console.log("Invitation send");
+                self.invitations.push(new Invitation(data.content.transmitter, self.getClientById(data.content.transmitter), data.content.receiver, self.getClientById(data.content.receiver), GameType.NORMAL));
+            } else if (data.type == 'emit_send_invite_bonus') {
+                console.log("Invitation bonus send");
+                self.invitations.push(new Invitation(data.content.transmitter, self.getClientById(data.content.transmitter), data.content.receiver, self.getClientById(data.content.receiver), GameType.BONUS));
+            } else if (data.type == 'accept_invite') {
+                console.log("Invitation accepted");
+                self.invitations.forEach(e => { // {type: 0 | 1}
+                    if (e._game_type == data.content.type && e._transmitter == data.content.transmitter && e._receiver == data.content.receiver)
+                        e.accept()
+                });
+            } else if (data.type == 'decline_invite') {
+                console.log("Invitation declined");
+                self.invitations.forEach(e => {
+                    if (e._game_type == data.content.type && e._transmitter == data.content.transmitter && e._receiver == data.content.receiver)
+                        e.decline();
+                });
             }
         });
         console.log("Connecté : " + this.queue._store.length);
@@ -96,7 +122,13 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
         this.timeoutList.push(new ClientTimeout(this.getClientBySocket(client)));
         this.rooms.forEach(room => {
             if (room._playera._socket == client) room.stopPA();
-            else room.stopPB();
+            else if (room._playerb._socket == client) room.stopPB();
+            room.removeSpectator(client);
+        });
+        this.rooms_bonus.forEach(room => {
+            if (room._playera._socket == client) room.stopPA();
+            else if (room._playerb._socket == client) room.stopPB();
+            room.removeSpectator(client);
         });
         console.log("Déconnecté : " + this.queue._store.length);
     }
@@ -110,6 +142,14 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             for (let i = 0; i < this.rooms.length; i++) {
                 if (this.rooms[i]._end && this.rooms[i]._start_chrono <= 0) {
                     this.rooms.splice(i, 1);
+                    remove = true;
+                    console.log("Delete room");
+                    break;
+                }
+            }
+            for (let i = 0; i < this.rooms_bonus.length; i++) {
+                if (this.rooms_bonus[i]._end && this.rooms_bonus[i]._start_chrono <= 0) {
+                    this.rooms_bonus.splice(i, 1);
                     remove = true;
                     console.log("Delete room");
                     break;
@@ -161,6 +201,21 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             this.queue_bonus.pop();
             this.queue_bonus.pop();
         }
+
+        this.invitations = this.invitations.filter(obj => (obj._state !== InvitationState.DECLINED));
+        this.invitations.forEach(e => {
+            if (e._state == InvitationState.ACCEPTED) {
+                let new_room = new Room(e._transmitter_socket, e._receiver_socket);
+                new_room.setup();
+                new_room.update_game();
+                if (e._game_type == GameType.NORMAL)
+                    this.rooms.push(new_room);
+                else if (e._game_type == GameType.BONUS)
+                    this.rooms.push(new_room);
+            } else if (e._timeout <= 0) {
+                e.decline();
+            }
+        });
     }
 
     getClientBySocket(s: Socket): Client {
@@ -173,6 +228,13 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     getClientByUser(us: any): Client {
         for (let i = 0; i < this.clients.length; i++)
             if (this.clients[i].compareByUser(us))
+                return this.clients[i];
+        return null;
+    }
+
+    getClientById(id: number): Client {
+        for (let i = 0; i < this.clients.length; i++)
+            if (this.clients[i]._user.id == id)
                 return this.clients[i];
         return null;
     }
