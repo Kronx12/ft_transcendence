@@ -165,6 +165,9 @@
       />
       <input type="submit" id="input-submit-chat" value="Send" />
     </form>
+    <!-- INVITATION SECTION -->
+    <div>
+    </div>
   </div>
   <router-view />
 </template>
@@ -174,6 +177,8 @@ import { server } from "./helper";
 const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
 import { ref } from "vue";
+import Invitation from "./components/Invitation.vue";
+
 export default {
   data() {
     return {
@@ -260,7 +265,6 @@ export default {
     haveRequest: function () {
       if (this.$store.state.user.id == -1) return false;
       const friends = this.$store.state.friends.request;
-      console.log(friends);
       if (friends == "") return false;
       return true;
     },
@@ -352,25 +356,21 @@ export default {
   async updated() {
     const self = this;
 
-    if (this.$store.state.user.id != -1 && this.connection == null) {
+    if (this.connection == null) {
       this.connection = new WebSocket(server.socketURL);
 
       this.connection.onopen = function (event) {
-        console.log(event);
         self.state = true;
         console.log("Connected !");
       };
 
       this.connection.onclose = function (event) {
-        console.log(event);
         self.state = false;
         console.log("Disconnected !, Try to reconnect");
         this.connection = new WebSocket(server.socketURL);
       };
       this.connection.onmessage = function (event) {
-        console.log(event);
         const data = JSON.parse(event.data);
-        console.log(self.$store.state.user);
         if (data.type === "emit_user") {
           // Send user at connection
           self.connection.send(
@@ -379,6 +379,10 @@ export default {
               content: { user: self.$store.state.user },
             })
           );
+        } else if (data.type == "invitation_send") {
+          console.log("RECEIVE INVITE");
+          console.log(data);
+          
         }
       };
     }
