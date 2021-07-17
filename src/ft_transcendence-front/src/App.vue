@@ -5,20 +5,7 @@
       {{ this.$store.state.user.id }}<br
     /></span>
     <div class="container-fluid">
-      <input
-        class="search-bar"
-        v-if="this.$store.state.user.id != -1"
-        type="search"
-        v-model="search"
-        placeholder="search login..."
-      />
-      <button
-        class="search-button"
-        v-if="this.$store.state.user.id != -1"
-        @click="searchUser()"
-      >
-        Search
-      </button>
+    <SearchBar />
       <router-link @click="checkOpenProfile()" to="/">Home</router-link>
       <span v-if="this.$store.state.user.id == -1"> | </span>
       <router-link v-if="this.$store.state.user.id == -1" to="/login"
@@ -37,100 +24,8 @@
 
       <div class="flex-shrink-0 dropdown" id="header">
         <div id="avatar-bootstrap">
-          <img
-            @click="openFriends()"
-            v-if="this.$store.state.user.id != -1"
-            id="commu"
-            src="https://image.flaticon.com/icons/png/512/417/417723.png"
-          />
-          <div id="notif" v-if="haveRequest()"></div>
-          <ul
-            v-if="showFriends"
-            class="dropdown-menu text-small shadow show"
-            data-popper-placement="bottom-end"
-            style="
-              position: absolute;
-              inset: 0px auto auto 0px;
-              margin: 10px;
-              transform: translate3d(-110px, 34px, 0px);
-            "
-          >
-            <li v-for="item in request" :key="item">
-              <router-link
-                :key="item"
-                id="li-drop2"
-                class="dropdown-item2"
-                @click="openFriends()"
-                :to="`/user/${item.username}`"
-                >{{ item.username }}</router-link
-              >
-              <button
-                :key="item"
-                style="margin-left: 5px; color: white; background-color: green"
-                @click="accept(item.id)"
-                v-if="item.id != ''"
-              >
-                ✓</button
-              ><button
-                :key="item"
-                @click="refuse(item.id)"
-                style="color: white; background-color: red"
-                v-if="item.id != ''"
-              >
-                x
-              </button>
-            </li>
-            <li v-if="haveRequest()"><hr class="dropdown-divider" /></li>
-            <li v-if="friend == ''">You have no friends...</li>
-            <li v-else v-for="item in friend" :key="item">
-              
-              <router-link
-                :key="item"
-                @click="openFriends()"
-                class="dropdown-item"
-                id="li-drop1"
-                :to="`/user/${item.username}`"
-                >{{ item.username }}
-                <div class="ingame" :key="item" v-if="item.status == 2" ></div>
-                <div class="online" :key="item" v-if="item.status == 1"></div>
-                <div class="offline" :key="item" v-if="item.status == 0" ></div></router-link
-              >
-              
-            </li>
-          </ul>
-          <span @click="openProfile()" id="login">{{
-            this.$store.state.user.login
-          }}</span>
-          <img
-            @click="openProfile()"
-            id="avatar"
-            v-if="this.$store.state.user.id != -1"
-            v-bind:src="this.$store.state.user.avatarURL"
-          />
-          <ul
-            v-if="showProfile"
-            @mouseleave="openProfile()"
-            class="dropdown-menu text-small shadow show"
-            aria-labelledby="dropdownUser2"
-            data-popper-placement="bottom-end"
-            style="
-              position: absolute;
-              inset: 0px auto auto 0px;
-              margin: 10px;
-              transform: translate3d(-110px, 34px, 0px);
-            "
-          >
-            <li @click="openProfile()" class="dropdown-item" for="li-drop1">
-              <router-link id="li-drop1" to="/profile">Profile</router-link>
-            </li>
-            <li @click="openProfile()" class="dropdown-item" for="li-drop1">
-              <router-link id="li-drop1" to="/settings">Settings</router-link>
-            </li>
-            <li><hr class="dropdown-divider" /></li>
-            <li @click="openProfile()" class="dropdown-item">
-              <router-link id="li-drop1" to="/logout">Logout</router-link>
-            </li>
-          </ul>
+          <Friends ref="friend" @openFriends="this.$refs.profile.closeProfile()" />
+          <ProfileMenu ref="profile" @openProfile="this.$refs.friend.closeFriend()" />
         </div>
       </div>
     </div>
@@ -176,14 +71,18 @@
 import { server } from "./helper";
 const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
-import { ref } from "vue";
-import Invitation from "./components/Invitation.vue";
-
+import SearchBar from './components/SearchBar.vue';
+import Friends from './components/Friends.vue';
+import ProfileMenu from './components/ProfileMenu.vue'
 export default {
+  name: "App",
+  components: {
+    SearchBar,
+    Friends,
+    ProfileMenu
+  },
   data() {
     return {
-      showProfile: 0,
-      showFriends: 0,
       connection: null,
       state: false,
       id: this.$store.state.user.id,
@@ -191,56 +90,13 @@ export default {
       in_bonus: false,
       inputMessage: null,
       messages: [],
-      search: "",
-      request: [],
-      friend: [],
       avatarURL: this.$store.state.user.avatarURL,
     };
   },
   methods: {
-    accept: async function (id) {
-      for (var i = 0; i < this.request.length; i++) {
-        if (this.request[i].id === id) {
-          this.request.splice(i, 1);
-        }
-      }
-      const self = this;
-      console.log({ asker: self.$store.state.user.id, asked: id });
-      await self.$store.dispatch("acceptFriend", {
-        id: self.$store.state.user.id,
-        new: id,
-      });
-      await this.updateFriend();
-    },
-    refuse: async function (id) {
-      for (var i = 0; i < this.request.length; i++) {
-        if (this.request[i].id === id) {
-          this.request.splice(i, 1);
-        }
-      }
-      this.$store.dispatch("refuseFriend", {
-        id: this.$store.state.user.id,
-        new: id,
-      });
-      await this.updateFriend();
-    },
-    openProfile: function () {
-      this.showProfile = !this.showProfile;
-      this.showFriends = 0;
-    },
     checkOpenProfile: function () {
-      if (this.showProfile) this.showProfile = 0;
-      if (this.showFriends) this.showFriends = 0;
-    },
-    openFriends: async function () {
-      this.showFriends = !this.showFriends;
-      this.showProfile = 0;
-    },
-    searchUser: function () {
-      if (this.search == this.$store.state.user.login)
-        this.$router.push("/profile");
-      else this.$router.push(`/user/${this.search}`);
-      this.search = "";
+      this.$refs.profile.closeProfile();
+      this.$refs.friend.closeFriend();
     },
     disconnectStatus: async function handler(e) {
       if (this.$store.state.user.id != -1)
@@ -262,12 +118,6 @@ export default {
       console.log("le user " + this.$store.state.user.login);
       return;
     },
-    haveRequest: function () {
-      if (this.$store.state.user.id == -1) return false;
-      const friends = this.$store.state.friends.request;
-      if (friends == "") return false;
-      return true;
-    },
     refreshChat: function () {
       const self = this;
       setInterval(function () {
@@ -279,43 +129,6 @@ export default {
             });
       }, 5000);
     },
-    updateFriend: async function () {
-      const self = this;
-      await self.$store.dispatch("getFriend", self.$store.state.user.id);
-      const request = self.$store.state.friends.request.split(":");
-      const schema = { id: "", username: "", status: 0};
-      if (request != "") {
-        for (const x in request) {
-          schema.id = request[x];
-          await self.$store
-            .dispatch("getUser", request[x])
-            .then(function (data) {
-              schema.username = data.username;
-            });
-          self.request[x] = schema;
-        }
-      }
-      let friend = self.$store.state.friends.list.split(":");
-      if (friend != "") {
-        for (const x in friend) {
-          schema.id = friend[x];
-          await self.$store
-            .dispatch("getUser", friend[x])
-            .then(function (data) {
-              schema.username = data.username;
-              schema.status = data.status;
-            });
-          friend[x] = schema;
-        }
-      }
-      self.friend = friend;
-    },
-    refreshFriend: async function() {
-      const self = this;
-      setInterval( async function () {
-        await self.updateFriend();
-      },600000);
-    }
   },
   computed: {
     ...mapState(["status", "friends"]),
@@ -346,12 +159,12 @@ export default {
           self.$store.state.user.secret = decoded.secret;
           self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
           await self.$store.dispatch("getFriend", self.$store.state.user.id);
-          await self.updateFriend();
+          await self.$refs.friend.updateFriend();
         }
       }
     );
     self.refreshChat();
-    self.refreshFriend();
+    self.$refs.friend.refreshFriend();
   },
   async updated() {
     const self = this;
@@ -426,19 +239,7 @@ export default {
 #nav a.router-link-exact-active {
   color: #2c3e50;
 }
-#avatar {
-  height: 60px;
-  width: 60px;
-  background-repeat: no-repeat;
-  background-size: 100%;
-  background-position: 50% 50%;
-  border-radius: 50%;
-  margin-right: 2rem;
-  padding: 10px;
-  display: table-cell;
-  vertical-align: middle;
-  cursor: pointer;
-}
+
 #user {
   position: absolute;
   top: 0;
@@ -446,24 +247,6 @@ export default {
   display: table;
 }
 
-#login {
-  font-family: Futura PT, Futura, Helvetica, Sans serif;
-  font-size: 1.2em;
-  font-weight: bold;
-  color: #666;
-  margin-bottom: 0;
-  padding-top: 13px;
-  /* padding-right: 1rem; */
-  vertical-align: middle;
-  display: table-cell;
-  cursor: pointer;
-}
-#login::selection {
-  background: transparent;
-}
-#login::-moz-selection {
-  background: transparent;
-}
 
 #dropdown-profile {
   right: 0;
@@ -477,28 +260,6 @@ export default {
   margin: 0px;
   transform: translate3d(-110px, 34px, 0px);
 }
-#li-drop1 {
-  text-decoration: none;
-  display: block;
-}
-
-#li-drop1::selection {
-  background: transparent;
-}
-#li-drop1::-moz-selection {
-  background: transparent;
-}
-
-#li-drop2 {
-  text-decoration: none;
-}
-
-#li-drop2::selection {
-  background: transparent;
-}
-#li-drop2::-moz-selection {
-  background: transparent;
-}
 
 #commu {
   width: 40px;
@@ -508,28 +269,8 @@ export default {
   right: 200px;
   cursor: pointer;
 }
-.search-button {
-  position: absolute;
-  left: 500px;
-}
-.search-bar {
-  position: absolute;
-  left: 300px;
-}
 
-.dropdown-item2 {
-  display: initial;
-  width: 100%;
-  padding: 0.25rem 1rem;
-  clear: both;
-  font-weight: 400;
-  color: #212529;
-  text-align: inherit;
-  text-decoration: none;
-  white-space: nowrap;
-  background-color: transparent;
-  border: 0;
-}
+
 .dropdown-item2:hover {
   background-color: grey;
 }
@@ -556,9 +297,7 @@ template {
   font-weight: bold;
   color: #2c3e50;
 }
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
+
 #fixedbutton {
   float: right;
   position: fixed;
@@ -714,40 +453,5 @@ template {
   font-size: 18px;
   font-weight: 700;
 }
-#notif {
-  background: red;
-  border-radius: 50%;
-  width: 15px;
-  height: 15px;
-  position: absolute;
-  top: 45px;
-  right: 195px;
-}
 
-.offline {
-  background: rgb(175, 174, 174);
-  border-color: black;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  position: relative;
-}
-
-.online {
-  background: rgb(51, 201, 94);
-  border-color: black;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  margin-right: 5px;
-}
-
-.ingame {
-  background: rgb(247, 187, 77);
-  border-color: black;
-  border-radius: 50%;
-  width: 10px;
-  height: 10px;
-  margin-right: 5px;
-}
 </style>
