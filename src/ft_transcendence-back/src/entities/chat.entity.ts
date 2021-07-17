@@ -6,11 +6,18 @@ export class Chat {
   public id: number;
 
   @Column()
-  public author: string;
+  public name: string;
 
   @Column()
-  public message: string;
+  public users: string;
 
   @Column()
-  public canalid: number;
+  public admins: string;
+
+  @Column()
+  public owner: string;
+
+  @Column({default: ""})
+  public password: string;
+
 }

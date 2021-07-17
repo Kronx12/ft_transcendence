@@ -7,18 +7,17 @@ import { Chat } from '../entities/chat.entity';
 export class ChatService {
     constructor(@InjectRepository(Chat) private chatRepo: Repository<Chat>) { }
 
-    findAllMessages(): Promise<Chat[]> {
+    findAllChats(): Promise<Chat[]> {
         return this.chatRepo.find();
-    }
-
-    findOneMessage(author: string): Promise<Chat[] | undefined>
-    {
-        return this.chatRepo.find({where: `author = '${author}'`});
     }
 
     findOneMessagePerID(id: number): Promise<Chat[] | undefined>
     {
         return this.chatRepo.find({where: `id = ${id}`});
+    }
+
+    findAllChatsForOneUser(user: string): Promise<Chat[] | undefined> {
+        return this.chatRepo.find({where: `users LIKE '%${user}%'`});
     }
 
     async addMessage(message: Chat) {

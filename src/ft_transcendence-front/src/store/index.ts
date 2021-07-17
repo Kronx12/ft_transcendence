@@ -151,34 +151,59 @@ export default createStore({
           })
       })
     },
-    getMessagesFromAuthor: ({ commit }, author) => {
+    getMessagesCanal: ({ commit }, canalid) => {
       return new Promise((resolve, reject) => {
-        instance.get(`/chat/search/${author}`)
+        instance.get(`/message/search/${canalid}`)
           .then((result: any) => {
 
+            if (result == undefined)
+              console.log(" c vide frere");
             let i = 0;
             const messages = [];
             while (i < result.data.length) {
               messages.push({
                 id: result.data[i].id,
-                author: result.data[i].author,
                 message: result.data[i].message,
+                author: result.data[i].author,
                 canalid: result.data[i].canalid
               });
               i++;
             }
-            //console.log(" la response = " + messages[0].id);
             resolve(messages);
           })
       })
     },
-    // addMessage: ({ commit }, content, author, canalid) => {
-    //   return ;
-    // },
+    addMessage: ({ commit }, chat) => {
+      return new Promise((resolve, reject) => {
+        instance.post(`/message/add/${chat.author}/${chat.message}/${chat.canalid}`).then((result: any) => {
+          resolve(result);
+        })
+      })
+    },
+    getAllChats: ({ commit }, user) => {
+      return new Promise((resolve, reject) => {
+        instance.get(`/chat/search/${user}`).then((result: any) => {
+          let i = 0;
+          const chats = [];
+          while (i < result.data.length) {
+            chats.push({
+              id: result.data[i].id,
+              name: result.data[i].name,
+              users: result.data[i].users,
+              admins: result.data[i].admins,
+              owner: result.data[i].owner,
+              password: result.data[i].password
+            });
+            i++;
+          }
+          resolve(chats);
+        });
+      });
+    },
     askFriend: ({ commit }, request) => {
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
     },
-     acceptFriend:({ commit }, request) => {
+    acceptFriend: ({ commit }, request) => {
       return new Promise((resolve, reject) => {
         instance
           .post(`/database/accept/${request.id}/${request.new}`)
@@ -199,7 +224,7 @@ export default createStore({
                 reject(err);
               });
           });
-           })
+      })
     },
     removeFriend: ({ commit }, request) => {
       instance.post(`/database/remove/${request.id}/${request.new}`);
@@ -212,7 +237,7 @@ export default createStore({
         instance
           .get(`/database/friends/${asker}`)
           .then((result: any) => {
-            console.log("get friend",result.data);
+            console.log("get friend", result.data);
             commit("updateFriend", {
               list: result.data.friends,
               request: result.data.request,
