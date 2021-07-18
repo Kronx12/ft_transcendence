@@ -99,9 +99,27 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                 self.invitations.push(new Invitation(data.content.transmitter, self.getClientById(data.content.transmitter), data.content.receiver, self.getClientById(data.content.receiver), GameType.BONUS));
             } else if (data.type == 'accept_invite') {
                 console.log("Invitation accepted");
-                self.invitations.forEach(e => { // {type: 0 | 1}
+                self.invitations.forEach(e => {
                     if (e._game_type == data.content.type && e._transmitter == data.content.transmitter && e._receiver == data.content.receiver)
-                        e.accept()
+                        var tmp_uuid: string = "";
+                        if (e._game_type == GameType.NORMAL) {
+                            let new_room = new Room(e._transmitter_socket, e._receiver_socket);
+                            tmp_uuid = new_room._id;
+                            new_room.setup();
+                            new_room.update_game();
+                            self.rooms.push(new_room);
+                            self.queue.pop();
+                            self.queue.pop();
+                        } else {
+                            let new_room = new RoomBonus(e._transmitter_socket, e._receiver_socket);
+                            tmp_uuid = new_room._id;
+                            new_room.setup();
+                            new_room.update_game();
+                            self.rooms_bonus.push(new_room);
+                            self.queue_bonus.pop();
+                            self.queue_bonus.pop();
+                        }
+                        e.accept(tmp_uuid);
                 });
             } else if (data.type == 'decline_invite') {
                 console.log("Invitation declined");
@@ -136,33 +154,15 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     @Cron("* * * * * *")
     handleCron() {
         // Remove paste room
-        let remove: boolean = true;        
-        while (remove) {
-            remove = false;
-            for (let i = 0; i < this.rooms.length; i++) {
-                if (this.rooms[i]._end && this.rooms[i]._start_chrono <= 0) {
-                    this.rooms.splice(i, 1);
-                    remove = true;
-                    console.log("Delete room");
-                    break;
-                }
-            }
-            for (let i = 0; i < this.rooms_bonus.length; i++) {
-                if (this.rooms_bonus[i]._end && this.rooms_bonus[i]._start_chrono <= 0) {
-                    this.rooms_bonus.splice(i, 1);
-                    remove = true;
-                    console.log("Delete room");
-                    break;
-                }
-            }
-        }  
+        this.rooms = this.rooms.filter(obj => (!(obj._end && obj._start_chrono <= 0)));
+        this.rooms_bonus = this.rooms_bonus.filter(obj => (!(obj._end && obj._start_chrono <= 0)));
 
         // Update des timeouts
         for (let i = 0; i < this.timeoutList.length; i++)
             this.timeoutList[i]._timeout--;            
 
         // Remove des clients
-        remove = true;        
+        let remove = true;
         while (remove) {
             remove = false;
             for (let i = 0; i < this.timeoutList.length; i++) {
@@ -191,6 +191,8 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             this.rooms.push(new_room);
             this.queue.pop();
             this.queue.pop();
+            console.log("Create room")
+            console.log("len:", this.rooms.length)
         }
         
         if (this.queue_bonus._store.length >= 2) {
@@ -234,7 +236,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
 
     getClientById(id: number): Client {
         for (let i = 0; i < this.clients.length; i++)
-            if (this.clients[i]._user.id == id)
+            if (this.clients[i]._user != null && this.clients[i]._user.id == id)
                 return this.clients[i];
         return null;
     }

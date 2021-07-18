@@ -1,3 +1,61 @@
-#hidden {
-    visibility: hidden;
+.body {
+    height: 80px;
+    width: 200px;
+    background-color: #599cba;
+    float: left;
+    margin-bottom: 30px;
+    font-family: Avenir, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+.arrow-right {
+    width: 0; 
+    height: 0; 
+    border-top: 40px solid transparent;
+    border-bottom: 40px solid transparent;
+    border-left: 40px solid #599cba;
+    float: left;
+}
+
+.section-left {
+    float: left;
+    width: 50%;
+    height: 100%;
+}
+
+.section-left>img {
+    height: 80px;
+    width: 80px;
+}
+
+.section-right {
+    float: left;
+    width: 50%;
+    height: 100%;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.section-right>div {
+    width: 20%;
+    margin: 5%;
+    vertical-align: middle;
+    float: left;
+}
+
+.section-right>div>img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(5px 0px 4px #666);
+}
+
+.type {
+    width: 100%;
+    margin: 5px;
+    text-align: left;
+    text-transform: uppercase;
+    filter: drop-shadow(5px 0px 4px #666);
 }

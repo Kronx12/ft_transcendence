@@ -252,12 +252,12 @@ export class Room {
 
     updatePlayerA(x:number, y:number): void {
         this._playerax = x;
-        this._playerax = y;
+        this._playeray = y;
     }
 
     updatePlayerB(x:number, y:number): void {
         this._playerbx = x;
-        this._playerbx = y;
+        this._playerby = y;
     }
 
     stopPA() {
@@ -615,12 +615,12 @@ export class RoomBonus {
 
     updatePlayerA(x:number, y:number): void {
         this._playerax = x;
-        this._playerax = y;
+        this._playeray = y;
     }
 
     updatePlayerB(x:number, y:number): void {
         this._playerbx = x;
-        this._playerbx = y;
+        this._playerby = y;
     }
 
     stopPA() {
@@ -652,7 +652,7 @@ export class Queue {
     }
 
     removeByUser(user: any): void {
-        this._store = this._store.filter(obj => obj._user.id !== user.id);
+        this._store = this._store.filter(obj => (obj && obj._user != null && obj._user.id !== user.id));
     }
 } 
 
