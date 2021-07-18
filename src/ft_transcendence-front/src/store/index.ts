@@ -223,28 +223,55 @@ export default createStore({
         });
       });
     },
-    getMessagesFromAuthor: ({ commit }, author) => {
+    getMessagesCanal: ({ commit }, canalid) => {
       return new Promise((resolve, reject) => {
-        instance.get(`/chat/search/${author}`).then((result: any) => {
+        instance.get(`/message/search/${canalid}`)
+          .then((result: any) => {
+
+            if (result == undefined)
+              console.log(" c vide frere");
+            let i = 0;
+            const messages = [];
+            while (i < result.data.length) {
+              messages.push({
+                id: result.data[i].id,
+                message: result.data[i].message,
+                author: result.data[i].author,
+                canalid: result.data[i].canalid
+              });
+              i++;
+            }
+            resolve(messages);
+          })
+      })
+    },
+    addMessage: ({ commit }, chat) => {
+      return new Promise((resolve, reject) => {
+        instance.post(`/message/add/${chat.author}/${chat.message}/${chat.canalid}`).then((result: any) => {
+          resolve(result);
+        })
+      })
+    },
+    getAllChats: ({ commit }, user) => {
+      return new Promise((resolve, reject) => {
+        instance.get(`/chat/search/${user}`).then((result: any) => {
           let i = 0;
-          const messages = [];
+          const chats = [];
           while (i < result.data.length) {
-            messages.push({
+            chats.push({
               id: result.data[i].id,
-              author: result.data[i].author,
-              message: result.data[i].message,
-              canalid: result.data[i].canalid,
+              name: result.data[i].name,
+              users: result.data[i].users,
+              admins: result.data[i].admins,
+              owner: result.data[i].owner,
+              password: result.data[i].password
             });
             i++;
           }
-          //console.log(" la response = " + messages[0].id);
-          resolve(messages);
+          resolve(chats);
         });
       });
     },
-    // addMessage: ({ commit }, content, author, canalid) => {
-    //   return ;
-    // },
     askFriend: ({ commit }, request) => {
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
     },
