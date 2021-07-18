@@ -20,4 +20,7 @@ export class Chat {
   @Column({default: ""})
   public password: string;
 
+  @Column({default: ""})
+  public image: string;
+
 }

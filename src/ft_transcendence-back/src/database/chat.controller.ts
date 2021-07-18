@@ -34,16 +34,17 @@ export class ChatController {
         return this.chatServ.addMessage(chat);
     }
 
-    @Post('/add/:name/:users/:admins/:owner/:password')
+    @Post('/add/:name/:users/:admins/:owner/:password/:image')
     async addMessageWithAllContent(@Param('name') name, @Param('users') users, @Param('admins') admins, 
-                                   @Param('owner') owner, @Param('password') password) {
+                                   @Param('owner') owner, @Param('password') password, @Param('image') image) {
         var chat: Chat = {
             id: null,
             name: name,
             users: users,
             admins: admins,
             owner: owner,
-            password: password
+            password: password,
+            image: image
         };
         return this.chatServ.addMessage(chat);
     }

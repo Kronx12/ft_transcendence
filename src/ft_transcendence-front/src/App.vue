@@ -146,12 +146,15 @@
 				class="chat-canal"
 				style="color: white"
 			>
-            <div class="name-canal">
-				<a class="chat-name" @click="current_chat = chat.id">{{ chat.name }}</a>
-            </div>
-            <div class="settings-canal">
-                settings
-            </div>
+				<div class="name-canal">
+					<a class="chat-name" @click="current_chat = chat.id">{{
+						chat.name
+					}}</a>
+				</div>
+				<div class="settings-canal">
+					<img src="./assets/settings.svg"/>
+					<img src="./assets/settings.svg"/>
+				</div>
 			</div>
 		</div>
 		<div id="messages-box-chat">
@@ -202,9 +205,10 @@
 import { server } from "./helper";
 const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
-import SearchBar from './components/SearchBar.vue';
-import Friends from './components/Friends.vue';
-import ProfileMenu from './components/ProfileMenu.vue'
+import SearchBar from "./components/SearchBar.vue";
+import Friends from "./components/Friends.vue";
+import ProfileMenu from "./components/ProfileMenu.vue";
+import Chat from "./components/Chat.vue";
 export default {
 	data() {
 		return {
@@ -295,8 +299,9 @@ export default {
 		},
 		// Submit messages data to database
 		messageSubmit: function () {
-			if (this.inputMessage == null && this.inputMessage == "") return;
-
+			if (this.inputMessage == null || this.inputMessage == "") {
+				return;
+			}
 			console.log("le message " + this.inputMessage);
 			console.log("le user " + this.$store.state.user.avatarURL);
 
@@ -322,6 +327,9 @@ export default {
 							self.messages = result;
 							// console.log("le numero du chat = " + self.current_chat);
 						});
+					var objDiv = document.getElementById("messages-box-chat");
+					if (objDiv != null)
+						objDiv.scrollTop = objDiv.scrollHeight;
 					self.$store
 						.dispatch("getAllChats", "thallard")
 						.then(function (result) {
@@ -633,14 +641,14 @@ template {
 	color: #42b983;
 }
 #fixedbutton {
-  float: right;
-  position: fixed;
-  margin-top: 50%;
-  margin-right: 500px;
-  text-decoration: none;
-  padding: 10px 40px;
-  margin: 0px 10px 10px 0px;
-  /* float: left; */
+	float: right;
+	position: fixed;
+	margin-top: 50%;
+	margin-right: 500px;
+	text-decoration: none;
+	padding: 10px 40px;
+	margin: 0px 10px 10px 0px;
+	/* float: left; */
 }
 
 .fixedButton {
@@ -751,7 +759,6 @@ template {
 	padding: 10px;
 	border-radius: 10px;
 	margin-left: 10%;
-
 }
 
 .message-current-user .content {
@@ -781,32 +788,44 @@ template {
 }
 
 .chat-canal {
-    background-color: pink;
-    margin-top: 5px;
-    font-size: 20px;
-    text-align: left;
-    padding-left: 5px;
+	margin-top: 5px;
+	font-size: 20px;
+	text-align: left;
+	padding-left: 10px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
 }
 
 .name-canal {
-    background-color: yellow;
-    max-width: 30%;
-    width: auto;
-    height: 10%;
-    max-height: 10%;
-    float: left;
-    /* margin-right: 10%; */
-    /* float: left; */
-    /* position: absolute; */
+	max-width: 30%;
+	width: auto;
+	height: 10%;
+	max-height: 10%;
+	float: left;
+
+}
+
+.name-canal a {
+	text-decoration: none;
+	font-weight: bold;
+	color: white !important;
 }
 
 .settings-canal {
-    height: 5%;
-    background-color: blue;
-    width: 30%;
-      margin-left: 30%;
-    /* float: left;
-    position: relative; */
+	height: 5%;
+	background-color: blue;
+	width: auto;
+	max-width: 40%;
+	margin-left: auto;
+	
+}
+
+.settings-canal img {
+	height: 25%;
+	width: 25%;
+	float:right;
+	margin: 3px;
+	
 }
 
 .message .user-image {
