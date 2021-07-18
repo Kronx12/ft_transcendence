@@ -24,9 +24,11 @@
 			<div
 				v-for="message in messages"
 				:key="message"
-				:class="message.author == username ? 'message-current-user' : 'message'"
+				:class="
+					message.author == usernameIntra ? 'message-current-user' : 'message'
+				"
 			>
-				<div v-if="username != message.author">
+				<div v-if="usernameIntra != message.author">
 					<img
 						class="user-image"
 						v-bind:src="
@@ -62,38 +64,33 @@
 		</form>
 	</div>
 </template>
-<style>
-@import "./../assets/styles/chat.css";
-</style>
+
 <script>
 export default {
+	props: ["username"],
 	data() {
 		return {
 			messages: [],
 			chats: [],
 			avatarURL: "",
-			username: "",
 			current_chat: "1",
+			inputMessage: "",
+			usernameIntra: "",
 		};
 	},
 	methods: {
-		async mounted() {
-			this.refreshChat();
+		mounted() {
 			this.avatarURL = this.$store.state.user.avatarURL;
-			this.username = this.$store.state.user.login;
+			this.usernameIntra = this.username;
+			this.refreshChat();
+			var objDiv = document.getElementById("messages-box-chat");
+			if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
 		},
-        async updated() {
-            this.refreshChat();
-        },
-		chatAppear: async function () {
-			const self = this;
-			var chat = document.getElementById("chat");
-			if (chat === null) return;
-			if (chat.style.display === "block") chat.style.display = "none";
-			else chat.style.display = "block";
+		updated() {
 
-			return {};
+			this.refreshChat();
 		},
+
 		// Submit messages data to database
 		messageSubmit: function () {
 			if (this.inputMessage == null || this.inputMessage == "") {
@@ -113,19 +110,20 @@ export default {
 			}
 			this.inputMessage = "";
 			this.refreshChat();
+			var objDiv = document.getElementById("messages-box-chat");
+			if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
 		},
 		refreshChat: function () {
 			const self = this;
+            console.log("oui");
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
 					self.$store
 						.dispatch("getMessagesCanal", self.current_chat)
 						.then(function (result) {
 							self.messages = result;
-							// console.log("le numero du chat = " + self.current_chat);
 						});
-					var objDiv = document.getElementById("messages-box-chat");
-					if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
+
 					self.$store
 						.dispatch("getAllChats", "thallard")
 						.then(function (result) {
@@ -137,3 +135,7 @@ export default {
 	},
 };
 </script>
+
+<style>
+@import "./../assets/styles/chat.css";
+</style>
