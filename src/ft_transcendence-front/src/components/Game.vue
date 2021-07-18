@@ -71,7 +71,6 @@ export default {
 					key = 38;
 				else if (sk.keyIsDown(40) && !sk.keyIsDown(38))
 					key = 40;
-				console.log(key)
 				if (key != 0 && (this.isA || this.isB))
 					this.$root.connection.send(JSON.stringify({type: 'emit_key', content: { room_id: this.$route.query.room_id, user: this.$store.state.user, key: key }}));
 
@@ -150,7 +149,13 @@ export default {
 				}, 5);
 		},
 		copyToClipboard() {
-			console.log("Copy");
+			let i = document.createElement("input");
+			i.value = window.location.href;
+			let body = document.getElementsByTagName("body")[0];
+			body.appendChild(i);
+			i.select();
+			document.execCommand("copy");
+			i.remove();
 		}
 	},
 	async created() {
