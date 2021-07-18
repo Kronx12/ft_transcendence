@@ -78,18 +78,17 @@ export default {
       usernameIntra: "",
     };
   },
+  mounted() {
+    this.avatarURL = this.$store.state.user.avatarURL;
+    this.usernameIntra = this.username;
+    this.refreshChat();
+    var objDiv = document.getElementById("messages-box-chat");
+    if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
+  },
+  updated() {
+    this.refreshChat();
+  },
   methods: {
-    mounted() {
-      this.avatarURL = this.$store.state.user.avatarURL;
-      this.usernameIntra = this.username;
-      this.refreshChat();
-      var objDiv = document.getElementById("messages-box-chat");
-      if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
-    },
-    updated() {
-      this.refreshChat();
-    },
-
     // Submit messages data to database
     messageSubmit: function () {
       if (this.inputMessage == null || this.inputMessage == "") {
