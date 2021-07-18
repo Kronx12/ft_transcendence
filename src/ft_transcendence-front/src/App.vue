@@ -92,48 +92,9 @@ export default {
 		};
 	},
 	methods: {
-		accept: async function (id) {
-			for (var i = 0; i < this.request.length; i++) {
-				if (this.request[i].id === id) {
-					this.request.splice(i, 1);
-				}
-			}
-			const self = this;
-			console.log({ asker: self.$store.state.user.id, asked: id });
-			await self.$store.dispatch("acceptFriend", {
-				id: self.$store.state.user.id,
-				new: id,
-			});
-			await self.$refs.friend.updateFriend();
-		},
-		refuse: async function (id) {
-			for (var i = 0; i < this.request.length; i++) {
-				if (this.request[i].id === id) {
-					this.request.splice(i, 1);
-				}
-			}
-			this.$store.dispatch("refuseFriend", {
-				id: this.$store.state.user.id,
-				new: id,
-			});
-			await this.updateFriend();
-		},
-		openProfile: function () {
-			this.showProfile = !this.showProfile;
-		},
 		checkOpenProfile: function () {
-			if (this.showProfile) this.showProfile = !this.showProfile;
-		},
-		openFriends: async function () {
-			console.log("firends console: ", this.friend);
-			console.log("requ console: ", this.request);
-			this.showFriends = !this.showFriends;
-		},
-		searchUser: function () {
-			if (this.search == this.$store.state.user.login)
-				this.$router.push("/profile");
-			else this.$router.push(`/user/${this.search}`);
-			this.search = "";
+			 this.$refs.profile.closeProfile();
+     		 this.$refs.friend.closeFriend();
 		},
 		disconnectStatus: async function handler(e) {
 			if (this.$store.state.user.id != -1)
@@ -150,45 +111,6 @@ export default {
 			else chat.style.display = "block";
 
 			return {};
-		},
-		haveRequest: function () {
-			if (this.$store.state.user.id == -1) return false;
-			const friends = this.$store.state.friends.request;
-			// console.log(friends);
-			if (friends == "") return false;
-			return true;
-		},
-		updateFriend: async function () {
-			const self = this;
-			await self.$store.dispatch("getFriend", self.$store.state.user.id);
-			const request = self.$store.state.friends.request.split(":");
-			const schema = { id: "", username: "" };
-			if (request != "") {
-				for (const x in request) {
-					schema.id = request[x];
-					await self.$store
-						.dispatch("getUser", request[x])
-						.then(function (data) {
-							schema.username = data.username;
-						});
-					self.request[x] = schema;
-					console.log(x, schema);
-				}
-			}
-			console.log(self.request);
-			self.friend = self.$store.state.friends.list.split(":");
-			if (self.friend != "") {
-				for (const x in self.friend) {
-					schema.id = self.friend[x];
-					await self.$store
-						.dispatch("getUser", self.friend[x])
-						.then(function (data) {
-							schema.username = data.username;
-						});
-					self.friend[x] = schema;
-					console.log(x, schema);
-				}
-			}
 		},
 	},
 	computed: {
