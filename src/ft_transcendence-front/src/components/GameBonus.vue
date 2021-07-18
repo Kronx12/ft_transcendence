@@ -1,4 +1,5 @@
 <template>
+	<button class="link" @click="copyToClipboard()">Share link <img src="../assets/url.svg"></button>
 	<vue-p5 v-on="{ setup, draw }"></vue-p5>
 </template>
 
@@ -163,6 +164,15 @@ export default {
 						self.waitForSocketConnection(socket, callback);
 					}
 			}, 5);
+		},
+		copyToClipboard() {
+			let i = document.createElement("input");
+			i.value = window.location.href;
+			let body = document.getElementsByTagName("body")[0];
+			body.appendChild(i);
+			i.select();
+			document.execCommand("copy");
+			i.remove();
 		}
 	},
 	created() {
@@ -223,5 +233,5 @@ export default {
 </script>
 
 <style>
-
+@import '../assets/styles/game.css';
 </style>
