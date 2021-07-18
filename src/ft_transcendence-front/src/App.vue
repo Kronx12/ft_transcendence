@@ -60,10 +60,13 @@
       />
       <input type="submit" id="input-submit-chat" value="Send" />
     </form>
-    <!-- INVITATION SECTION -->
-    <div>
-    </div>
   </div>
+
+  <!-- INVITATION SECTION -->
+  <div class="global-invitation" v-for="i in invitation" v-bind:key="i.id">
+    <Invitation :type="i.type" :transmitter="i.transmitter" :receiver="i.receiver"/>
+  </div>
+  
   <router-view />
 </template>
 
@@ -74,12 +77,15 @@ import { mapState } from "vuex";
 import SearchBar from './components/SearchBar.vue';
 import Friends from './components/Friends.vue';
 import ProfileMenu from './components/ProfileMenu.vue'
+import Invitation from './components/Invitation.vue'
+
 export default {
   name: "App",
   components: {
     SearchBar,
     Friends,
-    ProfileMenu
+    ProfileMenu,
+    Invitation
   },
   data() {
     return {
@@ -90,7 +96,10 @@ export default {
       in_bonus: false,
       inputMessage: null,
       messages: [],
+      invitation: [],
       avatarURL: this.$store.state.user.avatarURL,
+      type: "NORMAL",
+      result: {},
     };
   },
   methods: {
@@ -182,7 +191,7 @@ export default {
         console.log("Disconnected !, Try to reconnect");
         this.connection = new WebSocket(server.socketURL);
       };
-      this.connection.onmessage = function (event) {
+      this.connection.onmessage = async function (event) {
         const data = JSON.parse(event.data);
         if (data.type === "emit_user") {
           // Send user at connection
@@ -193,9 +202,51 @@ export default {
             })
           );
         } else if (data.type == "invitation_send") {
+          let tmp = {}
           console.log("RECEIVE INVITE");
+          console.log(self.$store.state.user.id)
+          console.log(data.content.transmitter)
+          if (self.$store.state.user.id == data.content.transmitter) {
+            console.log(data.content.receiver);
+            await self.$store.dispatch("getUser", data.content.receiver).then(function (d) { self.result = d; });
+            console.log("RESULT A:")
+            console.log(self.result)
+            self.result.id = self.result.intra_id;
+            self.result.avatarURL = self.result.avatar;
+            self.result.login = self.result.username;
+            tmp = {
+              type: data.content.type,
+              transmitter: self.$store.state.user,
+              receiver: self.result
+            }
+            console.log(tmp)
+          } else {
+            console.log(data.content.transmitter);
+            await self.$store.dispatch("getUser", data.content.transmitter).then(function (d) { self.result = d; });
+            console.log("RESULT B:")
+            console.log(self.result)
+            self.result.id = self.result.intra_id;
+            self.result.avatarURL = self.result.avatar;
+            self.result.login = self.result.username;
+            tmp = {
+              type: data.content.type,
+              transmitter: self.result,
+              receiver: self.$store.state.user
+            }
+            console.log(tmp)
+          }
+          self.invitation.push(tmp)
+        } else if (data.type == "invitation_accepted") {
+          console.log("ACCEPTED");
+          self.invitation = self.invitation.filter(obj => (obj.type !== data.content.type && obj.transmitter !== data.content.transmitter && obj.receiver !== data.content.receiver));
+          if (data.content.type == 0)
+            self.$router.push({path: '/game', query: {room_id: data.content.uuid}});
+          else if (data.content.type == 1)
+            self.$router.push({path: '/game_bonus', query: {room_id: data.content.uuid}});
+        } else if (data.type == "invitation_declined") {
+          console.log("DECLINED");
           console.log(data);
-          
+          self.invitation = self.invitation.filter(obj => (obj.type !== data.content.type && obj.transmitter !== data.content.transmitter && obj.receiver !== data.content.receiver));
         }
       };
     }
@@ -453,5 +504,9 @@ template {
   font-size: 18px;
   font-weight: 700;
 }
-
+.global-invitation {
+    width: 280px;
+    filter: drop-shadow(5px 0px 4px #666);
+    z-index: 4 !important;
+}
 </style>

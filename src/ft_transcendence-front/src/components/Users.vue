@@ -13,7 +13,7 @@
     <h1 v-else-if="aske">Request sended !</h1>
   </div>
   <div class="users-aff" v-else-if="result.length">
-    <div v-for="user in result" :key="user">
+    <div v-for="user in result" :key="user" style="width: 20% !important; margin-left: auto; margin-right: auto;">
       <figure>
         <img
           @click="goToUser(user.username)"

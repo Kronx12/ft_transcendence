@@ -1,5 +1,5 @@
 <template>
-	<button v-on:click="copyToClipboard()">Share link <img src="../assets/link_icon.jpg"></button>
+	<button class="link" @click="copyToClipboard()">Share link <img src="../assets/url.svg"></button>
 	<vue-p5 v-on="{ setup, draw }"></vue-p5>
 </template>
 
@@ -71,6 +71,7 @@ export default {
 					key = 38;
 				else if (sk.keyIsDown(40) && !sk.keyIsDown(38))
 					key = 40;
+				console.log(key)
 				if (key != 0 && (this.isA || this.isB))
 					this.$root.connection.send(JSON.stringify({type: 'emit_key', content: { room_id: this.$route.query.room_id, user: this.$store.state.user, key: key }}));
 
@@ -149,11 +150,7 @@ export default {
 				}, 5);
 		},
 		copyToClipboard() {
-			var $temp = $("<input>");
-			$("body").append($temp);
-			$temp.val($(window.location.href).text()).select();
-			document.execCommand("copy");
-			$temp.remove();
+			console.log("Copy");
 		}
 	},
 	async created() {
@@ -210,5 +207,5 @@ export default {
 </script>
 
 <style>
-
+@import '../assets/styles/game.css';
 </style>
