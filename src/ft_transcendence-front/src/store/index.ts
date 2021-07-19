@@ -62,6 +62,7 @@ export default createStore({
       });
     },
     getUser: ({ commit }, id) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/${id}`).then(function (user: any) {
           
@@ -72,6 +73,7 @@ export default createStore({
     authLogin: ({ commit }, token) => {
       commit("setStatus", "loading");
       return new Promise((resolve, reject) => {
+
         instance
           .post(`/login/${token}`)
           .then(function (response: any) {
@@ -101,6 +103,7 @@ export default createStore({
                 instance.patch(`/database/user/${user.data.intra_id}`, {
                   status: 1,
                 });
+                instance.defaults.headers.common["Authorization"] = token;
                 resolve(user.data);
               })
           })
@@ -182,6 +185,7 @@ export default createStore({
                       auth: user.data.auth,
                       secret: user.data.secret,
                     });
+                    instance.defaults.headers.common["Authorization"] = token;
                     instance.patch(`/database/user/${user.data.intra_id}`, {
                       status: 1,
                     });
@@ -199,17 +203,21 @@ export default createStore({
       });
     },
     editUsername: ({ commit }, params) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.patch(`/database/user/${params.id}`, {
         username: params.username,
       });
     },
     editAvatar: ({ commit }, params) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.patch(`/database/user/${params.id}`, { avatar: params.avatar });
     },
     editStatus: ({ commit }, params) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.patch(`/database/user/${params.id}`, { status: params.status });
     },
     searchUser: ({ commit }, name) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/search/${name}`).then((result: any) => {
           const response = {
@@ -278,9 +286,11 @@ export default createStore({
       });
     },
     askFriend: ({ commit }, request) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
     },
     acceptFriend: ({ commit }, request) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance
           .post(`/database/accept/${request.id}/${request.new}`)
@@ -302,12 +312,15 @@ export default createStore({
       });
     },
     removeFriend: ({ commit }, request) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.post(`/database/remove/${request.id}/${request.new}`);
     },
     refuseFriend: ({ commit }, request) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.post(`/database/refuse/${request.id}/${request.new}`);
     },
     getFriend: ({ commit }, asker) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance
           .get(`/database/friends/${asker}`)
@@ -340,6 +353,7 @@ export default createStore({
       })
     },
     activateAuth: ({ commit }, user) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.patch(`/database/user/${user.id}`, { auth: true });
       commit("setAuth", true);
     }

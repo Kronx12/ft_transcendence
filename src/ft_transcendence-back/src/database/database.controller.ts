@@ -6,33 +6,52 @@ import {
   Param,
   Body,
   Patch,
+  Headers,
 } from '@nestjs/common';
 import { Users } from 'src/entities/users.entity';
 import { DatabaseService } from './database.service';
+const jwt = require('jsonwebtoken');
 
 @Controller('database')
 export class DatabaseController {
   constructor(private readonly databaseServ: DatabaseService) {}
 
   @Get('user')
-  async findAll() {
+  async findAll(@Headers('authorization') auth) {
     return this.databaseServ.findAll();
   }
 
   @Get('user/:intra')
-  async findOne(@Param('intra') id) {
-    if(id != "-1")
-      return this.databaseServ.findOne(id);
+  async findOne(@Headers('authorization') auth, @Param('intra') id) {
+        if (id != '-1') return this.databaseServ.findOne(id);
   }
 
   @Get('user/search/:name')
-  async searchUser(@Param('name') name) {
-    return this.databaseServ.searchUser(name);
+  async searchUser(@Headers('authorization') auth, @Param('name') name) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.searchUser(name);
+      }
+    });
+    return resp;
   }
 
   @Get('friends/:id')
-  async getFirends(@Param('id') id) {
-    if (id != '-1') return this.databaseServ.getFriends(id);
+  async getFirends(@Headers('authorization') auth, @Param('id') id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        if (id != '-1') resp = self.databaseServ.getFriends(id);
+      }
+    });
+    return resp;
   }
 
   @Post('user')
@@ -41,42 +60,140 @@ export class DatabaseController {
   }
 
   @Post('ask/:from/:to')
-  async askFriend(@Param('from') from, @Param('to') to) {
-    return this.databaseServ.requestFriend(from, to);
+  async askFriend(
+    @Headers('authorization') auth,
+    @Param('from') from,
+    @Param('to') to,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.requestFriend(from, to);
+      }
+    });
+    return resp;
   }
 
   @Post('accept/:id/:accept')
-  async acceptFriend(@Param('id') id, @Param('accept') accept) {
-    return this.databaseServ.acceptFriend(id, accept);
+  async acceptFriend(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('accept') accept,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.acceptFriend(id, accept);
+      }
+    });
+    return resp;
   }
 
   @Post('remove/:id/:remove')
-  async removeFriend(@Param('id') id, @Param('remove') remove) {
-    return this.databaseServ.removeFriend(id, remove, 0);
+  async removeFriend(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('remove') remove,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.removeFriend(id, remove, 0);
+      }
+    });
+    return resp;
   }
 
   @Post('refuse/:id/:refuse')
-  async refuseFriends(@Param('id') id, @Param('refuse') refuse) {
-    return this.databaseServ.refuseFriend(id, refuse);
+  async refuseFriends(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('refuse') refuse,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.refuseFriend(id, refuse);
+      }
+    });
+    return resp;
   }
 
   @Delete('user/:id')
-  async delete(@Param('id') id) {
-    return this.databaseServ.delete(id);
+  async delete(@Headers('authorization') auth, @Param('id') id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.delete(id);
+      }
+    });
+    return resp;
   }
 
   @Patch('user/:id')
-  async editUser(@Param('id') id, @Body() content) {
-    return this.databaseServ.editUser(id, content);
+  async editUser(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Body() content,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.editUser(id, content);
+      }
+    });
+    return resp;
   }
 
   @Get('user/game/:id/')
-  async getGameHistory(@Param('id') id) {
-      return this.databaseServ.getGameHistory(id);
+  async getGameHistory(@Headers('authorization') auth, @Param('id') id) {
+    return this.databaseServ.getGameHistory(id);
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.getGameHistory(id);
+      }
+    });
+    return resp;
   }
 
   @Patch('user/game/:id/:gameid')
-  async addGameToUser(@Param('id') id, @Param('gameid') gameid) {
-      return this.databaseServ.addGameToUser(id, gameid);
+  async addGameToUser(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('gameid') gameid,
+  ) {
+    return this.databaseServ.addGameToUser(id, gameid);
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = { error: '401 Unauthorized' };
+      } else {
+        resp = self.databaseServ.addGameToUser(id, gameid);
+      }
+    });
+    return resp;
   }
 }

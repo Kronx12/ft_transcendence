@@ -41,6 +41,11 @@ export class DatabaseService {
     return undefined;
   }
   async create(newUser: Users) {
+    let user;
+    await this.findOne(String(newUser.intra_id)).then(function (found) {
+      user = found;
+    });
+    if (user != undefined) return user;
     await this.usersRepo.save(newUser);
     return this.findOne(String(newUser.intra_id));
   }
