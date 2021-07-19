@@ -85,7 +85,7 @@ export default {
     var objDiv = document.getElementById("messages-box-chat");
     if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
   },
-  updated() {
+  async updated() {
     this.refreshChat();
   },
   methods: {
