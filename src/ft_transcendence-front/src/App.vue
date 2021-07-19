@@ -47,6 +47,7 @@
       :receiver="i.receiver"
     />
   </div>
+  <!-- <ChatAdmin /> -->
   <router-view />
 </template>
 
@@ -55,6 +56,7 @@ import { server } from "./helper";
 const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
 import Chat from "./components/Chat.vue";
+import ChatAdmin from "./components/ChatAdmin.vue";
 import SearchBar from "./components/SearchBar.vue";
 import Friends from "./components/Friends.vue";
 import ProfileMenu from "./components/ProfileMenu.vue";
@@ -68,6 +70,7 @@ export default {
     ProfileMenu,
     Invitation,
     Chat,
+    ChatAdmin,
   },
   data() {
     return {

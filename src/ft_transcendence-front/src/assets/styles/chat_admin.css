@@ -1,0 +1,49 @@
+#admin_body {
+    z-index: 11;
+    background-color: #e4eaf5;
+    position:absolute;
+    top:10vh;
+    left:50%;
+    width:70%;
+    margin-left:-35%;
+    padding: 20px;
+	border: 8px solid;
+    border-radius: 5px;
+	border-image: linear-gradient(12deg, #599cba, #82bf56) 1;
+}
+
+.title {
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+hr {
+    border: none;
+    border-top: 3px double #333;
+    color: #333;
+    overflow: visible;
+    text-align: center;
+    height: 5px;
+}
+
+hr:after {
+    background: #fff;
+    content: '§';
+    padding: 0 4px;
+    position: relative;
+    top: -13px;
+}
+
+.form-section {
+    text-align: left;
+}
+
+.form-section>label {
+    font-weight: bold;
+    margin: 5px;
+}
+
+.important {
+    font-weight: bold;
+    text-transform: uppercase;
+}

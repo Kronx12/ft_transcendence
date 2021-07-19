@@ -26,12 +26,12 @@ export default {
         }
     },
     methods: {
-    searchUser: function () {
-      if (this.search == this.$store.state.user.login)
-        this.$router.push("/profile");
-      else this.$router.push(`/user/${this.search}`);
-      this.search = "";
-    },
+      searchUser: function () {
+        if (this.search == this.$store.state.user.login)
+          this.$router.push("/profile");
+        else this.$router.push(`/user/${this.search}`);
+        this.search = "";
+      },
     }
 }
 </script>
