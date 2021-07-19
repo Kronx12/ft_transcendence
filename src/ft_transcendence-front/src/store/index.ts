@@ -255,20 +255,25 @@ export default createStore({
     getAllChats: ({ commit }, user) => {
       return new Promise((resolve, reject) => {
         instance.get(`/chat/search/${user}`).then((result: any) => {
-          let i = 0;
-          const chats = [];
-          while (i < result.data.length) {
-            chats.push({
-              id: result.data[i].id,
-              name: result.data[i].name,
-              users: result.data[i].users,
-              admins: result.data[i].admins,
-              owner: result.data[i].owner,
-              password: result.data[i].password
-            });
-            i++;
+          try {
+            let i = 0;
+            const chats = [];
+            while (i < result.data.length) {
+              chats.push({
+                id: result.data[i].id,
+                name: result.data[i].name,
+                users: result.data[i].users,
+                admins: result.data[i].admins,
+                owner: result.data[i].owner,
+                password: result.data[i].password
+              });
+              i++;
+            }
+            resolve(chats);
+          } catch (error) {
+            console.log(error);
           }
-          resolve(chats);
+         
         });
       });
     },

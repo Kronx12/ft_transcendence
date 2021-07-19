@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
 	<header id="nav">
 		<span id="state" style="position: absolute; left: 10px">
@@ -93,8 +94,8 @@ export default {
 	},
 	methods: {
 		checkOpenProfile: function () {
-			 this.$refs.profile.closeProfile();
-     		 this.$refs.friend.closeFriend();
+			this.$refs.profile.closeProfile();
+			this.$refs.friend.closeFriend();
 		},
 		disconnectStatus: async function handler(e) {
 			if (this.$store.state.user.id != -1)
@@ -103,14 +104,31 @@ export default {
 					status: 0,
 				});
 		},
-		chatAppear: async function () {
-			const self = this;
+		chatAppear: function () {
 			var chat = document.getElementById("chat");
 			if (chat === null) return;
 			if (chat.style.display === "block") chat.style.display = "none";
 			else chat.style.display = "block";
-
+			
 			return {};
+		},
+		refreshChat: function () {
+			const self = this;
+			setInterval(function () {
+				if (self.$store != undefined && self.$store != null) {
+					self.$store
+						.dispatch("getMessagesCanal", self.current_chat)
+						.then(function (result) {
+							self.messages = result;
+						});
+
+					self.$store
+						.dispatch("getAllChats", "thallard")
+						.then(function (result) {
+							self.chats = result;
+						});
+				}
+			}, 1000);
 		},
 	},
 	computed: {
@@ -125,10 +143,12 @@ export default {
 			await this.$store.dispatch("getFriend", this.$store.state.user.id);
 		}
 	},
+
 	async mounted() {
 		var chat = document.getElementById("chat");
 		chat.style.display = "none";
 		const self = this;
+		self.refreshChat();
 		jwt.verify(
 			localStorage.getItem("jwtToken"),
 			"shhhhh",
@@ -150,8 +170,11 @@ export default {
 		self.$refs.friend.refreshFriend();
 	},
 	async updated() {
+			this.refreshChat();
+		console.log("oui");
 		const self = this;
-
+		console.log("le login = " + self.$store.state.user.login);
+	
 		if (this.connection == null) {
 			this.connection = new WebSocket(server.socketURL);
 
