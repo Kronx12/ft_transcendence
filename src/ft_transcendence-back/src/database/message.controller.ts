@@ -42,5 +42,4 @@ export class MessageController {
         };
         return this.messageServ.addMessage(mess);
     }
-  
 }

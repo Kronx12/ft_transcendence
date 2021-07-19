@@ -38,7 +38,7 @@
       </div>
     </div>
   </header>
-  <Chat ref="chat" :username="this.$store.state.user.login" />
+  <Chat v-if="this.$store.state.user.id != -1" ref="chat" :username="this.$store.state.user.login" />
   <!-- INVITATION SECTION -->
   <div class="global-invitation" v-for="i in invitation" v-bind:key="i.id">
     <Invitation
@@ -47,7 +47,7 @@
       :receiver="i.receiver"
     />
   </div>
-  <!-- <ChatAdmin /> -->
+  <ChatAdmin  v-if="this.$store.state.user.id != -1" />
   <router-view />
 </template>
 
@@ -115,24 +115,6 @@ export default {
 
       return {};
     },
-    refreshChat: function () {
-      const self = this;
-      setInterval(function () {
-        if (self.$store != undefined && self.$store != null) {
-          self.$store
-            .dispatch("getMessagesCanal", self.current_chat)
-            .then(function (result) {
-              self.messages = result;
-            });
-
-          self.$store
-            .dispatch("getAllChats", "thallard")
-            .then(function (result) {
-              self.chats = result;
-            });
-        }
-      }, 1000);
-    },
     checkToken: async function () {
       const self = this;
       setInterval(function () {
@@ -170,7 +152,6 @@ export default {
     var chat = document.getElementById("chat");
     chat.style.display = "none";
     const self = this;
-    self.refreshChat();
     jwt.verify(
       localStorage.getItem("jwtToken"),
       "shhhhh",
@@ -193,7 +174,6 @@ export default {
     self.checkToken();
   },
   async updated() {
-    this.refreshChat();
     console.log("oui");
     const self = this;
     console.log("le login = " + self.$store.state.user.login);

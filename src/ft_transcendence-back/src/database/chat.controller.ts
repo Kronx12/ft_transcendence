@@ -17,7 +17,7 @@ export class ChatController {
         return this.chatServ.findOneMessagePerID(id);
     }
 
-    @Delete(':id')
+    @Delete('/:id')
     async delete(@Param('id') id) {
         return this.chatServ.deleteMessage(id);
     }

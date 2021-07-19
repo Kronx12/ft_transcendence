@@ -13,6 +13,7 @@ export class ChatService {
 
     findOneMessagePerID(id: number): Promise<Chat[] | undefined>
     {
+        console.log("Show : ", id);
         return this.chatRepo.find({where: `id = ${id}`});
     }
 

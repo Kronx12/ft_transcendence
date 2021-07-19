@@ -85,10 +85,10 @@ export default {
 		this.avatarURL = this.$store.state.user.avatarURL;
 		this.usernameIntra = this.username;
 		
-		this.refreshChat();
+		//this.refreshChat();
 		var objDiv = document.getElementById("messages-box-chat");
 		if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
-		this.activate();
+		//this.activate();
 	},
 	methods: {
 		async activate() {
@@ -113,11 +113,13 @@ export default {
 				this.$store.dispatch("addMessage", chat);
 			}
 			this.inputMessage = "";
-			this.refreshChat();
+			//this.refreshChat();
 		
 		},
 		refreshChat: function () {
 			const self = this;
+			console.log(this.username)
+			
 			this.usernameIntra = this.username;
 			console.log("le nom de l'intra = " + self.username);
 			//   console.log("oui");

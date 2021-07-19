@@ -262,6 +262,7 @@ export default createStore({
     },
     getAllChats: ({ commit }, user) => {
       return new Promise((resolve, reject) => {
+        console.log("Here:", `/chat/search/${user}`)
         instance.get(`/chat/search/${user}`).then((result: any) => {
           try {
             let i = 0;
