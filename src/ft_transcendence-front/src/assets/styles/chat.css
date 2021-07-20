@@ -32,12 +32,14 @@
     border-color: #fff;
     height: 90%;
     border-radius: 0 0 0 5px;
+    color: white;
   }
   
   .chat-canal {
     z-index: 8 !important;
     width: 100%;
     background-color: #2c3e50;
+    color: white;
   }
   #messages-box-chat {
     width: 70%;
@@ -142,6 +144,9 @@
   .message .user-image {
     z-index: 10;
     float: left;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
   }
   
   #input-chat {
@@ -183,3 +188,9 @@
     font-size: 18px;
     font-weight: 700;
   }
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin: 5px;
+}

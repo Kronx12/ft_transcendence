@@ -23,11 +23,12 @@ export class CanalService {
         return this.CanalRepo.delete({ id: id });
     }
 
-    createCanal(Canal: Canal) {
-        return this.CanalRepo.create(Canal);
+    createCanal(canal: Canal) {
+        console.log(canal);
+        return this.CanalRepo.save(canal);
     }
 
-    updataCanal(Canal: Canal) {
-        return this.CanalRepo.save(Canal);
+    updataCanal(canal: Canal) {
+        return this.CanalRepo.save(canal);
     }
 }

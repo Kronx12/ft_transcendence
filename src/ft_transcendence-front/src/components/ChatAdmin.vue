@@ -8,6 +8,9 @@
             <label for="name">name</label>
             <input ref="name" type="name" id="name" name="name" required>
             <hr>
+            <label for="image">image</label>
+            <input ref="image" type="url" id="image" name="image">
+            <hr>
             <label class="important" for="visibility">Visibility:</label>
             <br>
             <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="public" value="public" name="visibility" checked required>
@@ -19,7 +22,7 @@
             <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="protected" value="protected" name="visibility" required>
             <label for="protected">protected</label>
             <br>
-            <div v-if="show_password">
+            <div v-if="this.last_visibility == 1">
                 <label for="password">password</label>
                 <input ref="password" type="password" id="password" name="password" required>
             </div>
@@ -34,25 +37,35 @@
 export default {
 	props: ["id", "method"],
     data() {
-        return { show_password: false }
+        return {
+            last_visibility: 0
+        }
     },
     methods: {
         sendForm() {
             console.log("SEND FORM:", this.method);
             if (this.method == "create") {
-                let chat = {
+                let canal = {
+                    id: null,
                     name: this.$refs.name.value,
+                    image: this.$refs.image.value,
                     owner: this.$root.$store.state.user.id,
-                    visibility: this.$refs.visibility.value,
-                    password: (this.$refs.visibility.value == "protected") ? this.$refs.password.value : "",
+                    users: String(this.$root.$store.state.user.id),
+                    admins: String(this.$root.$store.state.user.id),
+                    password: this.last_visibility == 1 ? this.$refs.password.value : "",
+                    visibility: this.last_visibility,
                 }
-                this.$store.dispatch("createChat", chat);
+                console.log(this.$store.dispatch("createCanal", canal));
                 this.destroy_popup();
             }
         },
         async updatePassword(event) {
-            this.show_password = (this.visibility == "protected");
-            console.log(this.show_password);
+            if (this.visibility == "public")
+                this.last_visibility = 0;
+            else if (this.visibility == "protected")
+                this.last_visibility = 1;
+            else if (this.visibility == "private")
+                this.last_visibility = 2;
         },
         destroy_popup() {
             this.$root.admin = false;

@@ -2,18 +2,16 @@
 <template>
 	<div id="chat">
 		<div id="header-chat">Chat</div>
-		<div id="list-chat" style="color: white">
-			Channels
-			<div
-				v-for="chat in chats"
-				:key="chat"
-				class="chat-canal"
-				style="color: white"
-			>
+		<div id="list-chat">
+			<div @click="createNewCanal()">
+				<img class="icon" src="../assets/plus.svg" />
+				Channels
+			</div>
+			<div v-for="chat in chats" :key="chat" class="chat-canal" >
 				<div class="name-canal">
-					<a class="chat-name" @click="current_chat = chat.id">{{
-						chat.name
-					}}</a>
+					<a class="chat-name" @click="canalid = chat.id">
+						{{ chat.name }}
+					</a>
 				</div>
 				<div class="settings-canal">
 					<img src="./../assets/settings.svg" />
@@ -22,24 +20,9 @@
 			</div>
 		</div>
 		<div id="messages-box-chat">
-			<div
-				v-for="message in messages"
-				:key="message"
-				:class="
-					message.author == this.$store.state.user.id
-						? 'message-current-user'
-						: 'message'
-				"
-			>
-				<div v-if="this.$store.state.user.id != message.author">
-					<img
-						class="user-image"
-						v-bind:src="
-							'https://cdn.intra.42.fr/users/small_' + message.author + '.jpg'
-						"
-						style="border-radius: 50%; width: 30px; height: 30px"
-					/>
-
+			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
+				<div v-if="this.userid != message.author">
+					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + message.author + '.jpg'" />
 					<div class="content" :key="message">
 						{{ message.message }}
 					</div>
@@ -51,20 +34,11 @@
 				</div>
 			</div>
 		</div>
-		<form
-			ref="formChat"
-			@submit.prevent="messageSubmit"
-			id="input-chat"
-			autocomplete="off"
-		>
-			<input
-				type="text"
-				id="input-text-chat"
-				v-model="inputMessage"
-				placeholder="Write a message..."
-			/>
+		<form v-if="this.canalid != -1" ref="formChat" @submit.prevent="messageSubmit" id="input-chat" autocomplete="off">
+			<input type="text" id="input-text-chat" v-model="inputMessage" placeholder="Write a message..." />
 			<input type="submit" id="input-submit-chat" value="Send" />
 		</form>
+		<h3 v-else>SELECT A CANAL FIRST</h3>
 	</div>
 </template>
 
@@ -75,14 +49,14 @@ export default {
 			messages: [],
 			chats: [],
 			avatarURL: "",
-			current_chat: 1,
+			canalid: -1,
 			inputMessage: "",
-			idIntra: -1,
+			userid: -1,
 		};
 	},
 	async mounted() {
 		this.avatarURL = this.$store.state.user.avatarURL;
-		this.idIntra = this.$store.state.user.id;
+		this.userid = this.$store.state.user.id;
 		
 		var objDiv = document.getElementById("messages-box-chat");
 		if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
@@ -106,7 +80,7 @@ export default {
 					id: null,
 					author: this.$store.state.user.id,
 					message: this.inputMessage,
-					canalid: this.current_chat,
+					canalid: this.canalid,
 				};
 				this.$store.dispatch("createMessage", msg);
 			}
@@ -115,20 +89,24 @@ export default {
 		refreshChat: function () {
 			const self = this;
 			
-			this.idIntra = this.$store.state.user.id;
+			this.userid = this.$store.state.user.id;
 			if (self.$store != undefined && self.$store != null) {
-				self.$store
-					.dispatch("getMessagesByCanalId", self.current_chat)
-					.then(function (result) {
-						self.messages = result;
-					});
 				self.$store
 					.dispatch("getCanalsByUserId", this.$store.state.user.id)
 					.then(function (result) {
 						self.chats = result;
 					});
+				self.$store
+					.dispatch("getMessagesByCanalId", self.canalid)
+					.then(function (result) {
+						self.messages = result;
+					});
 			}
 		},
+		createNewCanal: function () {
+			this.$root.admin = true;
+			this.$root.admin_method = "create";
+		}
 	},
 };
 </script>

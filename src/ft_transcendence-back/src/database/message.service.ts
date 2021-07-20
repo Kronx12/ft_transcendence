@@ -16,6 +16,6 @@ export class MessageService {
     }
 
     createMessage(msg: Message) {
-        return this.messageRepo.create(msg);
+        return this.messageRepo.save(msg);
     }
 }

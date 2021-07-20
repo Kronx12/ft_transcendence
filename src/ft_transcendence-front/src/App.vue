@@ -93,7 +93,7 @@ export default {
       avatarURL: this.$store.state.user.avatarURL,
       type: "NORMAL",
       result: {},
-      admin: true,
+      admin: false,
       admin_method: "create",
       admin_id: "0",
     };
