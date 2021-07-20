@@ -11,15 +11,7 @@ export class CanalController {
     // /canal/
     @Get()
     async getAllCanals(@Headers('authorization') auth) {
-        //const self = this;
-        let resp;
-        //await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-        //    if (err)
-        //        resp = { error: '401 Unauthorized' };
-        //    else
-                resp = this.CanalServ.getAllCanals();
-        //});
-        return resp;
+        return this.CanalServ.getAllCanals();
     }
 
     // /canal/:id
