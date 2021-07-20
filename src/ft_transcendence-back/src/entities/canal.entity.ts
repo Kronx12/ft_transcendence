@@ -1,12 +1,18 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class Chat {
+export class Canal {
   @PrimaryGeneratedColumn()
   public id: number;
 
   @Column()
   public name: string;
+
+  @Column({default: ""})
+  public image: string;
+
+  @Column()
+  public owner: number;
 
   @Column()
   public users: string;
@@ -14,13 +20,10 @@ export class Chat {
   @Column()
   public admins: string;
 
-  @Column()
-  public owner: string;
-
   @Column({default: ""})
   public password: string;
 
-  @Column({default: ""})
-  public image: string;
+  @Column({default: 0})
+  public visibility: number;
 
 }

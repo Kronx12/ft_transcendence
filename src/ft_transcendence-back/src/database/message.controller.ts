@@ -1,45 +1,51 @@
 import { Message } from '../entities/message.entity';
-import { Controller, Get, Post, Delete, Param, Body, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Patch, Headers } from '@nestjs/common';
 import { MessageService } from './message.service';
+const jwt = require('jsonwebtoken');
 
 @Controller('message')
 export class MessageController {
     constructor(private readonly messageServ: MessageService) { }
 
+    // /message/
     @Get()
-    async findAllMessages() {
-        return this.messageServ.findAllChats();
+    async getAllMessages(@Headers('authorization') auth) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.messageServ.getAllMessages();
+        });
+        return resp;
     }
 
+    // /message/:id
     @Get('/:id')
-    async findOneMessagePerID(@Param('id') id) {
-        return this.messageServ.findOneMessagePerID(id);
+    async getMessagesByCanalId(@Headers('authorization') auth, @Param('id') id) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.messageServ.getMessagesByCanalId(id);
+        });
+        return resp;
     }
 
-    @Delete(':id')
-    async delete(@Param('id') id) {
-        return this.messageServ.deleteMessage(id);
-    }
-
-    @Get('/search/:canalid')
-    async findMessagesCanal(@Param('canalid') id)
-    {
-        return this.messageServ.findMessagesCanal(id);
-    }
-
+    // /message/ => with body
     @Post()
-    addMessage(@Body() message: Message) {
-        return this.messageServ.addMessage(message);
-    }
-
-    @Post('/add/:author/:message/:canalid')
-    addNewMessage(@Param('author') author, @Param('message') message, @Param('canalid') id) {
-        var mess: Message = {
-            id: null,
-            author: author,
-            message: message,
-            canalid: id
-        };
-        return this.messageServ.addMessage(mess);
+    async createMessage(@Headers('authorization') auth, @Body() msg: Message) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.messageServ.createMessage(msg);
+        });
+        return resp;
     }
 }

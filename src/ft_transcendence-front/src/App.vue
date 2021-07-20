@@ -38,7 +38,7 @@
       </div>
     </div>
   </header>
-  <Chat v-if="this.$store.state.user.id != -1" ref="chat" :username="this.$store.state.user.login" />
+  <Chat v-if="this.$store.state.user.id != -1" ref="chat" />
   <!-- INVITATION SECTION -->
   <div class="global-invitation" v-for="i in invitation" v-bind:key="i.id">
     <Invitation
@@ -47,7 +47,7 @@
       :receiver="i.receiver"
     />
   </div>
-  <ChatAdmin  v-if="this.$store.state.user.id != -1" />
+  <ChatAdmin  v-if="this.$store.state.user.id != -1 && this.admin" v-bind:method="this.admin_method" v-bind:id="this.admin_id" />
   <router-view />
 </template>
 
@@ -93,6 +93,9 @@ export default {
       avatarURL: this.$store.state.user.avatarURL,
       type: "NORMAL",
       result: {},
+      admin: true,
+      admin_method: "create",
+      admin_id: "0",
     };
   },
   methods: {
@@ -149,8 +152,6 @@ export default {
   },
 
   async mounted() {
-    var chat = document.getElementById("chat");
-    chat.style.display = "none";
     const self = this;
     jwt.verify(
       localStorage.getItem("jwtToken"),

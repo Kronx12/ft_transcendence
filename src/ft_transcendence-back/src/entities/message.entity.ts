@@ -9,9 +9,9 @@ export class Message {
     public message: string;
 
     @Column()
-    public author: string;
+    public author: number;
 
     @Column()
-    public canalid: string;
+    public canalid: number;
 
 }

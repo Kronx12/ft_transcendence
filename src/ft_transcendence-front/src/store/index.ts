@@ -231,61 +231,6 @@ export default createStore({
         });
       });
     },
-    getMessagesCanal: ({ commit }, canalid) => {
-      return new Promise((resolve, reject) => {
-        instance.get(`/message/search/${canalid}`)
-          .then((result: any) => {
-
-            if (result == undefined)
-              console.log(" c vide frere");
-            let i = 0;
-            const messages = [];
-            while (i < result.data.length) {
-              messages.push({
-                id: result.data[i].id,
-                message: result.data[i].message,
-                author: result.data[i].author,
-                canalid: result.data[i].canalid
-              });
-              i++;
-            }
-            resolve(messages);
-          })
-      })
-    },
-    addMessage: ({ commit }, chat) => {
-      return new Promise((resolve, reject) => {
-        instance.post(`/message/add/${chat.author}/${chat.message}/${chat.canalid}`).then((result: any) => {
-          resolve(result);
-        })
-      })
-    },
-    getAllChats: ({ commit }, user) => {
-      return new Promise((resolve, reject) => {
-        console.log("Here:", `/chat/search/${user}`)
-        instance.get(`/chat/search/${user}`).then((result: any) => {
-          try {
-            let i = 0;
-            const chats = [];
-            while (i < result.data.length) {
-              chats.push({
-                id: result.data[i].id,
-                name: result.data[i].name,
-                users: result.data[i].users,
-                admins: result.data[i].admins,
-                owner: result.data[i].owner,
-                password: result.data[i].password
-              });
-              i++;
-            }
-            resolve(chats);
-          } catch (error) {
-            console.log(error);
-          }
-         
-        });
-      });
-    },
     askFriend: ({ commit }, request) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
@@ -357,8 +302,141 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       instance.patch(`/database/user/${user.id}`, { auth: true });
       commit("setAuth", true);
-    }
+    },
+    // ==================================== CHAT SECTION ===================
+
+    // >>>>>>>>>> CANAL SECTION
+    getCanals: ({ commit }) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/canal/`).then((result: any) => {
+          const canals: any[] = [];
+          if (result == undefined)
+            resolve(canals);
+          result.data.forEach((e: any) => {
+            canals.push({
+              id: e.id,
+              name: e.name,
+              image: e.image,
+              owner: e.owner,
+              users: e.users,
+              admins: e.admins,
+              password: e.password,
+              visibility: e.visibility
+            });
+          });
+          resolve(canals);
+        })
+      })
+    },
+    getCanalById: ({ commit }, canalid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/canal/${canalid}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    getCanalsByUserId: ({ commit }, userid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/canal/search/${userid}`).then((result: any) => {
+          const canals: any[] = [];
+          if (result == undefined)
+            resolve(canals);
+          result.data.forEach((e: any) => {
+            canals.push({
+              id: e.id,
+              name: e.name,
+              image: e.image,
+              owner: e.owner,
+              users: e.users,
+              admins: e.admins,
+              password: e.password,
+              visibility: e.visibility
+            });
+          });
+          resolve(canals);
+        })
+      })
+    },
+    deleteCanal: ({ commit }, canalid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.delete(`/canal/${canalid}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    createCanal: ({ commit }, canal) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/`, canal).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    updateCanal: ({ commit }, canal) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.patch(`/canal/`, canal).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+
+    // >>>>>>>>>> MESSAGE SECTION
+    
+    getMessages: ({ commit }) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/message/`).then((result: any) => {
+          const messages: any[] = [];
+          if (result == undefined)
+            resolve(messages);
+          result.data.forEach((e: any) => {
+            messages.push({
+              id: e.id,
+              author: e.author,
+              message: e.message,
+              canalid: e.canalid,
+            });
+          });
+          resolve(messages);
+        })
+      })
+    },
+    getMessagesByCanalId: ({ commit }, canalid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/message/${canalid}`).then((result: any) => {
+          const messages: any[] = [];
+          console.log(result);
+          if (result == undefined)
+            resolve(messages);
+          result.data.forEach((e: any) => {
+            messages.push({
+              id: e.id,
+              author: e.author,
+              message: e.message,
+              canalid: e.canalid,
+            });
+          });
+          resolve(messages);
+        })
+      })
+    },
+    createMessage: ({ commit }, msg) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/message/`, msg).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    // ==================================== END CHAT SECTION ===================
   },
+
   modules: {},
 });
 

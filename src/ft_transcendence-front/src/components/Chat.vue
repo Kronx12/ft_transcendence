@@ -26,12 +26,12 @@
 				v-for="message in messages"
 				:key="message"
 				:class="
-					message.author == this.username
+					message.author == this.$store.state.user.id
 						? 'message-current-user'
 						: 'message'
 				"
 			>
-				<div v-if="this.username != message.author">
+				<div v-if="this.$store.state.user.id != message.author">
 					<img
 						class="user-image"
 						v-bind:src="
@@ -70,30 +70,28 @@
 
 <script>
 export default {
-	props: ["username"],
 	data() {
 		return {
 			messages: [],
 			chats: [],
 			avatarURL: "",
-			current_chat: "1",
+			current_chat: 1,
 			inputMessage: "",
-			usernameIntra: "",
+			idIntra: -1,
 		};
 	},
 	async mounted() {
 		this.avatarURL = this.$store.state.user.avatarURL;
-		this.usernameIntra = this.username;
+		this.idIntra = this.$store.state.user.id;
 		
-		//this.refreshChat();
 		var objDiv = document.getElementById("messages-box-chat");
 		if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
-		//this.activate();
+		this.activate();
 	},
 	methods: {
 		async activate() {
-			var that = this;
-			setTimeout(function() { that.refreshChat(); }, 1000);
+			var self = this;
+			setTimeout(function() { self.refreshChat(); }, 1000);
 		},
 		// Submit messages data to database
 		messageSubmit: function () {
@@ -104,40 +102,32 @@ export default {
 			console.log("le user " + this.$store.state.user.avatarURL);
 
 			if (this.$store != undefined && this.$store != null) {
-				let chat = {
+				let msg = {
 					id: null,
-					author: this.$store.state.user.login,
+					author: this.$store.state.user.id,
 					message: this.inputMessage,
 					canalid: this.current_chat,
 				};
-				this.$store.dispatch("addMessage", chat);
+				this.$store.dispatch("createMessage", msg);
 			}
 			this.inputMessage = "";
-			//this.refreshChat();
-		
 		},
 		refreshChat: function () {
 			const self = this;
-			console.log(this.username)
 			
-			this.usernameIntra = this.username;
-			console.log("le nom de l'intra = " + self.username);
-			//   console.log("oui");
-			setInterval(function () {
-				if (self.$store != undefined && self.$store != null) {
-					self.$store
-						.dispatch("getMessagesCanal", self.current_chat)
-						.then(function (result) {
-							self.messages = result;
-						});
-
-					self.$store
-						.dispatch("getAllChats", self.username)
-						.then(function (result) {
-							self.chats = result;
-						});
-				}
-			}, 1000);
+			this.idIntra = this.$store.state.user.id;
+			if (self.$store != undefined && self.$store != null) {
+				self.$store
+					.dispatch("getMessagesByCanalId", self.current_chat)
+					.then(function (result) {
+						self.messages = result;
+					});
+				self.$store
+					.dispatch("getCanalsByUserId", this.$store.state.user.id)
+					.then(function (result) {
+						self.chats = result;
+					});
+			}
 		},
 	},
 };
