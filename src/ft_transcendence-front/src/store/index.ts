@@ -427,6 +427,7 @@ export default createStore({
       })
     },
     createMessage: ({ commit }, msg) => {
+      console.log(msg);
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.post(`/message/`, msg).then((result: any) => {
