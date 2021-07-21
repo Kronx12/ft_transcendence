@@ -3,7 +3,7 @@
 	<div id="chat">
 		<div id="header-chat">Chat</div>
 		<div id="list-chat">
-			<div @click="createNewCanal()">
+			<div id="add-button" @click="createNewCanal()">
 				<img class="icon" src="../assets/plus.svg" />
 				Channels
 			</div>
@@ -90,18 +90,20 @@ export default {
 			const self = this;
 			
 			this.userid = this.$store.state.user.id;
-			if (self.$store != undefined && self.$store != null) {
-				self.$store
-					.dispatch("getCanalsByUserId", this.$store.state.user.id)
-					.then(function (result) {
-						self.chats = result;
-					});
-				self.$store
-					.dispatch("getMessagesByCanalId", self.canalid)
-					.then(function (result) {
-						self.messages = result;
-					});
-			}
+			setInterval(function () {
+				if (self.$store != undefined && self.$store != null) {
+					self.$store
+						.dispatch("getCanalsByUserId", self.$store.state.user.id)
+						.then(function (result) {
+							self.chats = result;
+						});
+					self.$store
+						.dispatch("getMessagesByCanalId", self.canalid)
+						.then(function (result) {
+							self.messages = result;
+						});
+				}
+			}, 1000);
 		},
 		createNewCanal: function () {
 			this.$root.admin = true;

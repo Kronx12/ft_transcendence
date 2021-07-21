@@ -262,22 +262,13 @@ export class DatabaseService {
       this.usersRepo.update(user.id, user);
   }
 
-  serialize(lst: number[]): string {
-      let res = "";
-      lst.forEach(e => {
-          if (e != NaN)
-              res += e + ";";
-      });
-      res.slice(0, -1);
-      return (res);
+  // fonction de serialization d'un tableau d'entiers
+  serialize(array: number[]): string {
+      return array.join(':');
   }
 
-  deserialize(str: string): number[] {
-      let res: number[] = [];
-      str.split(";").forEach(e => {
-          if (e != "" && e != "NaN" && parseInt(e) != NaN)
-              res.push(parseInt(e));
-      });
-      return (res);
+  // fonction de deserialization d'une string en tableau d'entiers
+  deserialize(string: string): number[] {
+      return string.split(':').map(x=>+x);
   }
 }

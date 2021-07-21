@@ -6,7 +6,7 @@
     <form>
         <div class="form-section">
             <label for="name">name</label>
-            <input ref="name" type="name" id="name" name="name" maxlength="15" required>
+            <input ref="name" type="name" id="name" name="name" maxlength="10" required>
             <hr>
             <label for="image">image</label>
             <input ref="image" type="url" id="image" name="image">
@@ -69,7 +69,7 @@ export default {
         },
         destroy_popup() {
             this.$root.admin = false;
-        }
+        },
     },
     mounted() {
         this.$refs.submit.value = this.method;
