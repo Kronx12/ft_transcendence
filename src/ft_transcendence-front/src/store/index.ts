@@ -435,6 +435,16 @@ export default createStore({
       })
     },
     // ==================================== END CHAT SECTION ===================
+    // ==================================== GAME SECRETION =====================
+    getGameById: ({commit}, id) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        console.log("wait id: ", id)
+        instance.get(`/game_database/${id}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    }
   },
 
   modules: {},

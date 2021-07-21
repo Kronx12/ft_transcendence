@@ -242,11 +242,15 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     }
 
     fillUser(client: Socket, us: any): void {
+        if (us == null)
+            return;
         this.getClientBySocket(client).setUser(us);
         this.getClientBySocket(client).setState(State.READY);
     }
 
     updateClient(us: any, client: Socket): void {
+        if (this.getClientByUser(us) == null)
+            return;
         this.getClientByUser(us).setSocket(client);
         this.getClientByUser(us).setState(State.READY);
     }

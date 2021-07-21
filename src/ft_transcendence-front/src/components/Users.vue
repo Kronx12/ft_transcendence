@@ -6,11 +6,30 @@
     <button v-if="accept" @click="acceptFriend()">Accept friend !</button>
     <button v-else-if="add" @click="addFriend()">Add friend !</button>
     <button v-else-if="remove" @click="removeFriend()">Remove friend !</button>
-    <div v-if="invite">
+    <h1 v-else-if="aske">Request sended !</h1>
+    <div v-if="invite && id != this.$store.state.user.id">
       <button class="button" @click="sendInviteClassic()">Invite for normal game</button>
       <button class="button" @click="sendInviteBonus()">Invite for bonus game</button>
     </div>
-    <h1 v-else-if="aske">Request sended !</h1>
+    <hr>
+    <div style="width:100%;display: block" id="stats">
+      <h1 style="width:100%">Stats</h1>
+      <div style="width:100%">
+        <div class="wins">
+          Wins:
+        </div>
+        <div class="looses">
+          Looses:
+        </div>
+        <div class="winrate">
+          W/L rates:
+        </div>
+      </div>
+      <hr>
+      <div class="history" style="width:100%">
+        <h1>History</h1>
+      </div>
+    </div>
   </div>
   <div class="users-aff" v-else-if="result.length">
     <div v-for="user in result" :key="user" style="width: 20% !important; margin-left: auto; margin-right: auto;">
@@ -42,6 +61,7 @@ export default {
       result: [],
       friends: [],
       requests: [],
+      history: [],
       asked: [],
       last: "",
       accept: 0,
@@ -52,9 +72,9 @@ export default {
     };
   },
   methods: {
-    searchUser: function () {
+    searchUser: async function () {
       const self = this;
-      this.$store
+      await this.$store
         .dispatch("searchUser", this.$route.params.user)
         .then((result) => {
           if (result.type == "unique") {
@@ -63,6 +83,12 @@ export default {
             self.avatar = result.data.avatar;
             self.isFriend();
             self.haveAsked();
+            console.log("history", result.data.game_history);
+            self.history = result.data.game_history;
+
+            self.$store.dispatch("getGameById", 1).then((result) => {
+              console.log(result)
+            })
           } else {
             self.result = result.data;
           }
@@ -173,7 +199,7 @@ export default {
       await this.$store.dispatch("getFriend", this.$store.state.user.id);
       this.last = this.$route.params.user;
       (this.id = -1), (this.login = ""), (this.avatar = ""), (this.result = []);
-      this.searchUser();
+      await this.searchUser();
     }
   },
 };
@@ -223,6 +249,7 @@ div.user-aff {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  font-weigth: bold;
 }
+
+
 </style>
