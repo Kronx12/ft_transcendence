@@ -70,7 +70,8 @@ export class DatabaseService {
     if (content.hasOwnProperty('auth')) user.auth = content.auth;
     if (content.hasOwnProperty('friends_request'))
       user.friends_request = content.friends_request;
-
+    if (content.hasOwnProperty('game_history')) user.game_history = content.game_history;
+      
     console.log("edit user ! ", content);
     this.usersRepo.update(user.id, user);
     return { user };

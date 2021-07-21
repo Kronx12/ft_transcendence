@@ -176,6 +176,7 @@ export class Room {
                         "victory": this._winner.id,
                         "type": 0
                     }, this._id, this._playera._user.id, this._playerb._user.id);
+                    break;
                 }
 
                 this._bx += this._vx;
@@ -439,6 +440,7 @@ export class RoomBonus {
                         "victory": this._winner.id,
                         "type": 1
                     }, this._id, this._playera._user.id, this._playerb._user.id);
+                    break;
                 }
 
                 this._bx += this._vx;
