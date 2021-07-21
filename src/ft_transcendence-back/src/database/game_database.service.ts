@@ -15,11 +15,12 @@ export class GameDatabaseService {
     }
 
     findOne(id: number): Promise<Games> {
-        return this.gamesRepo.findOne(id);
+        console.log(id)
+        return this.gamesRepo.findOne({ where: `id = '${id}'` });
     }
 
     getId(id: string): Promise<Games> {
-        return this.gamesRepo.findOne({ where: `uuid = '${id}'` });
+        return this.gamesRepo.findOne();
     }
 
     addGame(game: Games): Promise<Games[]> {

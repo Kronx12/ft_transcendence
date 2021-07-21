@@ -6,11 +6,38 @@
     <button v-if="accept" @click="acceptFriend()">Accept friend !</button>
     <button v-else-if="add" @click="addFriend()">Add friend !</button>
     <button v-else-if="remove" @click="removeFriend()">Remove friend !</button>
-    <div v-if="invite">
+    <h1 v-else-if="aske">Request sended !</h1>
+    <div v-if="invite && id != this.$store.state.user.id">
       <button class="button" @click="sendInviteClassic()">Invite for normal game</button>
       <button class="button" @click="sendInviteBonus()">Invite for bonus game</button>
     </div>
-    <h1 v-else-if="aske">Request sended !</h1>
+    <hr>
+    <div style="width:100%;display: block" id="stats">
+      <h1 style="width:100%">Stats</h1>
+      <div style="width:100%">
+        <div class="wins">
+          Wins: {{win}}
+        </div>
+        <div class="looses">
+          Looses: {{loose}}
+        </div>
+        <div class="winrate">
+          W/L rates: {{ (loose + win) > 0 ? win * 100 / (loose+win) : 0 }}%
+        </div>
+      </div>
+      <hr>
+      <div class="history" style="width:100%">
+        <h1>History</h1>
+        <div class="history-box" v-for="item in history" :key="item">
+          <div :key="item" v-if="item.win == id" style="background: green">
+          {{item.p1_l}} vs {{item.p2_l}} | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
+          </div>
+          <div v-else style="background: red">
+          {{item.p1_l}} vs {{item.p2_l}} | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
   <div class="users-aff" v-else-if="result.length">
     <div v-for="user in result" :key="user" style="width: 20% !important; margin-left: auto; margin-right: auto;">
@@ -42,6 +69,7 @@ export default {
       result: [],
       friends: [],
       requests: [],
+      history: [],
       asked: [],
       last: "",
       accept: 0,
@@ -49,20 +77,67 @@ export default {
       remove: 0,
       aske: 0,
       invite: 1,
+      win: 0,
+      loose: 0
     };
   },
   methods: {
-    searchUser: function () {
+    searchUser: async function () {
       const self = this;
-      this.$store
+      await this.$store
         .dispatch("searchUser", this.$route.params.user)
-        .then((result) => {
+        .then(async (result) => {
           if (result.type == "unique") {
             self.id = result.data.intra_id;
             self.login = result.data.username;
             self.avatar = result.data.avatar;
             self.isFriend();
             self.haveAsked();
+            console.log("history", result.data.game_history);
+            let history = result.data.game_history.split(":");
+            let schema = {
+              p1: "",
+              p2: "",
+              p1_l: "",
+              p2_l: "",
+              win: "",
+              win_l: "",
+              s1: 0,
+              s2: 0,
+              type: 0
+            }
+            for(let x in history)
+            {
+                await self.$store.dispatch("getGameById", history[x]).then(async (result) => {
+                  console.log(history[x], result)
+                  schema.p1 = result.player_1;
+                  schema.s1 = result.score_1;
+
+                  schema.p2 = result.player_2;
+                  schema.s2 = result.score_2;
+
+                  schema.win = result.victory;
+                  await self.$store.dispatch("getUser", schema.p1).then(function (data) {
+              schema.p1_l = data.username
+            })
+                   await self.$store.dispatch("getUser", schema.p2)
+            .then(function (data) {
+              schema.p2_l = data.username
+            })
+
+              await self.$store.dispatch("getUser", schema.win)
+            .then(function (data) {
+              schema.win_l = data.username
+            })
+                  schema.type = result.type;
+
+                  if (result.victory == self.id)
+                    self.win++;
+                  else
+                    self.loose++;
+                })
+                self.history.push({...schema});
+            }
           } else {
             self.result = result.data;
           }
@@ -173,7 +248,7 @@ export default {
       await this.$store.dispatch("getFriend", this.$store.state.user.id);
       this.last = this.$route.params.user;
       (this.id = -1), (this.login = ""), (this.avatar = ""), (this.result = []);
-      this.searchUser();
+      await this.searchUser();
     }
   },
 };
@@ -223,6 +298,13 @@ div.user-aff {
   text-decoration: none;
   display: inline-block;
   font-size: 16px;
-  font-weigth: bold;
 }
+
+.history-box {
+  width: 30%;
+  color: white;
+  border: solid black 2px;
+}
+
+
 </style>

@@ -13,6 +13,7 @@ export class GameDatabaseController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
+        console.log(id)
         return this.databaseServ.findOne(+id);
     }
 
