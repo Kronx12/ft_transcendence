@@ -4,18 +4,16 @@
 		<div id="header-chat">Chat</div>
 		<div id="list-chat">
 			<div id="add-button" @click="createNewCanal()">
-				<img class="icon" src="../assets/plus.svg" />
+				<img class="icon" src="../assets/add.svg" />
 				Channels
 			</div>
 			<div v-for="chat in chats" :key="chat" class="chat-canal" >
-				<div class="name-canal">
-					<a class="chat-name" @click="canalid = chat.id">
-						{{ chat.name }}
-					</a>
-				</div>
-				<div class="settings-canal">
-					<img src="./../assets/settings.svg" />
-					<img src="./../assets/settings.svg" />
+				<a class="chat-canal-link" @click="canalid = chat.id">
+					{{ chat.name }}
+				</a>
+				<div class="chat-canal-settings">
+					<img src="./../assets/user.svg" />
+					<img @click="updateCanal()" src="./../assets/settings.svg" />
 				</div>
 			</div>
 		</div>
@@ -108,7 +106,12 @@ export default {
 		createNewCanal: function () {
 			this.$root.admin = true;
 			this.$root.admin_method = "create";
-		}
+		},
+		updateCanal: function () {
+			this.$root.admin = true;
+			this.$root.admin_method = "update";
+			this.$root.admin_id = this.canalid;
+		},
 	},
 };
 </script>

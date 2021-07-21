@@ -64,7 +64,13 @@ export class CanalService {
     // @param canal: le canal à sauvegarder
     // @param user: id du nouvel utilisateur
         // @return: le canal sauvegardé
-    saveCanal(canal: Canal, user: number) {
-        return this.CanalRepo.save({ users: this.addIdToSerialized(user, canal.users) }, { where: { id: canal.id } });
+    addIdToUser(canal: Canal, user: number) {
+        canal.users = this.addIdToSerialized(user, canal.users)
+        return this.CanalRepo.save(canal);
+    }
+    
+    addIdToAdmins(canal: Canal, user: number) {
+        canal.admins = this.addIdToSerialized(user, canal.admins)
+        return this.CanalRepo.save(canal);
     }
 }
