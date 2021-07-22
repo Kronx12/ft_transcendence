@@ -26,6 +26,23 @@ export class DatabaseController {
         if (id != '-1') return this.databaseServ.findOne(id);
   }
 
+  // fonction qui recupere tous les user a partir d'un tableau de id
+  @Post('users/')
+  async getUsers(@Headers('authorization') auth, @Body() users) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) {
+        resp = {
+          error: '401 Unauthorized',
+        };
+      } else {
+        resp = await self.databaseServ.getUsers(users);
+      }
+    });
+    return resp;
+  }
+
   @Get('user/search/:name')
   async searchUser(@Headers('authorization') auth, @Param('name') name) {
     const self = this;
@@ -195,5 +212,19 @@ export class DatabaseController {
       }
     });
     return resp;
+  }
+
+  // /database/other_users/:id
+  @Get('/other_users/:id')
+  async getCanalsOtherUsers(@Headers('authorization') auth, @Param('id') id) {
+      const self = this;
+      let resp;
+      await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+          if (err)
+              resp = { error: '401 Unauthorized' };
+          else
+              resp = self.databaseServ.getCanalsOtherUsers(id);
+      });
+      return resp;
   }
 }

@@ -16,7 +16,7 @@ export class CanalService {
     }
 
     getCanalsByUserId(id: number): Promise<Canal[] | undefined> {
-        return this.CanalRepo.find({ where: `users LIKE '%${id}%'` });
+        return this.CanalRepo.find({ where: `users LIKE '%${id}%' OR visibility = 0 OR visibility = 1 ORDER BY visibility` });
     }
 
     deleteCanalById(id: number) {
@@ -30,6 +30,22 @@ export class CanalService {
 
     updataCanal(canal: Canal) {
         return this.CanalRepo.save(canal);
+    }
+
+    getNonAdminUserIds(canalid: number): number[] {
+        const canal = this.getCanalById(canalid)[0];
+        if (canal != undefined) {
+            const admins = canal.admins.split(':');
+            const users = canal.users.split(':');
+            const nonAdmins = [];
+            for (let i = 0; i < users.length; i++) {
+                if (admins.indexOf(users[i]) === -1) {
+                    nonAdmins.push(users[i]);
+                }
+            }
+            return nonAdmins;
+        }
+        return [];
     }
 
     // fonction qui ajoute un number id dans une chaine serialisée

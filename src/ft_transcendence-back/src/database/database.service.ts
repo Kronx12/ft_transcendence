@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Any, Repository } from 'typeorm';
 import { Users } from '../entities/users.entity';
 
 @Injectable()
@@ -249,6 +249,10 @@ export class DatabaseService {
     };
   }
 
+  getCanalsOtherUsers(canalid: number) {
+    return this.usersRepo.find({ where: `canals NOT LIKE '%${canalid}%'` });
+  }
+
   async getGameHistory(id: number) {
       return (await this.usersRepo.findOne(id)).game_history;
   }
@@ -261,6 +265,12 @@ export class DatabaseService {
           tmp.push(gameid);
       user.game_history = this.serialize(tmp);
       this.usersRepo.update(user.id, user);
+  }
+
+  // fonction qui recupere les users a partir d'un tableau d'id
+  // la fonction retourne un tableau de users
+  getUsers(ids: Array<number>) {
+    return this.usersRepo.find({ where: { intra_id: Any(ids) } });
   }
 
   // fonction de serialization d'un tableau d'entiers

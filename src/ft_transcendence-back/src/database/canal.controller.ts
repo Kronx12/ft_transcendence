@@ -83,4 +83,18 @@ export class CanalController {
         });
         return resp;
     }
+
+    // /canal/non_admin/:id
+    @Get('/non_admin/:id')
+    async getNonAdminUserIds(@Headers('authorization') auth, @Param('id') id) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.getNonAdminUserIds(id);
+        });
+        return resp;
+    }
 }

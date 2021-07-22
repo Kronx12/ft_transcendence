@@ -304,6 +304,19 @@ export default createStore({
       commit("setAuth", true);
     },
     // ==================================== CHAT SECTION ===================
+    // >>>>>>>>>> USER LOGIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+    getUsersFromIds: ({ commit }, ids) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/database/users/`, ids).then((result: any) => {  
+          resolve(result.data);
+        });
+      });
+    },
+
+    // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
 
     // >>>>>>>>>> CANAL SECTION
     getCanals: ({ commit }) => {
@@ -384,6 +397,34 @@ export default createStore({
         })
       })
     },
+    getUsersNotInCanal: ({ commit }, canalid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/database/other_users/${canalid}`).then((result: any) => {
+          const users: any[] = [];
+          if (result == undefined)
+            resolve(users);
+          result.data.forEach((e: any) => {
+            users.push(e.intra_id);
+          });
+          resolve(users);
+        })
+      })
+    },
+    getUsersNotAdmin: ({ commit }, canalid) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/canal/non_admin/${canalid}`).then((result: any) => {
+          const users: any[] = [];
+          if (result == undefined)
+            resolve(users);
+          result.data.forEach((e: any) => {
+            users.push(e.intra_id);
+          });
+          resolve(users);
+        })
+      })
+    },
 
     // >>>>>>>>>> MESSAGE SECTION
     
@@ -411,7 +452,6 @@ export default createStore({
       return new Promise((resolve, reject) => {
         instance.get(`/message/${canalid}`).then((result: any) => {
           const messages: any[] = [];
-          console.log(result);
           if (result == undefined)
             resolve(messages);
           result.data.forEach((e: any) => {
@@ -427,7 +467,6 @@ export default createStore({
       })
     },
     createMessage: ({ commit }, msg) => {
-      console.log(msg);
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.post(`/message/`, msg).then((result: any) => {
@@ -440,7 +479,6 @@ export default createStore({
     getGameById: ({commit}, id) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        console.log("wait id: ", id)
         instance.get(`/game_database/${id}`).then((result: any) => {
           resolve(result.data);
         })

@@ -14,12 +14,8 @@
         >Login</router-link
       >
       <a v-if="this.$store.state.user.id != -1" class="fixedButton">
-        <button
-          id="roundedFixedBtn"
-          @click="chatAppear()"
-          class="action-button shadow animate green"
-        >
-          CHAT
+        <button id="roundedFixedBtn" >
+          <img @click="chatAppear()" v-if="this.$store.state.user.id != -1" src="./assets/email.svg" />
         </button>
         <!-- <div class="roundedFixedBtn">CHAT</div> -->
       </a>
@@ -47,7 +43,8 @@
       :receiver="i.receiver"
     />
   </div>
-  <ChatAdmin  v-if="this.$store.state.user.id != -1 && this.admin" v-bind:method="this.admin_method" v-bind:id="this.admin_id" />
+  <ChatAdmin  v-if="this.$store.state.user.id != -1 && this.admin == 1" v-bind:method="this.admin_method" v-bind:id="this.admin_id" />
+  <ChatAdminUsers  v-if="this.$store.state.user.id != -1 && this.admin == 2" v-bind:id="this.admin_id" />
   <router-view />
 </template>
 
@@ -57,6 +54,7 @@ const jwt = require("jsonwebtoken");
 import { mapState } from "vuex";
 import Chat from "./components/Chat.vue";
 import ChatAdmin from "./components/ChatAdmin.vue";
+import ChatAdminUsers from "./components/ChatAdminUsers.vue";
 import SearchBar from "./components/SearchBar.vue";
 import Friends from "./components/Friends.vue";
 import ProfileMenu from "./components/ProfileMenu.vue";
@@ -71,6 +69,7 @@ export default {
     Invitation,
     Chat,
     ChatAdmin,
+    ChatAdminUsers,
   },
   data() {
     return {
@@ -93,9 +92,9 @@ export default {
       avatarURL: this.$store.state.user.avatarURL,
       type: "NORMAL",
       result: {},
-      admin: false,
+      admin: 0,
       admin_method: "create",
-      admin_id: "0",
+      admin_id: 0,
     };
   },
   methods: {
@@ -455,39 +454,21 @@ template {
 
 .fixedButton {
   position: fixed;
-  bottom: 0px;
-  right: 0px;
-  padding: 20px;
+  bottom: 90px;
+  right: 50px;
 }
 
 #roundedFixedBtn {
-  height: 60px;
-  line-height: 80px;
+  height: 0px;
   width: 100px;
-  font-weight: bold;
-  text-align: center;
   cursor: pointer;
-  border-radius: 10px;
-  font-family: Avenir, cursive;
-  font-size: 15px;
-  color: #fff;
-  text-decoration: none;
-  border: 0px;
-  background-color: #82bf56;
-  border-bottom: 5px solid #669644;
-  text-shadow: 0px -2px #669644;
-  transition: all 0.1s;
-  -webkit-transition: all 0.1s;
+  border: none;
+  background-color: transparent;
 }
-.action-button:active {
-  transform: translate(0px, 5px);
-  -webkit-transform: translate(0px, 5px);
-  border-bottom: 1px solid;
-  /* margin-bottom: 50px; */
-}
-.animate {
-  transition: all 0.1s;
-  -webkit-transition: all 0.1s;
+
+#roundedFixedBtn>img:hover {
+  filter: drop-shadow(8px 8px 4px rgba(0, 0, 0, 0.5));
+  -webkit-transition: filter 0.3s;;
 }
 
 #notif {

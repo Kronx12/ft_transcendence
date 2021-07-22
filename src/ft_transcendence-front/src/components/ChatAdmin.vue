@@ -13,13 +13,13 @@
             <hr>
             <label class="important" for="visibility">Visibility:</label>
             <br>
-            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="public" value="public" name="visibility" checked required>
+            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="public" value="public" name="visibility" :checked="visibility == 0" required>
             <label for="public">public</label>
             <br>
-            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="private" value="private" name="visibility" required>
+            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="private" value="private" name="visibility" :checked="visibility == 1" required>
             <label for="private">private</label>
             <br>
-            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="protected" value="protected" name="visibility" required>
+            <input ref="visibility" v-model="visibility" @change="updatePassword()" type="radio" id="protected" value="protected" name="visibility" :checked="visibility == 2" required>
             <label for="protected">protected</label>
             <br>
             <div v-if="this.last_visibility == 1">
@@ -38,7 +38,8 @@ export default {
 	props: ["id", "method"],
     data() {
         return {
-            last_visibility: 0
+            last_visibility: 0,
+            visibility: 0,
         }
     },
     methods: {
@@ -55,7 +56,20 @@ export default {
                     password: this.last_visibility == 1 ? this.$refs.password.value : "",
                     visibility: this.last_visibility,
                 }
-                console.log(this.$store.dispatch("createCanal", canal));
+                this.$store.dispatch("createCanal", canal);
+                this.destroy_popup();
+            } else if (this.method == "update") {
+                let canal = {
+                    id: this.id,
+                    name: this.$refs.name.value,
+                    image: this.$refs.image.value,
+                    owner: this.$root.$store.state.user.id,
+                    users: String(this.$root.$store.state.user.id),
+                    admins: String(this.$root.$store.state.user.id),
+                    password: this.last_visibility == 1 ? this.$refs.password.value : "",
+                    visibility: this.last_visibility,
+                }
+                this.$store.dispatch("updateCanal", canal);
                 this.destroy_popup();
             }
         },
@@ -68,12 +82,26 @@ export default {
                 this.last_visibility = 2;
         },
         destroy_popup() {
-            this.$root.admin = false;
+            this.$root.admin = 0;
         },
     },
     mounted() {
         this.$refs.submit.value = this.method;
-    }
+
+        if (this.method == "update") {
+            console.log("UPDATE CANAL");
+            this.$store.dispatch("getCanalById", this.id).then(canal => {
+                canal = canal[0];
+                console.log("CANAL:", canal);
+                console.log("CANAL USERS:", canal.name);
+                this.$refs.name.value = canal.name;
+                this.$refs.image.value = canal.image;
+                this.visibility = canal.visibility;
+                if (canal.visibility == 1)
+                    this.$refs.password.value = canal.password;
+            });
+        }
+    },
 }
 </script>
 

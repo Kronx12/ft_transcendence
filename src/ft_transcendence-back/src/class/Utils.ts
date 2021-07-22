@@ -64,7 +64,7 @@ export class Room {
     _vx: number;
     _vy: number;
 
-    _spectators: Socket[]; // TODO
+    _spectators: Socket[];
 
     _canvas_w: number;
     _canvas_h: number;

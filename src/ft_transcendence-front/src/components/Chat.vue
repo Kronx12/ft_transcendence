@@ -8,13 +8,14 @@
 				Channels
 			</div>
 			<div v-for="chat in chats" :key="chat" class="chat-canal" >
+				<img id="chat-canal-visibility" v-if="chat.visibility == 0" src="../assets/earth-globe.svg" />
+				<img id="chat-canal-visibility" v-else-if="chat.visibility == 1" src="../assets/lock.svg" />
+				<img id="chat-canal-visibility" v-else-if="chat.visibility == 2" src="../assets/chat.svg" />
 				<a class="chat-canal-link" @click="canalid = chat.id">
 					{{ chat.name }}
 				</a>
-				<div class="chat-canal-settings">
-					<img src="./../assets/user.svg" />
-					<img @click="updateCanal()" src="./../assets/settings.svg" />
-				</div>
+				<img id="chat-canal-settings" v-if="chat.id == canalid" @click="updateUsers()" src="../assets/user.svg" />
+				<img id="chat-canal-settings" v-if="chat.id == canalid" @click="updateCanal()" src="../assets/settings.svg" />
 			</div>
 		</div>
 		<div id="messages-box-chat">
@@ -70,8 +71,6 @@ export default {
 			if (this.inputMessage == null || this.inputMessage == "") {
 				return;
 			}
-			console.log("le message " + this.inputMessage);
-			console.log("le user " + this.$store.state.user.avatarURL);
 
 			if (this.$store != undefined && this.$store != null) {
 				let msg = {
@@ -104,11 +103,16 @@ export default {
 			}, 1000);
 		},
 		createNewCanal: function () {
-			this.$root.admin = true;
+			this.$root.admin = 1;
 			this.$root.admin_method = "create";
 		},
 		updateCanal: function () {
-			this.$root.admin = true;
+			this.$root.admin = 1;
+			this.$root.admin_method = "update";
+			this.$root.admin_id = this.canalid;
+		},
+		updateUsers: function () {
+			this.$root.admin = 2;
 			this.$root.admin_method = "update";
 			this.$root.admin_id = this.canalid;
 		},
