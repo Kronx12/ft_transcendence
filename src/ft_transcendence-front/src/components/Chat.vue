@@ -5,7 +5,6 @@
 		<div id="list-chat">
 			<div id="add-button" @click="createNewCanal()">
 				<img class="icon" src="../assets/add.svg" />
-				Channels
 			</div>
 			<div v-for="chat in chats" :key="chat" class="chat-canal">
 				<img
@@ -102,10 +101,10 @@ export default {
 			inputMessage: "",
 			userid: -1,
 			userImage: "",
+			canalname: "",
 		};
 	},
 	async mounted() {
-		// console.log("Le login quon cherche = " + this.$store.dispatch("getUser", 77110));
 		this.avatarURL = this.$store.state.user.avatarURL;
 		this.userid = this.$store.state.user.id;
 
@@ -151,6 +150,7 @@ export default {
 						.then(function (result) {
 							self.messages = result;
 						});
+						// self.getCanalName(self.$store.state.canalid);
 				}
 			}, 1000);
 		},
@@ -171,8 +171,12 @@ export default {
 		getUserImage: function (id) {
 			const self = this;
 
-			if (self.$store != undefined && self.$store != null &&
-				id != null && id != undefined) {
+			if (
+				self.$store != undefined &&
+				self.$store != null &&
+				id != null &&
+				id != undefined
+			) {
 				self.$store.dispatch("getUser", id).then(function (result) {
 					// console.log(result.username + " " + id);
 					self.userImage = result.username;
@@ -183,8 +187,16 @@ export default {
 			return self.userImage;
 		},
 		goToUserProfile: function (user) {
-			if (user != undefined && user != null) 
-				this.$router.push(`/user/${user}`);
+			if (user != undefined && user != null) this.$router.push(`/user/${user}`);
+		},
+		getCanalName: function () {
+			const self = this;
+			if (self.$store != undefined && self.$store != null)
+				self.$store
+					.dispatch("getCanalById", self.$store.state.canalid)
+					.then(function (result) {
+						self.canalname = result.name;
+					});
 		},
 	},
 };
