@@ -115,8 +115,6 @@ export default {
     updateFriend: async function () {
       const self = this;
       await self.$store.dispatch("getFriend", self.$store.state.user.id);
-      if (self.$store.state.friends.request == undefined)
-      return ;
        const request = self.$store.state.friends.request.split(":");
       const schema = { id: "", username: "", status: 0 };
       if (request != "") {

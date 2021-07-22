@@ -48,7 +48,10 @@
 					message.author == this.userid ? 'message-current-user' : 'message'
 				"
 			>
-				<div v-if="this.userid != message.author">
+				<div
+					v-if="this.userid != message.author"
+					v-on:click="goToUserProfile(getUserImage(message.author))"
+				>
 					<img
 						class="user-image"
 						v-bind:src="
@@ -56,6 +59,7 @@
 							getUserImage(message.author) +
 							'.jpg'
 						"
+						v-bind:alt="getUserImage(message.author)"
 					/>
 					<div class="content" :key="message">
 						{{ message.message }}
@@ -97,7 +101,7 @@ export default {
 			canalid: -1,
 			inputMessage: "",
 			userid: -1,
-			userImage: ""
+			userImage: "",
 		};
 	},
 	async mounted() {
@@ -118,8 +122,7 @@ export default {
 		},
 		// Submit messages data to database
 		messageSubmit: function () {
-			if (this.inputMessage == null || this.inputMessage == "")
-				return;
+			if (this.inputMessage == null || this.inputMessage == "") return;
 
 			if (this.$store != undefined && this.$store != null) {
 				let msg = {
@@ -168,16 +171,21 @@ export default {
 		getUserImage: function (id) {
 			const self = this;
 
-			if (self.$store != undefined && self.$store != null && id != null && id != undefined) {
+			if (self.$store != undefined && self.$store != null &&
+				id != null && id != undefined) {
 				self.$store.dispatch("getUser", id).then(function (result) {
-					// console.log(result);
+					// console.log(result.username + " " + id);
 					self.userImage = result.username;
-				})
+				});
 				return self.userImage;
 			}
-			return "thallard";
-
-		}
+			self.userImage = "thallard";
+			return self.userImage;
+		},
+		goToUserProfile: function (user) {
+			if (user != undefined && user != null) 
+				this.$router.push(`/user/${user}`);
+		},
 	},
 };
 </script>
