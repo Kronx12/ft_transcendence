@@ -357,19 +357,26 @@ export default createStore({
           const canals: any[] = [];
           if (result == undefined)
             resolve(canals);
-          result.data.forEach((e: any) => {
-            canals.push({
-              id: e.id,
-              name: e.name,
-              image: e.image,
-              owner: e.owner,
-              users: e.users,
-              admins: e.admins,
-              password: e.password,
-              visibility: e.visibility
+          try {
+            result.data.forEach((e: any) => {
+              canals.push({
+                id: e.id,
+                name: e.name,
+                image: e.image,
+                owner: e.owner,
+                users: e.users,
+                admins: e.admins,
+                password: e.password,
+                visibility: e.visibility
+              });
             });
-          });
-          resolve(canals);
+            resolve(canals);
+          }
+          catch (error)
+          {
+            ;
+          }
+         
         })
       })
     },

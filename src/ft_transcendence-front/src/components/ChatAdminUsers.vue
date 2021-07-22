@@ -1,3 +1,4 @@
+/* eslint-disable */
 <template>
 <div id="admin_body">
     <div @click="destroy_popup()" id="quit"><img src="../assets/close.svg" class="denied"></div>

@@ -14,7 +14,7 @@ const jwt = require('jsonwebtoken');
 
 @Controller('database')
 export class DatabaseController {
-  constructor(private readonly databaseServ: DatabaseService) {}
+  constructor(private readonly databaseServ: DatabaseService) { }
 
   @Get('user')
   async findAll(@Headers('authorization') auth) {
@@ -23,7 +23,7 @@ export class DatabaseController {
 
   @Get('user/:intra')
   async findOne(@Headers('authorization') auth, @Param('intra') id) {
-        if (id != '-1') return this.databaseServ.findOne(id);
+    if (id != '-1') return this.databaseServ.findOne(id);
   }
 
   // fonction qui recupere tous les user a partir d'un tableau de id
@@ -217,14 +217,14 @@ export class DatabaseController {
   // /database/other_users/:id
   @Get('/other_users/:id')
   async getCanalsOtherUsers(@Headers('authorization') auth, @Param('id') id) {
-      const self = this;
-      let resp;
-      await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-          if (err)
-              resp = { error: '401 Unauthorized' };
-          else
-              resp = self.databaseServ.getCanalsOtherUsers(id);
-      });
-      return resp;
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.getCanalsOtherUsers(id);
+    });
+    return resp;
   }
 }

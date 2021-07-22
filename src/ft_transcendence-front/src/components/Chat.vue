@@ -7,21 +7,56 @@
 				<img class="icon" src="../assets/add.svg" />
 				Channels
 			</div>
-			<div v-for="chat in chats" :key="chat" class="chat-canal" >
-				<img id="chat-canal-visibility" v-if="chat.visibility == 0" src="../assets/earth-globe.svg" />
-				<img id="chat-canal-visibility" v-else-if="chat.visibility == 1" src="../assets/lock.svg" />
-				<img id="chat-canal-visibility" v-else-if="chat.visibility == 2" src="../assets/chat.svg" />
+			<div v-for="chat in chats" :key="chat" class="chat-canal">
+				<img
+					id="chat-canal-visibility"
+					v-if="chat.visibility == 0"
+					src="../assets/earth-globe.svg"
+				/>
+				<img
+					id="chat-canal-visibility"
+					v-else-if="chat.visibility == 1"
+					src="../assets/lock.svg"
+				/>
+				<img
+					id="chat-canal-visibility"
+					v-else-if="chat.visibility == 2"
+					src="../assets/chat.svg"
+				/>
 				<a class="chat-canal-link" @click="canalid = chat.id">
 					{{ chat.name }}
 				</a>
-				<img id="chat-canal-settings" v-if="chat.id == canalid" @click="updateUsers()" src="../assets/user.svg" />
-				<img id="chat-canal-settings" v-if="chat.id == canalid" @click="updateCanal()" src="../assets/settings.svg" />
+				<img
+					id="chat-canal-settings"
+					v-if="chat.id == canalid"
+					@click="updateUsers()"
+					src="../assets/user.svg"
+				/>
+				<img
+					id="chat-canal-settings"
+					v-if="chat.id == canalid"
+					@click="updateCanal()"
+					src="../assets/settings.svg"
+				/>
 			</div>
 		</div>
 		<div id="messages-box-chat">
-			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
+			<div
+				v-for="message in messages"
+				:key="message"
+				:class="
+					message.author == this.userid ? 'message-current-user' : 'message'
+				"
+			>
 				<div v-if="this.userid != message.author">
-					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + message.author + '.jpg'" />
+					<img
+						class="user-image"
+						v-bind:src="
+							'https://cdn.intra.42.fr/users/small_' +
+							getUserImage(message.author) +
+							'.jpg'
+						"
+					/>
 					<div class="content" :key="message">
 						{{ message.message }}
 					</div>
@@ -33,8 +68,19 @@
 				</div>
 			</div>
 		</div>
-		<form v-if="this.canalid != -1" ref="formChat" @submit.prevent="messageSubmit" id="input-chat" autocomplete="off">
-			<input type="text" id="input-text-chat" v-model="inputMessage" placeholder="Write a message..." />
+		<form
+			v-if="this.canalid != -1"
+			ref="formChat"
+			@submit.prevent="messageSubmit"
+			id="input-chat"
+			autocomplete="off"
+		>
+			<input
+				type="text"
+				id="input-text-chat"
+				v-model="inputMessage"
+				placeholder="Write a message..."
+			/>
 			<input type="submit" id="input-submit-chat" value="Send" />
 		</form>
 		<h3 v-else>SELECT A CANAL FIRST</h3>
@@ -51,12 +97,14 @@ export default {
 			canalid: -1,
 			inputMessage: "",
 			userid: -1,
+			userImage: ""
 		};
 	},
 	async mounted() {
+		// console.log("Le login quon cherche = " + this.$store.dispatch("getUser", 77110));
 		this.avatarURL = this.$store.state.user.avatarURL;
 		this.userid = this.$store.state.user.id;
-		
+
 		var objDiv = document.getElementById("messages-box-chat");
 		if (objDiv != null) objDiv.scrollTop = objDiv.scrollHeight;
 		this.activate();
@@ -64,13 +112,14 @@ export default {
 	methods: {
 		async activate() {
 			var self = this;
-			setTimeout(function() { self.refreshChat(); }, 1000);
+			setTimeout(function () {
+				self.refreshChat();
+			}, 1000);
 		},
 		// Submit messages data to database
 		messageSubmit: function () {
-			if (this.inputMessage == null || this.inputMessage == "") {
+			if (this.inputMessage == null || this.inputMessage == "")
 				return;
-			}
 
 			if (this.$store != undefined && this.$store != null) {
 				let msg = {
@@ -85,7 +134,7 @@ export default {
 		},
 		refreshChat: function () {
 			const self = this;
-			
+
 			this.userid = this.$store.state.user.id;
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
@@ -116,6 +165,19 @@ export default {
 			this.$root.admin_method = "update";
 			this.$root.admin_id = this.canalid;
 		},
+		getUserImage: function (id) {
+			const self = this;
+
+			if (self.$store != undefined && self.$store != null && id != null && id != undefined) {
+				self.$store.dispatch("getUser", id).then(function (result) {
+					// console.log(result);
+					self.userImage = result.username;
+				})
+				return self.userImage;
+			}
+			return "thallard";
+
+		}
 	},
 };
 </script>
