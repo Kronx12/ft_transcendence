@@ -63,6 +63,8 @@ export default createStore({
     },
     getUser: ({ commit }, id) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      if (id == undefined)
+        return;
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/${id}`).then(function (user: any) {
           
