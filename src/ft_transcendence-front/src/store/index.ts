@@ -406,6 +406,38 @@ export default createStore({
         })
       })
     },
+    addAdminUserId: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/add_admin/`, specs).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    addUserId: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/add_user/`, specs).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    delAdminUserId: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/del_admin/`, specs).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    delUserId: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/del_user/`, specs).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
     getUsersNotInCanal: ({ commit }, canalid) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {

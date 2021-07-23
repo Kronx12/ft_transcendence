@@ -97,4 +97,60 @@ export class CanalController {
         });
         return resp;
     }
+
+    // /canal/add_admin/
+    @Post('/add_admin/')
+    async addAdminUserId(@Headers('authorization') auth, @Body() body) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.addAdminUserId(body.canal_id, body.id);
+        });
+        return resp;
+    }
+
+    // /canal/add_user/
+    @Post('/add_user/')
+    async addUserId(@Headers('authorization') auth, @Body() body) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.addUserId(body.canal_id, body.id);
+        });
+        return resp;
+    }
+
+    // /canal/del_admin/
+    @Post('/del_admin/')
+    async delAdminUserId(@Headers('authorization') auth, @Body() body) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.delAdminUserId(body.canal_id, body.id);
+        });
+        return resp;
+    }
+
+    // /canal/del_user/
+    @Post('/del_user/')
+    async delUserId(@Headers('authorization') auth, @Body() body) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.delUserId(body.canal_id, body.id);
+        });
+        return resp;
+    }
 }

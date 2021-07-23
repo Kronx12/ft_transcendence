@@ -48,6 +48,35 @@ export class CanalService {
         return [];
     }
 
+    addAdminUserId(canal_id: number, user: number) {
+        let canal = this.getCanalById(canal_id)[0];
+        console.log(canal);
+        canal.admins = this.addIdToSerialized(user, canal.admins)
+        return this.CanalRepo.save(canal);
+    }
+
+    addUserId(canal_id: number, user: number) {
+        console.log(canal_id);
+        let canal = this.getCanalById(canal_id)[0];
+        console.log(canal);
+        canal.users = this.addIdToSerialized(user, canal.users)
+        return this.CanalRepo.save(canal);
+    }
+
+    delAdminUserId(canal_id: number, user: number) {
+        let canal = this.getCanalById(canal_id)[0];
+        console.log(canal);
+        canal.admins = this.serialize(this.delIdFromDeserialized(user, this.deserialize(canal.admins)))
+        return this.CanalRepo.save(canal);
+    }
+
+    delUserId(canal_id: number, user: number) {
+        let canal = this.getCanalById(canal_id)[0];
+        console.log(canal);
+        canal.users = this.serialize(this.delIdFromDeserialized(user, this.deserialize(canal.users)))
+        return this.CanalRepo.save(canal);
+    }
+
     // fonction qui ajoute un number id dans une chaine serialisée
     // @param id: le numéro id à ajouter
     // @param serialized: la chaine serialisée
@@ -66,14 +95,27 @@ export class CanalService {
         return array[array.length - 1];
     }
 
+    // fonction qui supprime un id d'un tableau d'entiers
+    // @param id: l'id à supprimer
+    // @param array: le tableau d'entiers à modifier
+    // @return: le tableau d'entiers modifié
+    delIdFromDeserialized(id: number, array: number[]): number[] {
+        const index = array.indexOf(id);
+        if (index !== -1) {
+            array.splice(index, 1);
+        }
+        return array;
+    }
+
     // fonction de serialization d'un tableau d'entiers
     serialize(array: number[]): string {
         return array.join(':');
     }
 
     // fonction de deserialization d'une string en tableau d'entiers
-    deserialize(string: string): number[] {
-        return string.split(':').map(x=>+x);
+    deserialize(str: string): number[] {
+        console.log(str);
+        return str.split(':').map(x=>+x);
     }
 
     // fonction qui save un canal en modifiant les utilisateurs
@@ -82,11 +124,6 @@ export class CanalService {
         // @return: le canal sauvegardé
     addIdToUser(canal: Canal, user: number) {
         canal.users = this.addIdToSerialized(user, canal.users)
-        return this.CanalRepo.save(canal);
-    }
-    
-    addIdToAdmins(canal: Canal, user: number) {
-        canal.admins = this.addIdToSerialized(user, canal.admins)
         return this.CanalRepo.save(canal);
     }
 }
