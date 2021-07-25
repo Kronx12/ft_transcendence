@@ -37,4 +37,15 @@ export class Users {
 
   @Column()
   public auth: boolean;
+
+  // 1;September 22, 2018 16:00:00|
+  @Column({default: ""})
+  public mute: string;
+
+  @Column({default: ""})
+  public ban: string;
+
+  @Column({default: ""})
+  public block: string;
 }
+

@@ -123,6 +123,38 @@ export default {
 		messageSubmit: function () {
 			if (this.inputMessage == null || this.inputMessage == "") return;
 
+			// Check if sender is muted
+			const self = this;
+			if (self.$store != undefined && self.$store != null) {
+				self.$store
+					.dispatch("getUser", self.$store.state.user.id)
+					.then(function (result) {
+						if (result.mute == null || result.mute == undefined)
+							return ;
+						const mutes = result.mute.split("|");
+						if (mutes != "") {
+							for (const x in mutes) {
+								console.log(x[0]);
+							}
+						}
+						console.log(mutes);
+					});
+			}
+
+			// 		 if (friend != "") {
+			//     for (const x in friend) {
+			//       schema.id = friend[x];
+			//       await self.$store
+			//         .dispatch("getUser", friend[x])
+			//         .then(function (data) {
+			//           schema.username = data.username;
+			//           schema.status = data.status;
+			//         });
+			//       friend[x] = schema;
+			//     }
+			//   }
+			//   self.friend = friend;
+
 			if (this.$store != undefined && this.$store != null) {
 				let msg = {
 					id: null,
@@ -150,7 +182,7 @@ export default {
 						.then(function (result) {
 							self.messages = result;
 						});
-						// self.getCanalName(self.$store.state.canalid);
+					// self.getCanalName(self.$store.state.canalid);
 				}
 			}, 1000);
 		},

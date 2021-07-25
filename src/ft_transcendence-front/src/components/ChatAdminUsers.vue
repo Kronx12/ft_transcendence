@@ -18,6 +18,7 @@
                     <tr v-for="user in users_admins_actual" :key="user">
                         <td>{{user.username}}</td>
                         <td><button @click.prevent="del_admin(user.intra_id)" class="del-button">x</button></td>
+                        <td><button @click.prevent="mute_user(user.intra_id)">MUTE</button></td>
                     </tr>
                 </tbody>
             </table>    
@@ -115,6 +116,13 @@ export default {
             this.$store.dispatch("delUserId", {canal_id: this.id, id: id}).then(function(response) {
                 self.getUsers();
             });
+        },
+        mute_user(id) {
+            var self = this;
+            const date = new Date().getTime();
+            self.$store.dispatch("muteUserIdTime", {id: id, canalid: self.id, time: date + 60000 * 60}).then(function (response) {
+                console.log(id + " has been muted for 1 hour from " + self.id + " channel");
+            })
         },
         destroy_popup() {
             this.$root.admin = 0;

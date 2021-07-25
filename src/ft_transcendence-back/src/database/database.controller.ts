@@ -8,6 +8,7 @@ import {
   Patch,
   Headers,
 } from '@nestjs/common';
+import { identity } from 'rxjs';
 import { Users } from 'src/entities/users.entity';
 import { DatabaseService } from './database.service';
 const jwt = require('jsonwebtoken');
@@ -224,6 +225,22 @@ export class DatabaseController {
         resp = { error: '401 Unauthorized' };
       else
         resp = self.databaseServ.getCanalsOtherUsers(id);
+    });
+    return resp;
+  }
+
+  // Mute with a duration
+  @Post('/mute/:id/:canalid/:time')
+  async addMuteUserTime(@Headers('authorization') auth, @Param('id') id, @Param('canalid') canalid, @Param('time') time)
+  {
+    const self = this;
+    let resp;
+
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.addMuteUserTime(id, canalid, time);
     });
     return resp;
   }
