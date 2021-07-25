@@ -52,22 +52,25 @@ export class CanalService {
         });
     }
 
-    login(canal_id: number, body: any): Promise<boolean> {
-        let password = hash(body.password);
-        if (body.password === undefined) {
+    login(canal_id: number, user_id: number, password: string) {
+        const self = this;
+        if (password === undefined || password === "" || password === null)
             return Promise.reject('Password is required');
-        } else {
-            return this.getCanalById(canal_id).then(canal => {
+        return this.getCanalById(canal_id).then(canal => {
+            const _self = self;
+            password = hash(password);
+            return self.getCanalById(canal_id).then(canal => {
                 if (canal[0] !== undefined) {
-                    if (canal[0].password === password)
+                    if (canal[0].password === password) {
+                        canal[0].users = _self.addIdToSerializedIfNotExist(user_id, canal[0].users);
+                        self.CanalRepo.save(canal[0]);
                         return true;
-                    else
-                        return false;
-                } else {
-                    return false;
-                }
+                    } else
+                        return Promise.reject('Wrong password');
+                } else
+                    return Promise.reject('Wrong password');
             });
-        }
+        });
     }
 
     addAdminUserId(canal_id: number, user: number) {
@@ -117,7 +120,7 @@ export class CanalService {
     // @param serialized: la chaine serialisée
     // @return: la chaine serialisée avec l'id ajouté
     addIdToSerializedIfNotExist(id: number, serialized: string): string {
-        const array = serialized === "" ? [] : this.deserialize(serialized);
+        let array = serialized === "" ? [] : this.deserialize(serialized);
         if (array.indexOf(id) === -1)
             array.push(id);
         return this.serialize(array);
@@ -132,5 +135,13 @@ export class CanalService {
         if (array.indexOf(id) !== -1)
             array.splice(array.indexOf(id), 1);
         return this.serialize(array);
+    }
+
+    loginState(canal_id: number, user_id: number): Promise<boolean> {
+        return this.CanalRepo.find({ where: `users LIKE '%${user_id}%' AND id = ${canal_id}` }).then(canals => {
+            if (canals.length > 0)
+                return true;
+            return false;
+        });
     }
 }

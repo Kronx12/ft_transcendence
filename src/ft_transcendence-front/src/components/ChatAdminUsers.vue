@@ -172,7 +172,6 @@ export default {
                         console.log("ACTUAL USERS:", _self.users_admins_actual);
                     });
                 }
-                this.$vm.$forceUpdate();
             });
         },
         deserialize(str) {
