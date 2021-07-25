@@ -93,7 +93,7 @@ export class CanalController {
             if (err)
                 resp = { error: '401 Unauthorized' };
             else
-                resp = self.CanalServ.getNonAdminUserIds(id);
+                resp = await self.CanalServ.getNonAdminUser(id);
         });
         return resp;
     }
@@ -150,6 +150,20 @@ export class CanalController {
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.delUserId(body.canal_id, body.id);
+        });
+        return resp;
+    }
+
+    // /login/:canal_id
+    @Post('/login/:canal_id')
+    async login(@Headers('authorization') auth, @Param('canal_id') canal_id, @Body() body) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.login(canal_id, body);
         });
         return resp;
     }

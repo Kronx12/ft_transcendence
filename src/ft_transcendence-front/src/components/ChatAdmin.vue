@@ -7,10 +7,7 @@
     <form>
         <div class="form-section">
             <label for="name">name</label>
-            <input ref="name" type="name" id="name" name="name" maxlength="10" required>
-            <hr>
-            <label for="image">image</label>
-            <input ref="image" type="url" id="image" name="image">
+            <input ref="name" type="name" id="name" name="name" maxlength="10" required="required">
             <hr>
             <label class="important" for="visibility">Visibility:</label>
             <br>
@@ -50,7 +47,6 @@ export default {
                 let canal = {
                     id: null,
                     name: this.$refs.name.value,
-                    image: this.$refs.image.value,
                     owner: this.$root.$store.state.user.id,
                     users: String(this.$root.$store.state.user.id),
                     admins: String(this.$root.$store.state.user.id),
@@ -63,7 +59,6 @@ export default {
                 let canal = {
                     id: this.id,
                     name: this.$refs.name.value,
-                    image: this.$refs.image.value,
                     owner: this.$root.$store.state.user.id,
                     users: String(this.$root.$store.state.user.id),
                     admins: String(this.$root.$store.state.user.id),
@@ -88,15 +83,10 @@ export default {
     },
     mounted() {
         this.$refs.submit.value = this.method;
-
         if (this.method == "update") {
-            console.log("UPDATE CANAL");
             this.$store.dispatch("getCanalById", this.id).then(canal => {
                 canal = canal[0];
-                console.log("CANAL:", canal);
-                console.log("CANAL USERS:", canal.name);
                 this.$refs.name.value = canal.name;
-                this.$refs.image.value = canal.image;
                 this.visibility = canal.visibility;
                 if (canal.visibility == 1)
                     this.$refs.password.value = canal.password;

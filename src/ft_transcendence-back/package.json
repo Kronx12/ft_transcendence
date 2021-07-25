@@ -30,6 +30,7 @@
     "@nestjs/typeorm": "^7.1.5",
     "@nestjs/websockets": "^7.6.18",
     "jsonwebtoken": "^8.5.1",
+    "object-hash": "^2.2.0",
     "pg": "^8.6.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",

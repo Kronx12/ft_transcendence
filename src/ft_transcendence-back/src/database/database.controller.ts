@@ -227,4 +227,32 @@ export class DatabaseController {
     });
     return resp;
   }
+
+  // /database/user/delete/:canal_id
+  @Patch('/user/delete/:canal_id')
+  async deleteCanal(@Headers('authorization') auth, @Param('canal_id') canal_id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.removeCanal(canal_id);
+    });
+    return resp;
+  }
+
+  // /database/user/add/:canal_id
+  @Patch('/user/add/:canal_id')
+  async addCanal(@Headers('authorization') auth, @Param('canal_id') canal_id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.addCanal(canal_id);
+    });
+    return resp;
+  }
 }

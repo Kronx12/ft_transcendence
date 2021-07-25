@@ -8,9 +8,6 @@ export class Canal {
   @Column()
   public name: string;
 
-  @Column({default: ""})
-  public image: string;
-
   @Column()
   public owner: number;
 
