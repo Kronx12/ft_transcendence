@@ -61,8 +61,8 @@
 			</div>
 		</div>
 		<div id="messages-box-chat" v-else>
-			<input type="password" name="password" v-model="password" @keyup.enter="login(password)" />
-			<button @click="login(password)">Connection</button>
+			<input type="password" name="password" @keyup.enter="login()" />
+			<button @click="login()">Connection</button>
 		</div>
 		<form
 			v-if="this.canalid != -1"
