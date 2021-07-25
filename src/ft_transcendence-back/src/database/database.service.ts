@@ -271,6 +271,15 @@ export class DatabaseService {
       this.usersRepo.update(user.id, user);
   }
 
+  // Add a new user muted with a timer
+  async addMuteUserTime(id: number, canalid: number, time: string)
+  {
+    let user: Users;
+    await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
+    user.mute = canalid + ";" + time + "|" + user.mute;
+    this.usersRepo.update(user.id, user);
+  }
+
   // fonction qui recupere les users a partir d'un tableau d'id
   // la fonction retourne un tableau de users
   getUsers(ids: Array<number>) {
@@ -314,4 +323,5 @@ export class DatabaseService {
       this.usersRepo.update(user.id, user);
     }
   }
+
 }

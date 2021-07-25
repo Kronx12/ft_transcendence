@@ -443,6 +443,14 @@ export default createStore({
         })
       })
     },
+    muteUserIdTime: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/database/mute/${specs.id}/${specs.canalid}/${specs.time}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
     getUsersNotInCanal: ({ commit }, canalid) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
