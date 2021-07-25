@@ -128,7 +128,7 @@ export default {
 						const mutes = result.mute.split("|");
 						if (mutes != "") {
 							for (const x in mutes) {
-								console.log(x[0]);
+								console.log("le canalid = " + x[0] + "| la chaine complete = " + x);
 							}
 						}
 						console.log(mutes);
