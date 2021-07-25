@@ -45,7 +45,7 @@
 				/>
 			</div>
 		</div>
-		<div id="messages-box-chat" > <!-- v-if="this.logged" -->
+		<div id="messages-box-chat" v-if="this.logged">
 			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
 				<div v-if="this.userid != message.author" v-on:click="goToUserProfile(getUserImage(message.author))" >
 					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + getUserImage(message.author) +'.jpg'" v-bind:alt="getUserImage(message.author)" />
@@ -60,10 +60,10 @@
 				</div>
 			</div>
 		</div>
-		<!--<div v-else>
+		<div id="messages-box-chat" v-else>
 			<input type="password" name="password" v-model="password" @keyup.enter="login(password)" />
 			<button @click="login(password)">Connection</button>
-		</div>-->
+		</div>
 		<form
 			v-if="this.canalid != -1"
 			ref="formChat"
