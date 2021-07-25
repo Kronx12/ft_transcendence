@@ -253,6 +253,10 @@ export class DatabaseService {
     return this.usersRepo.find({ where: `canals NOT LIKE '%${canalid}%'` });
   }
 
+  getCanalsUsers(canalid: number): Promise<Users[]> {
+    return this.usersRepo.find({ where: `canals LIKE '%${canalid}%'` });
+  }
+
   async getGameHistory(id: number) {
       return (await this.usersRepo.findOne(id)).game_history;
   }
@@ -289,7 +293,35 @@ export class DatabaseService {
 
   // fonction de deserialization d'une string en tableau d'entiers
   deserialize(string: string): number[] {
-      return string.split(':').map(x=>+x);
+      return string.split(':').map(x => +x);
+  }
+
+  // fonction qui supprime un id correspondant a un canal dans chaque liste de canal de chaque utilisateur
+  // la fonction ne retourne rien
+  async removeCanal(canal_id: number) {
+    let users = await this.getCanalsUsers(canal_id);
+    for (let user of users) {
+      let tmp = user.canals.split(':');
+      for (let i = 0; i < tmp.length; i++) {
+        if (+tmp[i] == canal_id) {
+          tmp.splice(i, 1);
+        }
+      }
+      user.canals = tmp.join(':');
+      this.usersRepo.update(user.id, user);
+    }
+  }
+
+  // fonction qui ajoute un id correspondant a un canal dans chaque liste de canal de chaque utilisateur
+  // la fonction ne retourne rien
+  async addCanal(canal_id: number) {
+    let users = await this.getCanalsOtherUsers(canal_id);
+    for (let user of users) {
+      let tmp = user.canals == "" ? [] : this.deserialize(user.canals);
+      tmp.push(canal_id);
+      user.canals = this.serialize(tmp);
+      this.usersRepo.update(user.id, user);
+    }
   }
 
 }

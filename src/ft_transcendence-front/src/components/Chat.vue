@@ -22,7 +22,7 @@
 					v-else-if="chat.visibility == 2"
 					src="../assets/chat.svg"
 				/>
-				<a class="chat-canal-link" @click="canalid = chat.id">
+				<a class="chat-canal-link" @click="updateShowedCanal(chat.id)">
 					{{ chat.name }}
 				</a>
 				<img
@@ -37,29 +37,18 @@
 					@click="updateCanal()"
 					src="../assets/settings.svg"
 				/>
+				<img
+					id="chat-canal-settings"
+					v-if="chat.id == canalid"
+					@click="deleteCanal()"
+					src="../assets/cancel.svg"
+				/>
 			</div>
 		</div>
-		<div id="messages-box-chat">
-			<div
-				v-for="message in messages"
-				:key="message"
-				:class="
-					message.author == this.userid ? 'message-current-user' : 'message'
-				"
-			>
-				<div
-					v-if="this.userid != message.author"
-					v-on:click="goToUserProfile(getUserImage(message.author))"
-				>
-					<img
-						class="user-image"
-						v-bind:src="
-							'https://cdn.intra.42.fr/users/small_' +
-							getUserImage(message.author) +
-							'.jpg'
-						"
-						v-bind:alt="getUserImage(message.author)"
-					/>
+		<div id="messages-box-chat" v-if="this.logged">
+			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
+				<div v-if="this.userid != message.author" v-on:click="goToUserProfile(getUserImage(message.author))" >
+					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + getUserImage(message.author) +'.jpg'" v-bind:alt="getUserImage(message.author)" />
 					<div class="content" :key="message">
 						{{ message.message }}
 					</div>
@@ -70,6 +59,10 @@
 					</div>
 				</div>
 			</div>
+		</div>
+		<div v-else>
+			<input type="password" name="password" v-model="password" @keyup.enter="login(password)" />
+			<button @click="login(password)">Connection</button>
 		</div>
 		<form
 			v-if="this.canalid != -1"
@@ -102,6 +95,7 @@ export default {
 			userid: -1,
 			userImage: "",
 			canalname: "",
+			logged: false,
 		};
 	},
 	async mounted() {
@@ -174,9 +168,7 @@ export default {
 				if (self.$store != undefined && self.$store != null) {
 					self.$store
 						.dispatch("getCanalsByUserId", self.$store.state.user.id)
-						.then(function (result) {
-							self.chats = result;
-						});
+						.then(function (result) { self.chats = result; });
 					self.$store
 						.dispatch("getMessagesByCanalId", self.canalid)
 						.then(function (result) {
@@ -195,6 +187,20 @@ export default {
 			this.$root.admin_method = "update";
 			this.$root.admin_id = this.canalid;
 		},
+		deleteCanal: function () {
+			let self = this;
+			if (confirm("Are you sure you want to delete this canal?")) {
+				self.$store.dispatch("deleteCanal", this.canalid).then(function (result) {
+					self.canalname = "";
+					self.canalid = -1;
+					self.refreshChat();
+				});
+			}
+		},
+		updateShowedCanal: function (canalid) {
+			this.canalid = canalid;
+			this.logged = false;
+		},
 		updateUsers: function () {
 			this.$root.admin = 2;
 			this.$root.admin_method = "update";
@@ -210,7 +216,6 @@ export default {
 				id != undefined
 			) {
 				self.$store.dispatch("getUser", id).then(function (result) {
-					// console.log(result.username + " " + id);
 					self.userImage = result.username;
 				});
 				return self.userImage;
@@ -229,6 +234,15 @@ export default {
 					.then(function (result) {
 						self.canalname = result.name;
 					});
+		},
+		login: function (password) {
+			const self = this;
+			if (password != undefined && password != null) {
+				self.$store.dispatch("login", password).then(function (result) {
+					self.logged = true;
+					self.refreshChat();
+				});
+			}
 		},
 	},
 };

@@ -29,7 +29,7 @@ export class Users {
   @Column()
     public asked: string;
 
-  @Column()
+  @Column({default: ""})
   public canals: string;
   
   @Column()

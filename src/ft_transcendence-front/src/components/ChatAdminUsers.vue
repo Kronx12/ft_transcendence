@@ -5,7 +5,7 @@
     <h1 class="title">Users Administration Panel</h1>
     <hr>
     <div class="container">
-        <h3>Users</h3>
+        <h3>Admins</h3>
         <div class="table">
             <table>
                 <thead>
@@ -36,7 +36,7 @@
     </div>
 
     <div class="container">
-        <h3>Admins</h3>
+        <h3>Users</h3>
         <div class="table">
             <table>
                 <thead>
@@ -45,7 +45,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="user in users_admins" :key="user">
+                    <tr v-for="user in users_actual" :key="user">
                         <td>{{user.username}}</td>
                         <td><button @click.prevent="del_user(user.intra_id)" class="del-button">x</button></td>
                     </tr>
@@ -154,7 +154,7 @@ export default {
             this.$store.dispatch("getCanalById", this.id).then(function (result) {
                 var _self = self;
                 console.log("CANAL:", result);                
-                self.users_actual = self.deserialize(result[0].users); // Return un tableau did
+                self.users_actual = self.deserialize(result[0].users);
                 self.users_admins_actual = self.deserialize(result[0].admins);
 
                 if (self.users_actual.length > 0) {
@@ -172,6 +172,7 @@ export default {
                         console.log("ACTUAL USERS:", _self.users_admins_actual);
                     });
                 }
+                this.$vm.$forceUpdate();
             });
         },
         deserialize(str) {

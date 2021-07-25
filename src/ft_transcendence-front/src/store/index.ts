@@ -332,7 +332,6 @@ export default createStore({
             canals.push({
               id: e.id,
               name: e.name,
-              image: e.image,
               owner: e.owner,
               users: e.users,
               admins: e.admins,
@@ -364,7 +363,6 @@ export default createStore({
               canals.push({
                 id: e.id,
                 name: e.name,
-                image: e.image,
                 owner: e.owner,
                 users: e.users,
                 admins: e.admins,
@@ -385,16 +383,23 @@ export default createStore({
     deleteCanal: ({ commit }, canalid) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.delete(`/canal/${canalid}`).then((result: any) => {
-          resolve(result.data);
-        })
+        instance.delete(`/canal/${canalid}`);
+        instance.patch(`/database/user/delete/${canalid}`);
       })
     },
     createCanal: ({ commit }, canal) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
-      return new Promise((resolve, reject) => {
+      new Promise((resolve, reject) => {
         instance.post(`/canal/`, canal).then((result: any) => {
+          console.log(result.data);
           resolve(result.data);
+          instance.patch(`/database/user/add/${result.data.id}`);
+          instance.get(`/database/user/`).then((r: any) => {
+            console.log(r.data);
+            r.data.forEach((e: any) => {
+              instance.post(`canal/add_user`, { canal_id: result.data.id, id: e.intra_id });
+            });
+          });
         })
       })
     },
