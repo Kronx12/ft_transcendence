@@ -134,21 +134,6 @@ export default {
 						console.log(mutes);
 					});
 			}
-
-			// 		 if (friend != "") {
-			//     for (const x in friend) {
-			//       schema.id = friend[x];
-			//       await self.$store
-			//         .dispatch("getUser", friend[x])
-			//         .then(function (data) {
-			//           schema.username = data.username;
-			//           schema.status = data.status;
-			//         });
-			//       friend[x] = schema;
-			//     }
-			//   }
-			//   self.friend = friend;
-
 			if (this.$store != undefined && this.$store != null) {
 				let msg = {
 					id: null,
