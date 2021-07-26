@@ -78,6 +78,7 @@ export default {
             users: [],
             users_admins_actual: [],
             users_actual: [],
+            canal: null,
         }
     },
     methods: {
@@ -153,7 +154,8 @@ export default {
             });
             this.$store.dispatch("getCanalById", this.id).then(function (result) {
                 var _self = self;
-                console.log("CANAL:", result);                
+                self.canal = result[0];          
+                console.log("CANAL:", self.canal);      
                 self.users_actual = self.deserialize(result[0].users);
                 self.users_admins_actual = self.deserialize(result[0].admins);
 
@@ -180,6 +182,7 @@ export default {
     },
     mounted() {
         const self = this;
+
         this.getUsers();
 		// setInterval(function () {
         //     self.getUsers();

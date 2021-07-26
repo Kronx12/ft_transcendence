@@ -153,7 +153,7 @@ export default {
 				if (self.$store != undefined && self.$store != null) {
 					self.$store
 						.dispatch("getCanalsByUserId", self.$store.state.user.id)
-						.then(function (result) { self.chats = result; console.log("Chats: ", result); });
+						.then(function (result) { self.chats = result; });
 					self.$store
 						.dispatch("getMessagesByCanalId", self.canalid)
 						.then(function (result) {
