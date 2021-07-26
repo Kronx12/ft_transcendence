@@ -410,6 +410,24 @@ export default createStore({
         })
       })
     },
+    loginCanal: ({ commit }, body) => {
+      console.log(body);
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/login/`, body).then((result: any) => {
+          console.log(result.data);
+          resolve(result.data);
+        })
+      })
+    },
+    getLogState: ({ commit }, body) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
     addAdminUserId: ({ commit }, specs) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
@@ -566,7 +584,6 @@ export default createStore({
       })
     }
   },
-
   modules: {},
 });
 

@@ -154,16 +154,31 @@ export class CanalController {
         return resp;
     }
 
-    // /login/:canal_id
-    @Post('/login/:canal_id')
-    async login(@Headers('authorization') auth, @Param('canal_id') canal_id, @Body() body) {
+    // /canal/login/:canal_id
+    @Post('/login/')
+    async login(@Headers('authorization') auth, @Body() body) {
+        const self = this;
+        console.log("HERE:", body);
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.login(body.canal_id, body.user, body.password);
+        });
+        return resp;
+    }
+
+    // /canal/login/state/:canal_id
+    @Post('/login/state/:canal_id')
+    async loginState(@Headers('authorization') auth, @Param('canal_id') canal_id, @Body() body) {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
             if (err)
                 resp = { error: '401 Unauthorized' };
             else
-                resp = self.CanalServ.login(canal_id, body);
+                resp = self.CanalServ.loginState(canal_id, body.user);
         });
         return resp;
     }

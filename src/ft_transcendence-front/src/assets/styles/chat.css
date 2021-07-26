@@ -193,3 +193,23 @@
   margin: 5px;
   cursor: pointer;
 }
+
+.login-field {
+  width: 64%;
+  background-color: #9fa0a4;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  margin: 2%;
+}
+
+.login-submit {
+  margin: 2%;
+  width: 26%;
+  background-color: #599cba;
+  border: none;
+  border-radius: 5px;
+  padding: 5px;
+  text-transform: uppercase;
+  font-weight: bold;
+}

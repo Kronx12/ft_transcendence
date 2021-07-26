@@ -45,27 +45,14 @@
 				/>
 			</div>
 		</div>
-		<div id="messages-box-chat" v-if="this.logged">
-			<div
-				v-for="message in messages"
-				:key="message"
-				:class="
-					message.author == this.userid ? 'message-current-user' : 'message'
-				"
-			>
-				<div
-					v-if="this.userid != message.author"
-					v-on:click="goToUserProfile(getUserImage(message.author))"
-				>
-					<img
-						class="user-image"
-						v-bind:src="
-							'https://cdn.intra.42.fr/users/small_' +
-							getUserImage(message.author) +
-							'.jpg'
-						"
-						v-bind:alt="getUserImage(message.author)"
-					/>
+		<div id="messages-box-chat" v-if="!this.logged && this.getVisibility() == 1">
+			<input ref="password" type="password" class="login-field" name="password" @keyup.enter="login()" />
+			<button class="login-submit" @click="login()">login</button>
+		</div>
+		<div id="messages-box-chat" v-else>
+			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
+				<div v-if="this.userid != message.author" v-on:click="goToUserProfile(getUserImage(message.author))" >
+					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + getUserImage(message.author) +'.jpg'" v-bind:alt="getUserImage(message.author)" />
 					<div class="content" :key="message">
 						{{ message.message }}
 					</div>
@@ -76,10 +63,6 @@
 					</div>
 				</div>
 			</div>
-		</div>
-		<div id="messages-box-chat" v-else>
-			<input type="password" name="password" @keyup.enter="login()" />
-			<button @click="login()">Connection</button>
 		</div>
 		<form
 			v-if="this.canalid != -1"
@@ -178,15 +161,25 @@ export default {
 					self.$store
 						.dispatch("getUser", self.$store.state.user.id)
 						.then(function (result) {
-							specs.user = result;
 							self.$store
 								.dispatch("getCanalsByUserId", self.$store.state.user.id)
 								.then(function (result) {
 									self.chats = result;
+									console.log("Chats: ", result);
+								});
+							self.$store
+								.dispatch("getMessagesByCanalId", self.canalid)
+								.then(function (result) {
+									specs.user = result;
 									self.$store
-										.dispatch("getMessagesByCanalId", specs)
+										.dispatch("getCanalsByUserId", self.$store.state.user.id)
 										.then(function (result) {
-											self.messages = result;
+											self.chats = result;
+											self.$store
+												.dispatch("getMessagesByCanalId", specs)
+												.then(function (result) {
+													self.messages = result;
+												});
 										});
 								});
 						});
@@ -218,7 +211,16 @@ export default {
 		},
 		updateShowedCanal: function (canalid) {
 			this.canalid = canalid;
-			this.logged = false;
+			const self = this;
+			self.$store
+				.dispatch("getLogState", {
+					canalid: canalid,
+					value: self.$store.state.user.id,
+				})
+				.then(function (result) {
+					self.logged = result;
+					console.log(result);
+				});
 		},
 		updateUsers: function () {
 			this.$root.admin = 2;
@@ -254,14 +256,36 @@ export default {
 						self.canalname = result.name;
 					});
 		},
-		login: function (password) {
+		login: function () {
 			const self = this;
-			if (password != undefined && password != null) {
-				self.$store.dispatch("login", password).then(function (result) {
-					self.logged = true;
-					self.refreshChat();
-				});
+			console.log(this.$refs.password.value);
+			if (
+				this.$refs.password.value != undefined &&
+				this.$refs.password.value != null
+			) {
+				self.$store
+					.dispatch("loginCanal", {
+						canal_id: this.canalid,
+						user: self.$store.state.user.id,
+						password: self.$refs.password.value,
+					})
+					.then(function (result) {
+						if (result.error == null || result.error == undefined) {
+							self.logged = true;
+							self.refreshChat();
+						}
+					});
 			}
+		},
+		getVisibility: function () {
+			const self = this;
+			let ret = -1;
+			this.chats.forEach(function (item) {
+				if (item.id == self.canalid) {
+					ret = item.visibility;
+				}
+			});
+			return ret;
 		},
 	},
 };
