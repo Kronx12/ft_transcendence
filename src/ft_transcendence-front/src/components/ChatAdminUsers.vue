@@ -18,7 +18,7 @@
                     <tr v-for="user in users_admins_actual" :key="user">
                         <td>{{user.username}}</td>
                         <td><button @click.prevent="del_admin(user.intra_id)" class="del-button">x</button></td>
-                        <td><button @click.prevent="mute_user(user.intra_id)">MUTE</button></td>
+                      
                     </tr>
                 </tbody>
             </table>    
@@ -48,6 +48,8 @@
                     <tr v-for="user in users_actual" :key="user">
                         <td>{{user.username}}</td>
                         <td><button @click.prevent="del_user(user.intra_id)" class="del-button">x</button></td>
+                        <td><button @click.prevent="mute_temp_user(user.intra_id)">MUTE 1h</button></td>
+                        <td><button @click.prevent="ban_temp_user(user.intra_id)">BAN 1h</button></td>
                     </tr>
                 </tbody>
             </table>
@@ -117,12 +119,19 @@ export default {
                 self.getUsers();
             });
         },
-        mute_user(id) {
+        mute_temp_user(id) {
             var self = this;
             const date = new Date().getTime();
             self.$store.dispatch("muteUserIdTime", {id: id, canalid: self.id, time: date + 60000 * 60}).then(function (response) {
                 console.log(id + " has been muted for 1 hour from " + self.id + " channel");
             })
+        },
+        ban_temp_user(id) {
+            var self = this;
+            const date = new Date().getTime();
+            self.$store.dispatch("banUserIdTime", {id: id, canalid: self.id, time: date + 60000 * 60}).then(function (response) {
+                console.log(id + " has been banned for 1 hour from " + self.id + " channel");
+            });
         },
         destroy_popup() {
             this.$root.admin = 0;
@@ -172,7 +181,6 @@ export default {
                         console.log("ACTUAL USERS:", _self.users_admins_actual);
                     });
                 }
-                this.$vm.$forceUpdate();
             });
         },
         deserialize(str) {

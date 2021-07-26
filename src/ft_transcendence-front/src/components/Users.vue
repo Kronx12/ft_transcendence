@@ -11,6 +11,8 @@
       <button class="button" @click="sendInviteClassic()">Invite for normal game</button>
       <button class="button" @click="sendInviteBonus()">Invite for bonus game</button>
     </div>
+    <button v-if="blocked == 0" id="button-block" class="button" @click="blockUser()">Block</button>
+    <button v-else-if="blocked == 1" id="button-unblock" class="button" @click="unblockUser()">Unblock</button>
     <hr>
     <div style="width:100%;display: block" id="stats">
       <h1 style="width:100%">Stats</h1>
@@ -78,7 +80,8 @@ export default {
       aske: 0,
       invite: 1,
       win: 0,
-      loose: 0
+      loose: 0,
+      blocked: 0
     };
   },
   methods: {
@@ -118,7 +121,7 @@ export default {
 
                   schema.win = result.victory;
                   await self.$store.dispatch("getUser", schema.p1).then(function (data) {
-              schema.p1_l = data.username
+                  schema.p1_l = data.username
             })
                    await self.$store.dispatch("getUser", schema.p2)
             .then(function (data) {
@@ -145,6 +148,18 @@ export default {
     },
     goToUser: function (user) {
       this.$router.push(`/user/${user}`);
+    },
+    blockUser: function () {
+      const self = this;
+      self.$store.dispatch("blockUser", self.id).then(function (result) {
+        self.blocked = 1;
+      })
+    },
+    unblockUser: function () {
+        const self = this;
+      self.$store.dispatch("blockUser", self.id).then(function (result) {
+        self.blocked = 0;
+      })
     },
     isFriend: function () {
       if (this.$store.state.user.id == this.id) return;
@@ -304,6 +319,14 @@ div.user-aff {
   width: 30%;
   color: white;
   border: solid black 2px;
+}
+
+#button-block {
+  background-color: red !important;
+}
+
+#button-unblock {
+  background-color: green !important;
 }
 
 

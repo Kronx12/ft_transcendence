@@ -280,6 +280,31 @@ export class DatabaseService {
     this.usersRepo.update(user.id, user);
   }
 
+  // Add a new user to block list
+  async addBanUserTime(id: number, canalid: number, time: string)
+  {
+    let user: Users;
+    await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
+    user.ban = canalid + ";" + time + "|" + user.ban;
+    this.usersRepo.update(user.id, user);
+  }
+
+  async addBlockUser(id: number)
+  {
+    let user: Users;
+    await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
+    user.block = id + ":";
+    this.usersRepo.update(user.id, user);
+  }
+
+  async removeBlockUser(id: number) {
+    let user: Users;
+    await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
+    let blocks = user.block;
+    user.block = this.delIdFromSerializedIfExist(id, blocks);
+    this.usersRepo.update(user.id, user);
+  }
+
   // fonction qui recupere les users a partir d'un tableau d'id
   // la fonction retourne un tableau de users
   getUsers(ids: Array<number>) {
@@ -294,6 +319,17 @@ export class DatabaseService {
   // fonction de deserialization d'une string en tableau d'entiers
   deserialize(string: string): number[] {
       return string.split(':').map(x => +x);
+  }
+
+  // fonction qui supprime un id d'une chaine serialisée si il est dedans
+    // @param id: l'id à supprimer
+    // @param serialized: la chaine serialisée
+    // @return: la chaine serialisée sans l'id
+    delIdFromSerializedIfExist(id: number, serialized: string): string {
+      const array = serialized === "" ? [] : this.deserialize(serialized);
+      if (array.indexOf(id) !== -1)
+          array.splice(array.indexOf(id), 1);
+      return this.serialize(array);
   }
 
   // fonction qui supprime un id correspondant a un canal dans chaque liste de canal de chaque utilisateur

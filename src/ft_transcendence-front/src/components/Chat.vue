@@ -46,9 +46,26 @@
 			</div>
 		</div>
 		<div id="messages-box-chat" v-if="this.logged">
-			<div v-for="message in messages" :key="message" :class="message.author == this.userid ? 'message-current-user' : 'message'">
-				<div v-if="this.userid != message.author" v-on:click="goToUserProfile(getUserImage(message.author))" >
-					<img class="user-image" v-bind:src="'https://cdn.intra.42.fr/users/small_' + getUserImage(message.author) +'.jpg'" v-bind:alt="getUserImage(message.author)" />
+			<div
+				v-for="message in messages"
+				:key="message"
+				:class="
+					message.author == this.userid ? 'message-current-user' : 'message'
+				"
+			>
+				<div
+					v-if="this.userid != message.author"
+					v-on:click="goToUserProfile(getUserImage(message.author))"
+				>
+					<img
+						class="user-image"
+						v-bind:src="
+							'https://cdn.intra.42.fr/users/small_' +
+							getUserImage(message.author) +
+							'.jpg'
+						"
+						v-bind:alt="getUserImage(message.author)"
+					/>
 					<div class="content" :key="message">
 						{{ message.message }}
 					</div>
@@ -123,12 +140,15 @@ export default {
 				self.$store
 					.dispatch("getUser", self.$store.state.user.id)
 					.then(function (result) {
-						if (result.mute == null || result.mute == undefined)
-							return ;
+						if (result.mute == null || result.mute == undefined) return;
 						const mutes = result.mute.split("|");
 						if (mutes != "") {
 							for (const x in mutes) {
-								console.log("le canalid = " + x[0] + "| la chaine complete = " + x);
+								if (mutes[x] == "" || mutes[x] == undefined) break;
+								let canalId = +mutes[x].split(";")[0];
+								let timestamp = +mutes[x].split(";")[1];
+								if (canalId == self.canalid && timestamp > new Date().getTime())
+									return;
 							}
 						}
 						console.log(mutes);
@@ -151,14 +171,26 @@ export default {
 			this.userid = this.$store.state.user.id;
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
+					var specs = {
+						canalid: self.canalid,
+						user: null,
+					};
 					self.$store
-						.dispatch("getCanalsByUserId", self.$store.state.user.id)
-						.then(function (result) { self.chats = result; });
-					self.$store
-						.dispatch("getMessagesByCanalId", self.canalid)
+						.dispatch("getUser", self.$store.state.user.id)
 						.then(function (result) {
-							self.messages = result;
+							specs.user = result;
+							self.$store
+								.dispatch("getCanalsByUserId", self.$store.state.user.id)
+								.then(function (result) {
+									self.chats = result;
+									self.$store
+										.dispatch("getMessagesByCanalId", specs)
+										.then(function (result) {
+											self.messages = result;
+										});
+								});
 						});
+
 					// self.getCanalName(self.$store.state.canalid);
 				}
 			}, 1000);
@@ -175,11 +207,13 @@ export default {
 		deleteCanal: function () {
 			let self = this;
 			if (confirm("Are you sure you want to delete this canal?")) {
-				self.$store.dispatch("deleteCanal", this.canalid).then(function (result) {
-					self.canalname = "";
-					self.canalid = -1;
-					self.refreshChat();
-				});
+				self.$store
+					.dispatch("deleteCanal", this.canalid)
+					.then(function (result) {
+						self.canalname = "";
+						self.canalid = -1;
+						self.refreshChat();
+					});
 			}
 		},
 		updateShowedCanal: function (canalid) {

@@ -7,6 +7,7 @@ import {
   Body,
   Patch,
   Headers,
+  Head,
 } from '@nestjs/common';
 import { identity } from 'rxjs';
 import { Users } from 'src/entities/users.entity';
@@ -242,6 +243,43 @@ export class DatabaseController {
     });
   }
 
+  @Post('/mute/:id/:canalid/:time')
+  async addBanUserTime(@Headers('authorization') auth, @Param('id') id, @Param('canalid') canalid, @Param('time') time) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.addBanUserTime(id, canalid, time);
+    });
+  }
+
+  @Post('/block/:id')
+  async addBlockUser(@Headers('authorization') auth, @Param('id') id)
+  {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.addBlockUser(id);
+    });
+  }
+
+  @Post('/unblock/:id')
+  async removeBlockUser(@Headers('authorization') auth, @Param('id') id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.removeBlockUser(id);
+    });
+  }
+
   // /database/user/delete/:canal_id
   @Patch('/user/delete/:canal_id')
   async deleteCanal(@Headers('authorization') auth, @Param('canal_id') canal_id) {
@@ -269,4 +307,4 @@ export class DatabaseController {
     });
     return resp;
   }
-}+
+}
