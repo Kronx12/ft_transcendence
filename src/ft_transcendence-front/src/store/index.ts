@@ -67,7 +67,7 @@ export default createStore({
         return;
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/${id}`).then(function (user: any) {
-          
+
           resolve(user.data);
         });
       });
@@ -110,7 +110,7 @@ export default createStore({
               })
           })
       })
-      
+
     },
     getLogin: ({ commit }, token) => {
       commit("setStatus", "loading");
@@ -288,7 +288,7 @@ export default createStore({
     pair: ({ commit }, secret) => {
       console.log(`${secret.username}/${secret.code}`);
       return new Promise((resolve, reject) => {
-        instance.get(`login/2fa/${secret.username}/${secret.code}`).then((result: any) =>{
+        instance.get(`login/2fa/${secret.username}/${secret.code}`).then((result: any) => {
           resolve(result);
         });
       })
@@ -311,7 +311,7 @@ export default createStore({
     getUsersFromIds: ({ commit }, ids) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.post(`/database/users/`, ids).then((result: any) => {  
+        instance.post(`/database/users/`, ids).then((result: any) => {
           resolve(result.data);
         });
       });
@@ -372,11 +372,10 @@ export default createStore({
             });
             resolve(canals);
           }
-          catch (error)
-          {
+          catch (error) {
             ;
           }
-         
+
         })
       })
     },
@@ -469,6 +468,30 @@ export default createStore({
         })
       })
     },
+    banUserIdTime: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/database/ban/${specs.id}/${specs.canalid}/${specs.time}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    blockUser: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/database/block/${specs.id}/${specs.blockedid}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
+    unblockUser: ({ commit }, specs) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.post(`/database/unblock/${specs.id}/${specs.blockedid}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
     getUsersNotInCanal: ({ commit }, canalid) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
@@ -483,6 +506,7 @@ export default createStore({
         })
       })
     },
+
     getUsersNotAdmin: ({ commit }, canalid) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
@@ -499,7 +523,7 @@ export default createStore({
     },
 
     // >>>>>>>>>> MESSAGE SECTION
-    
+
     getMessages: ({ commit }) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
@@ -519,20 +543,24 @@ export default createStore({
         })
       })
     },
-    getMessagesByCanalId: ({ commit }, canalid) => {
+    getMessagesByCanalId: ({ commit }, specs) => {
+      // console.log("les specs =" , specs.user);
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.get(`/message/${canalid}`).then((result: any) => {
+        instance.get(`/message/${specs.canalid}`).then((result: any) => {
           const messages: any[] = [];
           if (result == undefined)
             resolve(messages);
+
           result.data.forEach((e: any) => {
-            messages.push({
-              id: e.id,
-              author: e.author,
-              message: e.message,
-              canalid: e.canalid,
-            });
+            console.log(specs.user.block + " et l'autheur du msg = " + e.author);
+            if (specs.user.block == undefined || specs.user.block == "" || !specs.user.block.includes(e.author))
+              messages.push({
+                id: e.id,
+                author: e.author,
+                message: e.message,
+                canalid: e.canalid,
+              });
           });
           resolve(messages);
         })
@@ -548,7 +576,7 @@ export default createStore({
     },
     // ==================================== END CHAT SECTION ===================
     // ==================================== GAME SECRETION =====================
-    getGameById: ({commit}, id) => {
+    getGameById: ({ commit }, id) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/game_database/${id}`).then((result: any) => {

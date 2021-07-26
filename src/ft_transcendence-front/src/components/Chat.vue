@@ -123,12 +123,15 @@ export default {
 				self.$store
 					.dispatch("getUser", self.$store.state.user.id)
 					.then(function (result) {
-						if (result.mute == null || result.mute == undefined)
-							return ;
+						if (result.mute == null || result.mute == undefined) return;
 						const mutes = result.mute.split("|");
 						if (mutes != "") {
 							for (const x in mutes) {
-								console.log("le canalid = " + x[0] + "| la chaine complete = " + x);
+								if (mutes[x] == "" || mutes[x] == undefined) break;
+								let canalId = +mutes[x].split(";")[0];
+								let timestamp = +mutes[x].split(";")[1];
+								if (canalId == self.canalid && timestamp > new Date().getTime())
+									return;
 							}
 						}
 						console.log(mutes);
@@ -151,14 +154,26 @@ export default {
 			this.userid = this.$store.state.user.id;
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
+						var specs = {
+						canalid: self.canalid,
+						user: null,
+					};
 					self.$store
-						.dispatch("getCanalsByUserId", self.$store.state.user.id)
-						.then(function (result) { self.chats = result; });
-					self.$store
-						.dispatch("getMessagesByCanalId", self.canalid)
+						.dispatch("getUser", self.$store.state.user.id)
 						.then(function (result) {
-							self.messages = result;
+							specs.user = result;
+							self.$store
+								.dispatch("getCanalsByUserId", self.$store.state.user.id)
+								.then(function (result) {
+									self.chats = result;
+									self.$store
+									.dispatch("getMessagesByCanalId", specs)
+									.then(function (result) {
+										self.messages = result;
+									});
+								});
 						});
+
 					// self.getCanalName(self.$store.state.canalid);
 				}
 			}, 1000);
@@ -175,20 +190,27 @@ export default {
 		deleteCanal: function () {
 			let self = this;
 			if (confirm("Are you sure you want to delete this canal?")) {
-				self.$store.dispatch("deleteCanal", this.canalid).then(function (result) {
-					self.canalname = "";
-					self.canalid = -1;
-					self.refreshChat();
-				});
+				self.$store
+					.dispatch("deleteCanal", this.canalid)
+					.then(function (result) {
+						self.canalname = "";
+						self.canalid = -1;
+						self.refreshChat();
+					});
 			}
 		},
 		updateShowedCanal: function (canalid) {
 			this.canalid = canalid;
 			const self = this;
-			self.$store.dispatch("getLogState", { canalid: canalid, value: self.$store.state.user.id }).then(function (result) {
-				self.logged = result;
-				console.log(result);
-			});
+			self.$store
+				.dispatch("getLogState", {
+					canalid: canalid,
+					value: self.$store.state.user.id,
+				})
+				.then(function (result) {
+					self.logged = result;
+					console.log(result);
+				});
 		},
 		updateUsers: function () {
 			this.$root.admin = 2;
@@ -227,13 +249,22 @@ export default {
 		login: function () {
 			const self = this;
 			console.log(this.$refs.password.value);
-			if (this.$refs.password.value != undefined && this.$refs.password.value != null) {
-				self.$store.dispatch("loginCanal", { canal_id: this.canalid, user: self.$store.state.user.id, password: self.$refs.password.value }).then(function (result) {
-					if (result.error == null || result.error == undefined) {
-						self.logged = true;
-						self.refreshChat();
-					}
-				});
+			if (
+				this.$refs.password.value != undefined &&
+				this.$refs.password.value != null
+			) {
+				self.$store
+					.dispatch("loginCanal", {
+						canal_id: this.canalid,
+						user: self.$store.state.user.id,
+						password: self.$refs.password.value,
+					})
+					.then(function (result) {
+						if (result.error == null || result.error == undefined) {
+							self.logged = true;
+							self.refreshChat();
+						}
+					});
 			}
 		},
 		getVisibility: function () {
