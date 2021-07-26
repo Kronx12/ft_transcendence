@@ -255,8 +255,8 @@ export class DatabaseController {
     });
   }
 
-  @Post('/block/:id')
-  async addBlockUser(@Headers('authorization') auth, @Param('id') id)
+  @Post('/block/:id/:blockedid')
+  async addBlockUser(@Headers('authorization') auth, @Param('id') id, @Param('blockedid') blockedid)
   {
     const self = this;
     let resp;
@@ -264,19 +264,19 @@ export class DatabaseController {
       if (err)
         resp = { error: '401 Unauthorized' };
       else
-        resp = self.databaseServ.addBlockUser(id);
+        resp = self.databaseServ.addBlockUser(id, +blockedid);
     });
   }
 
-  @Post('/unblock/:id')
-  async removeBlockUser(@Headers('authorization') auth, @Param('id') id) {
+  @Post('/unblock/:id/:blockedid')
+  async removeBlockUser(@Headers('authorization') auth, @Param('id') id, @Param('blockedid') blockedid) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
       if (err)
         resp = { error: '401 Unauthorized' };
       else
-        resp = self.databaseServ.removeBlockUser(id);
+        resp = self.databaseServ.removeBlockUser(id, blockedid);
     });
   }
 

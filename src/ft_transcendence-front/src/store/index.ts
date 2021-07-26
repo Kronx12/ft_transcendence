@@ -476,18 +476,18 @@ export default createStore({
         })
       })
     },
-    blockUser: ({ commit }, id) => {
+    blockUser: ({ commit }, specs) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.post(`/database/block/${id}`).then((result: any) => {
+        instance.post(`/database/block/${specs.id}/${specs.blockedid}`).then((result: any) => {
           resolve(result.data);
         })
       })
     },
-    unblockUser: ({ commit }, id) => {
+    unblockUser: ({ commit }, specs) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.post(`/database/unblock/${id}`).then((result: any) => {
+        instance.post(`/database/unblock/${specs.id}/${specs.blockedid}`).then((result: any) => {
           resolve(result.data);
         })
       })
@@ -544,7 +544,7 @@ export default createStore({
       })
     },
     getMessagesByCanalId: ({ commit }, specs) => {
-      console.log("les specs =", specs.user);
+      // console.log("les specs =" , specs.user);
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/message/${specs.canalid}`).then((result: any) => {
@@ -553,7 +553,8 @@ export default createStore({
             resolve(messages);
 
           result.data.forEach((e: any) => {
-            if (!specs.user.block.includes(e.author))
+            console.log(specs.user.block + " et l'autheur du msg = " + e.author);
+            if (specs.user.block == undefined || specs.user.block == "" || !specs.user.block.includes(e.author))
               messages.push({
                 id: e.id,
                 author: e.author,

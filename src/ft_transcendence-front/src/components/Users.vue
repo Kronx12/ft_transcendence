@@ -151,13 +151,26 @@ export default {
     },
     blockUser: function () {
       const self = this;
-      self.$store.dispatch("blockUser", self.id).then(function (result) {
+       
+      console.log(self.id);
+      console.log(self.$store.state.user.id);
+       var specs = {
+        id: self.$store.state.user.id,
+        blockedid: self.id
+      };
+      console.log(specs.id);
+      console.log(specs.blockedid);
+      self.$store.dispatch("blockUser", specs).then(function (result) {
         self.blocked = 1;
       })
     },
     unblockUser: function () {
         const self = this;
-      self.$store.dispatch("blockUser", self.id).then(function (result) {
+      var specs = {
+        id: self.$store.state.user.id,
+        blockedid: self.id
+      }
+      self.$store.dispatch("unblockUser", specs).then(function (result) {
         self.blocked = 0;
       })
     },

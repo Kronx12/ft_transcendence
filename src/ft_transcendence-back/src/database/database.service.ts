@@ -289,20 +289,28 @@ export class DatabaseService {
     this.usersRepo.update(user.id, user);
   }
 
-  async addBlockUser(id: number)
+  async addBlockUser(id: number, blockedid: number)
   {
+    console.log(typeof blockedid);
+    console.log(id + " " + blockedid);
+    console.log(typeof blockedid);
     let user: Users;
+    console.log(typeof blockedid);
     await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
-    user.block = id + ":";
-    this.usersRepo.update(user.id, user);
+    console.log(typeof blockedid);
+    user.block = this.addIdToSerializedIfNotExist(blockedid, user.block);
+    this.usersRepo.save(user);
   }
 
-  async removeBlockUser(id: number) {
+  async removeBlockUser(id: number, blockedid: number) {
     let user: Users;
     await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
-    let blocks = user.block;
-    user.block = this.delIdFromSerializedIfExist(id, blocks);
-    this.usersRepo.update(user.id, user);
+
+    user.block = this.delIdFromSerializedIfExist(blockedid, user.block);
+    console.log("le user avec ces blcoks = " + user.block);
+    console.log("le blocked = " + blockedid);
+
+    this.usersRepo.save(user);
   }
 
 	// fonction qui recupere les users a partir d'un tableau d'id
@@ -342,11 +350,23 @@ export class DatabaseService {
     // @param serialized: la chaine serialisée
     // @return: la chaine serialisée sans l'id
     delIdFromSerializedIfExist(id: number, serialized: string): string {
-      const array = serialized === "" ? [] : this.deserialize(serialized);
+      var array = serialized === "" ? [] : this.deserialize(serialized);
+  
+      console.log("lindex of = " , array.indexOf(id) , " et lid = " , id , " et le content " , array);
       if (array.indexOf(id) !== -1)
-          array.splice(array.indexOf(id), 1);
+      {
+        array.splice(array.indexOf(id), 1);
+        console.log("cc");
+      }
       return this.serialize(array);
   }
+
+  addIdToSerializedIfNotExist(id: number, serialized: string): string {
+    let array = serialized === "" ? [] : this.deserialize(serialized);
+    if (array.indexOf(id) === -1)
+        array.push(id);
+    return this.serialize(array);
+}
 
 	// fonction qui ajoute un id correspondant a un canal dans chaque liste de canal de chaque utilisateur
 	// la fonction ne retourne rien

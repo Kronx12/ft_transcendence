@@ -154,34 +154,32 @@ export default {
 			this.userid = this.$store.state.user.id;
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
-					var specs = {
+						var specs = {
 						canalid: self.canalid,
 						user: null,
 					};
 					self.$store
 						.dispatch("getUser", self.$store.state.user.id)
 						.then(function (result) {
+						
+							specs.user = result;
 							self.$store
 								.dispatch("getCanalsByUserId", self.$store.state.user.id)
 								.then(function (result) {
 									self.chats = result;
-									console.log("Chats: ", result);
-								});
-							self.$store
-								.dispatch("getMessagesByCanalId", self.canalid)
-								.then(function (result) {
-									specs.user = result;
+									// console.log("Chats: ", result2);
 									self.$store
-										.dispatch("getCanalsByUserId", self.$store.state.user.id)
-										.then(function (result) {
-											self.chats = result;
-											self.$store
-												.dispatch("getMessagesByCanalId", specs)
-												.then(function (result) {
-													self.messages = result;
-												});
-										});
+									.dispatch("getMessagesByCanalId", specs)
+									.then(function (result) {
+										self.messages = result;
+										self.$store
+											.dispatch("getCanalsByUserId", self.$store.state.user.id)
+											.then(function (result) {
+												self.chats = result;
+											});
+									});
 								});
+							
 						});
 
 					// self.getCanalName(self.$store.state.canalid);
