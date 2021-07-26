@@ -544,7 +544,6 @@ export default createStore({
       })
     },
     getMessagesByCanalId: ({ commit }, specs) => {
-      // console.log("les specs =" , specs.user);
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/message/${specs.canalid}`).then((result: any) => {
@@ -553,7 +552,6 @@ export default createStore({
             resolve(messages);
 
           result.data.forEach((e: any) => {
-            console.log(specs.user.block + " et l'autheur du msg = " + e.author);
             if (specs.user.block == undefined || specs.user.block == "" || !specs.user.block.includes(e.author))
               messages.push({
                 id: e.id,
@@ -567,6 +565,8 @@ export default createStore({
       })
     },
     createMessage: ({ commit }, msg) => {
+      if (msg.author == undefined || msg.author == null)
+        return ;
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.post(`/message/`, msg).then((result: any) => {

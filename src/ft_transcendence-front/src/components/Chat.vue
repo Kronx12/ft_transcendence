@@ -116,7 +116,6 @@ export default {
 		// Submit messages data to database
 		messageSubmit: function () {
 			if (this.inputMessage == null || this.inputMessage == "") return;
-
 			// Check if sender is muted
 			const self = this;
 			if (self.$store != undefined && self.$store != null) {
@@ -134,7 +133,6 @@ export default {
 									return;
 							}
 						}
-						console.log(mutes);
 					});
 			}
 			if (this.$store != undefined && this.$store != null) {
@@ -173,8 +171,6 @@ export default {
 									});
 								});
 						});
-
-					// self.getCanalName(self.$store.state.canalid);
 				}
 			}, 1000);
 		},

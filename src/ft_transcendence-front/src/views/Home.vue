@@ -1,18 +1,7 @@
 <template>
   <div>
-    <h1>Bonjour</h1>
+    <h1>Welcome to ft_transcendence</h1>
     <router-link v-if="$store.state.user.id != -1" to="/queue">Join Game</router-link>
-    <!-- <div id="main">
-      <div id="leaderboard">
-        <h3>Leaderbord du cul</h3>
-      </div>
-      <div id="global">
-        <h3>Launch game, historics et petits trucs sympa</h3>
-      </div>
-      <div id="chat">
-        <h3>Chat</h3>
-      </div>
-    </div> -->
   </div>
 </template>
 

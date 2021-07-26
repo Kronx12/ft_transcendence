@@ -17,7 +17,7 @@
                 <tbody>
                     <tr v-for="user in users_admins_actual" :key="user">
                         <td>{{user.username}}</td>
-                        <td><button @click.prevent="del_admin(user.intra_id)" class="del-button">x</button></td>
+                        <td><button @click.prevent="del_admin(user.intra_id)" class="del-button">X</button></td>
                       
                     </tr>
                 </tbody>
@@ -47,9 +47,9 @@
                 <tbody>
                     <tr v-for="user in users_actual" :key="user">
                         <td>{{user.username}}</td>
-                        <td><button @click.prevent="del_user(user.intra_id)" class="del-button">x</button></td>
-                        <td><button @click.prevent="mute_temp_user(user.intra_id)">MUTE 1h</button></td>
-                        <td><button @click.prevent="ban_temp_user(user.intra_id)">BAN 1h</button></td>
+                        <td><button @click.prevent="del_user(user.intra_id)" class="del-button">X</button></td>
+                        <td><div><img @click.prevent="mute_temp_user(user.intra_id)" src="../assets/mute.svg" class="mute-button"></div></td>
+                        <td><div><img @click.prevent="ban_temp_user(user.intra_id)" src="../assets/sandglass.svg" class="mute-button"></div></td>
                     </tr>
                 </tbody>
             </table>

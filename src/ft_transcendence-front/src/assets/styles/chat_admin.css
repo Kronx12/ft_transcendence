@@ -153,3 +153,8 @@
   margin-right: 40%;
   box-sizing: border-box;
 }
+
+.mute-button {
+  width: 30px !important;
+  height: 30px !important;
+}

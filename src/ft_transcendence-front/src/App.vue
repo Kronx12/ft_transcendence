@@ -46,6 +46,8 @@
   <ChatAdmin  v-if="this.$store.state.user.id != -1 && this.admin == 1" v-bind:method="this.admin_method" v-bind:id="this.admin_id" />
   <ChatAdminUsers  v-if="this.$store.state.user.id != -1 && this.admin == 2" v-bind:id="this.admin_id" />
   <router-view />
+  <footer>
+  </footer>
 </template>
 
 <script>
@@ -174,24 +176,21 @@ export default {
     self.checkToken();
   },
   async updated() {
-    console.log("oui");
     const self = this;
-    console.log("le login = " + self.$store.state.user.login);
+    if (self.connection == null) {
+      self.connection = new WebSocket(server.socketURL);
 
-    if (this.connection == null) {
-      this.connection = new WebSocket(server.socketURL);
-
-      this.connection.onopen = function (event) {
+      self.connection.onopen = function (event) {
         self.state = true;
         console.log("Connected !");
       };
 
-      this.connection.onclose = function (event) {
+      self.connection.onclose = function (event) {
         self.state = false;
         console.log("Disconnected !, Try to reconnect");
-        this.connection = new WebSocket(server.socketURL);
+        self.connection = new WebSocket(server.socketURL);
       };
-      this.connection.onmessage = async function (event) {
+      self.connection.onmessage = async function (event) {
         const data = JSON.parse(event.data);
         if (data.type === "emit_user") {
           // Send user at connection

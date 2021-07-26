@@ -16,9 +16,6 @@ export class MessageService {
     }
 
     createMessage(msg: Message) {
-        if (msg.author == undefined || msg.author == null)
-            msg.author = 77110;
-        console.log("lauteur = " + msg.author);
         return this.messageRepo.save(msg);
     }
 }
