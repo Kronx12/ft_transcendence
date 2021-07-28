@@ -15,7 +15,13 @@ export class MessageService {
         return this.messageRepo.find({ where: { canalid: id } });
     }
 
-    createMessage(msg: Message) {
+    createMessage(mess: string, author: number, canalid: number) {
+        let msg = {
+            id: undefined,
+            message: mess,
+            author: author,
+            canalid: canalid
+        };
         return this.messageRepo.save(msg);
     }
 }

@@ -243,7 +243,7 @@ export class DatabaseController {
     });
   }
 
-  @Post('/mute/:id/:canalid/:time')
+  @Post('/ban/:id/:canalid/:time')
   async addBanUserTime(@Headers('authorization') auth, @Param('id') id, @Param('canalid') canalid, @Param('time') time) {
     const self = this;
     let resp;
@@ -276,7 +276,7 @@ export class DatabaseController {
       if (err)
         resp = { error: '401 Unauthorized' };
       else
-        resp = self.databaseServ.removeBlockUser(id, blockedid);
+        resp = self.databaseServ.removeBlockUser(id, +blockedid);
     });
   }
 

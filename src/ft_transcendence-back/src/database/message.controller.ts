@@ -36,15 +36,15 @@ export class MessageController {
     }
 
     // /message/ => with body
-    @Post()
-    async createMessage(@Headers('authorization') auth, @Body() msg: Message) {
+    @Post('/:message/:author/:canalid')
+    async createMessage(@Headers('authorization') auth, @Param('message') mess, @Param('author') author, @Param('canalid') canalid) {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
             if (err)
                 resp = { error: '401 Unauthorized' };
             else
-                resp = self.messageServ.createMessage(msg);
+                resp = self.messageServ.createMessage(mess, +author, +canalid);
         });
         return resp;
     }

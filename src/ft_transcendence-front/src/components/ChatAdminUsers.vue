@@ -3,6 +3,7 @@
 <div id="admin_body">
     <div @click="destroy_popup()" id="quit"><img src="../assets/close.svg" class="denied"></div>
     <h1 class="title">Users Administration Panel</h1>
+    <h6 style="color: red;">{{ banMessage }}</h6>
     <hr>
     <div class="container">
         <h3>Admins</h3>
@@ -18,7 +19,6 @@
                     <tr v-for="user in users_admins_actual" :key="user">
                         <td>{{user.username}}</td>
                         <td><button @click.prevent="del_admin(user.intra_id)" class="del-button">X</button></td>
-                      
                     </tr>
                 </tbody>
             </table>    
@@ -27,14 +27,15 @@
             <div class="form-section vertical-center">
                 <div class="box">
                     <select ref="admin_select" name="users" id="admin-select" class="user-row">
-                        <option v-for="user in users_admins" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
+                        <div v-if="user != undefined">
+                            <option  v-for="user in users_admins" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
+                        </div>
                     </select>
                 </div>
                 <button @click.prevent="add_admin()" class="add-button"></button>
             </div>
         </form>
     </div>
-
     <div class="container">
         <h3>Users</h3>
         <div class="table">
@@ -58,7 +59,9 @@
             <div class="form-section vertical-center">
                 <div class="box">
                     <select ref="user_select" name="users" id="user-select" class="user-row">
-                        <option v-for="user in users" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
+                        <div v-if="user != undefined">
+                            <option v-for="user in users" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
+                        </div>
                     </select>
                 </div>
                 <button @click.prevent="add_user()" class="add-button"></button>
@@ -81,6 +84,7 @@ export default {
             users_admins_actual: [],
             users_actual: [],
             canal: null,
+            banMessage: ""
         }
     },
     methods: {
@@ -120,11 +124,13 @@ export default {
                 self.getUsers();
             });
         },
-        mute_temp_user(id) {
+        mute_temp_user: function(id) {
             var self = this;
             const date = new Date().getTime();
             self.$store.dispatch("muteUserIdTime", {id: id, canalid: self.id, time: date + 60000 * 60}).then(function (response) {
                 console.log(id + " has been muted for 1 hour from " + self.id + " channel");
+                self.banMessage = id + " has been banned for 1 hour from " + self.id + " channel";
+                setTimeout(function() { self.banMessage = ""; }, 5000);
             })
         },
         ban_temp_user(id) {
@@ -132,6 +138,8 @@ export default {
             const date = new Date().getTime();
             self.$store.dispatch("banUserIdTime", {id: id, canalid: self.id, time: date + 60000 * 60}).then(function (response) {
                 console.log(id + " has been banned for 1 hour from " + self.id + " channel");
+                self.banMessage = id + " has been banned for 1 hour from " + self.id + " channel";
+                self.del_user(id);
             });
         },
         destroy_popup() {

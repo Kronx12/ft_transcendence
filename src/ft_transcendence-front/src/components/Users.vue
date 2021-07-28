@@ -11,8 +11,8 @@
       <button class="button" @click="sendInviteClassic()">Invite for normal game</button>
       <button class="button" @click="sendInviteBonus()">Invite for bonus game</button>
     </div>
-    <button v-if="blocked == 0" id="button-block" class="button" @click="blockUser()">Block</button>
-    <button v-else-if="blocked == 1" id="button-unblock" class="button" @click="unblockUser()">Unblock</button>
+    <button v-if="blocked == 0 && id != this.$store.state.user.id" id="button-block" class="button" @click="blockUser()">Block</button>
+    <button v-else-if="blocked == 1 && id != this.$store.state.user.id" id="button-unblock" class="button" @click="unblockUser()">Unblock</button>
     <hr>
     <div style="width:100%;display: block" id="stats">
       <h1 style="width:100%">Stats</h1>
@@ -57,7 +57,7 @@
     </div>
   </div>
   <div v-else>
-    <h1>User not foud...</h1>
+    <h1>User not found...</h1>
   </div>
 </template>
 
@@ -121,7 +121,8 @@ export default {
 
                   schema.win = result.victory;
                   await self.$store.dispatch("getUser", schema.p1).then(function (data) {
-                  schema.p1_l = data.username
+                    if (data.username != undefined)
+                      schema.p1_l = data.username
             })
                    await self.$store.dispatch("getUser", schema.p2)
             .then(function (data) {

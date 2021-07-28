@@ -286,7 +286,7 @@ export class DatabaseService {
     let user: Users;
     await this.usersRepo.findOne({ where: `intra_id = '${id}'`}).then(function (result) { user = result});
     user.ban = canalid + ";" + time + "|" + user.ban;
-    this.usersRepo.update(user.id, user);
+    this.usersRepo.save(user);
   }
 
   async addBlockUser(id: number, blockedid: number)

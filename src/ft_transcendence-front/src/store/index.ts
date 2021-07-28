@@ -569,7 +569,7 @@ export default createStore({
         return ;
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.post(`/message/`, msg).then((result: any) => {
+        instance.post(`/message/${msg.message}/${msg.author}/${msg.canalid}`).then((result: any) => {
           resolve(result.data);
         })
       })
