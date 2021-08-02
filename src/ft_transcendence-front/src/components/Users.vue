@@ -1,7 +1,9 @@
 <template>
   <div v-if="id != -1">
     <h1>{{ login }}</h1>
-    <img class="avatar-user" :src="avatar" />
+    <img v-if="id == this.$store.state.user.id" @click="goSettings()" @mouseenter="hoverimageMouse()" @mouseout="hoverimageMouse()"  id="avatar-profile" v-bind:src=avatar />  
+    <img v-else class="avatar-user" :src="avatar" />
+    <div @click="goSettings()"  class="hoverImage" v-if="hoverimage">Edit Avatar</div>
 
     <button v-if="accept" @click="acceptFriend()">Accept friend !</button>
     <button v-else-if="add" @click="addFriend()">Add friend !</button>
@@ -81,10 +83,17 @@ export default {
       invite: 1,
       win: 0,
       loose: 0,
-      blocked: 0
+      blocked: 0,
+      hoverimage: 0
     };
   },
   methods: {
+    hoverimageMouse: function(){
+            this.hoverimage = !this.hoverimage;
+        },
+        goSettings: function() {
+            this.$router.push("/settings")
+        },
     searchUser: async function () {
       const self = this;
       await this.$store
@@ -92,6 +101,11 @@ export default {
         .then(async (result) => {
           if (result.type == "unique") {
             self.id = result.data.intra_id;
+            if (self.id == self.$store.state.user.id)
+            {
+              self.$router.push('/profile');
+              return;
+            }
             self.login = result.data.username;
             self.avatar = result.data.avatar;
             self.isFriend();
@@ -342,6 +356,7 @@ div.user-aff {
 #button-unblock {
   background-color: green !important;
 }
+
 
 
 </style>
