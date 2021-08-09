@@ -20,7 +20,7 @@ export class GameDatabaseService {
     }
 
     getId(id: string): Promise<Games> {
-        return this.gamesRepo.findOne();
+        return this.gamesRepo.findOne({where: `uuid = '${id}'`});
     }
 
     addGame(game: Games): Promise<Games[]> {

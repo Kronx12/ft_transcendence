@@ -80,7 +80,7 @@ export class Room {
     constructor(p1: Client, p2: Client) {
         this._id = uuidv4();
 
-        this._scorelimit = 11
+        this._scorelimit = 1
 
         this._canvas_w = 1000
         this._canvas_h = 562
@@ -176,7 +176,6 @@ export class Room {
                         "victory": this._winner.id,
                         "type": 0
                     }, this._id, this._playera._user.id, this._playerb._user.id);
-                    break;
                 }
 
                 this._bx += this._vx;
@@ -440,7 +439,6 @@ export class RoomBonus {
                         "victory": this._winner.id,
                         "type": 1
                     }, this._id, this._playera._user.id, this._playerb._user.id);
-                    break;
                 }
 
                 this._bx += this._vx;
@@ -710,7 +708,8 @@ export async function saveGame(content, uuid:string, p1:number, p2:number) {
     });
     const response_getid = await fetch("http://localhost:3000/game_database/getid/" + uuid)
     .then(res => res.json())
-    .then(json => {    
+    .then(json => {  
+        console.log(json)  
         fetch("http://localhost:3000/database/user/game/" + p1.toString() + "/" + json.id.toString(), {
             method: 'PATCH',
             body: JSON.stringify(content),

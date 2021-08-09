@@ -264,10 +264,7 @@ export class DatabaseService {
 	async addGameToUser(id: number, gameid: number) {
 			let user: Users;
 			await this.usersRepo.findOne({ where: `intra_id = '${id}'` }).then(function (edit) { user = edit; });
-			let tmp = this.deserialize(user.game_history);
-			if (gameid !== NaN)
-					tmp.push(gameid);
-			user.game_history = this.serialize(tmp);
+			user.game_history = this.addIdToSerializedIfNotExist(gameid, user.game_history);
 			this.usersRepo.update(user.id, user);
 	}
 
@@ -319,16 +316,6 @@ export class DatabaseService {
 		return this.usersRepo.find({ where: { intra_id: Any(ids) } });
 	}
 
-	// fonction de serialization d'un tableau d'entiers
-	serialize(array: number[]): string {
-			return array.join(':');
-	}
-
-	// fonction de deserialization d'une string en tableau d'entiers
-	deserialize(string: string): number[] {
-			return string.split(':').map(x => +x);
-	}
-
 	// fonction qui supprime un id correspondant a un canal dans chaque liste de canal de chaque utilisateur
 	// la fonction ne retourne rien
 	async removeCanal(canal_id: number) {
@@ -345,28 +332,37 @@ export class DatabaseService {
 		}
 	}
 
-  // fonction qui supprime un id d'une chaine serialisée si il est dedans
-    // @param id: l'id à supprimer
-    // @param serialized: la chaine serialisée
-    // @return: la chaine serialisée sans l'id
-    delIdFromSerializedIfExist(id: number, serialized: string): string {
-      var array = serialized === "" ? [] : this.deserialize(serialized);
-  
-      console.log("lindex of = " , array.indexOf(id) , " et lid = " , id , " et le content " , array);
-      if (array.indexOf(id) !== -1)
-      {
-        array.splice(array.indexOf(id), 1);
-        console.log("cc");
-      }
-      return this.serialize(array);
-  }
+	// fonction de serialization d'un tableau d'entiers
+	serialize(array: number[]): string {
+		return array.join(':');
+	}
 
-  addIdToSerializedIfNotExist(id: number, serialized: string): string {
-    let array = serialized === "" ? [] : this.deserialize(serialized);
-    if (array.indexOf(id) === -1)
-        array.push(id);
-    return this.serialize(array);
-}
+	// fonction de deserialization d'une string en tableau d'entiers
+	deserialize(str: string): number[] {
+		return str.split(':').map(x=>+x);
+	}
+
+	// fonction qui ajoute un id a une chaine serialisée si il n'est pas deja dedans
+	// @param id: l'id à ajouter
+	// @param serialized: la chaine serialisée
+	// @return: la chaine serialisée avec l'id ajouté
+	addIdToSerializedIfNotExist(id: number, serialized: string): string {
+		let array = serialized === "" ? [] : this.deserialize(serialized);
+		if (array.indexOf(id) === -1)
+			array.push(id);
+		return this.serialize(array);
+	}
+
+	// fonction qui supprime un id d'une chaine serialisée si il est dedans
+	// @param id: l'id à supprimer
+	// @param serialized: la chaine serialisée
+	// @return: la chaine serialisée sans l'id
+	delIdFromSerializedIfExist(id: number, serialized: string): string {
+		const array = serialized === "" ? [] : this.deserialize(serialized);
+		if (array.indexOf(id) !== -1)
+			array.splice(array.indexOf(id), 1);
+		return this.serialize(array);
+	}
 
 	// fonction qui ajoute un id correspondant a un canal dans chaque liste de canal de chaque utilisateur
 	// la fonction ne retourne rien

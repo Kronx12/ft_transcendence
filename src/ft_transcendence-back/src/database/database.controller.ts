@@ -185,16 +185,6 @@ export class DatabaseController {
   @Get('user/game/:id/')
   async getGameHistory(@Headers('authorization') auth, @Param('id') id) {
     return this.databaseServ.getGameHistory(id);
-    const self = this;
-    let resp;
-    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
-        resp = { error: '401 Unauthorized' };
-      } else {
-        resp = self.databaseServ.getGameHistory(id);
-      }
-    });
-    return resp;
   }
 
   @Patch('user/game/:id/:gameid')
@@ -204,16 +194,6 @@ export class DatabaseController {
     @Param('gameid') gameid,
   ) {
     return this.databaseServ.addGameToUser(id, gameid);
-    const self = this;
-    let resp;
-    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
-        resp = { error: '401 Unauthorized' };
-      } else {
-        resp = self.databaseServ.addGameToUser(id, gameid);
-      }
-    });
-    return resp;
   }
 
   // /database/other_users/:id

@@ -19,6 +19,7 @@ export class GameDatabaseController {
 
     @Get('/getid/:uuid')
     async getId(@Param('uuid') id: string) {
+        console.log(id);
         return this.databaseServ.getId(id);
     }
 

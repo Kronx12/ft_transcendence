@@ -66,8 +66,6 @@ export default {
             self.id = result.data.intra_id;
             self.login = result.data.username;
             self.avatar = result.data.avatar;
-            self.isFriend();
-            self.haveAsked();
             console.log("history", result.data.game_history);
             let history = result.data.game_history.split(":");
             let schema = {
