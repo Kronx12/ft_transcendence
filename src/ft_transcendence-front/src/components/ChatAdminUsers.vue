@@ -57,7 +57,7 @@
             <div class="form-section vertical-center">
                 <div class="box">
                     <select ref="user_select" name="users" id="user-select" class="user-row">
-                        <option v-for="user in users" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
+                        <option v-for="user in users" :key="user" :value="user.intra_id">{{user.username}}</option>
                     </select>
                 </div>
                 <button @click.prevent="add_user()" class="add-button"></button>
@@ -155,6 +155,8 @@ export default {
             this.$store.dispatch("getUsersNotInCanal", this.id).then(function (result) {
                 var _self = self;
                 self.users = result;
+                console.log("Not in channel");
+                console.log(result);
                 if (self.users.length > 0) {
                     // Get users
                     self.$store.dispatch("getUsersFromIds", self.users).then(function (result) {
@@ -195,9 +197,6 @@ export default {
         const self = this;
 
         this.getUsers();
-		// setInterval(function () {
-        //     self.getUsers();
-        // }, 1000);
     },
 }
 </script>

@@ -455,9 +455,9 @@ export default createStore({
     delUserId: ({ commit }, specs) => {
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
-        instance.post(`/canal/del_user/`, specs).then((result: any) => {
-          resolve(result.data);
-        })
+        console.log("Here");
+        instance.post(`/canal/del_user/`, specs);
+        instance.patch(`/database/user/delete_one/${specs.canal_id}/${specs.user_id}`);
       })
     },
     muteUserIdTime: ({ commit }, specs) => {
@@ -496,6 +496,7 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/database/other_users/${canalid}`).then((result: any) => {
+          console.log(result);
           const users: any[] = [];
           if (result == undefined)
             resolve(users);

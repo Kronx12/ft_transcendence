@@ -250,6 +250,8 @@ export class DatabaseService {
 	}
 
 	getCanalsOtherUsers(canalid: number) {
+		console.log("Canal id:");
+		console.log(canalid);
 		return this.usersRepo.find({ where: `canals NOT LIKE '%${canalid}%'` });
 	}
 
@@ -328,6 +330,24 @@ export class DatabaseService {
 				}
 			}
 			user.canals = tmp.join(':');
+			this.usersRepo.update(user.id, user);
+		}
+	}
+
+	async removeCanalForUser(canal_id: number, user_id: number) {
+		console.log(user_id);
+		console.log(canal_id);
+		let users = await this.usersRepo.find({ where: { intra_id: user_id } });
+		console.log(users);
+		for (let user of users) {
+			let tmp = user.canals.split(':');
+			for (let i = 0; i < tmp.length; i++) {
+				if (+tmp[i] == canal_id) {
+					tmp.splice(i, 1);
+				}
+			}
+			user.canals = tmp.join(':');
+			console.log(user.canals);
 			this.usersRepo.update(user.id, user);
 		}
 	}

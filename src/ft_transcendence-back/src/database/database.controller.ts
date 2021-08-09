@@ -274,6 +274,20 @@ export class DatabaseController {
     return resp;
   }
 
+  // /database/user/delete_one/:canal_id/:user_id
+  @Patch('/user/delete_one/:canal_id/:user_id')
+  async deleteCanalForUser(@Headers('authorization') auth, @Param('canal_id') canal_id, @Param('user_id') user_id) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err)
+        resp = { error: '401 Unauthorized' };
+      else
+        resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
+    });
+    return resp;
+  }
+
   // /database/user/add/:canal_id
   @Patch('/user/add/:canal_id')
   async addCanal(@Headers('authorization') auth, @Param('canal_id') canal_id) {
