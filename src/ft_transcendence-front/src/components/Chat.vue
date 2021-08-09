@@ -162,16 +162,26 @@ export default {
 						.dispatch("getUser", self.$store.state.user.id)
 						.then(function (result) {
 							specs.user = result;
+							console.log("user",)
+							let list = result.canals.split(":")
+							if (list.length == 0)
+								return;
+							for (let x in list)
+							{
+								console.log("cehjbcvebci", x, list)
+								self.chats = []
 							self.$store
-								.dispatch("getCanalsByUserId", self.$store.state.user.id)
+								.dispatch("getCanalById", list[x])
 								.then(function (result) {
-									self.chats = result;
+									console.log("chat", result)
+									self.chats.push(result[0]);
 									self.$store
 									.dispatch("getMessagesByCanalId", specs)
 									.then(function (result) {
 										self.messages = result;
 									});
 								});
+							}
 						});
 				}
 			}, 1000);

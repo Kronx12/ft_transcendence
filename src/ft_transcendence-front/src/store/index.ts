@@ -457,7 +457,7 @@ export default createStore({
       return new Promise((resolve, reject) => {
         console.log("Here");
         instance.post(`/canal/del_user/`, specs);
-        instance.patch(`/database/user/delete_one/${specs.canal_id}/${specs.user_id}`);
+        instance.patch(`/database/user/delete_one/${specs.canal_id}/${specs.id}`);
       })
     },
     muteUserIdTime: ({ commit }, specs) => {

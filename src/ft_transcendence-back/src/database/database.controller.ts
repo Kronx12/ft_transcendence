@@ -283,6 +283,7 @@ export class DatabaseController {
       if (err)
         resp = { error: '401 Unauthorized' };
       else
+        console.log("wesh: ", canal_id, user_id)
         resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
     });
     return resp;

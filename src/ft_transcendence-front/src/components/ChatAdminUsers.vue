@@ -109,11 +109,11 @@ export default {
                 self.getUsers();
             });
         },
-        del_user(id) {
+        async del_user(id) {
             var self = this;
             console.log("DEL USER:", id);
             this.$store.dispatch("delUserId", {canal_id: this.id, id: id}).then(function(response) {
-                self.getUsers();
+                await self.getUsers();
             });
         },
         mute_temp_user: function(id) {
