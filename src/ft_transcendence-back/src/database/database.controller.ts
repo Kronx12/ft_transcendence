@@ -16,7 +16,7 @@ const jwt = require('jsonwebtoken');
 
 @Controller('database')
 export class DatabaseController {
-  constructor(private readonly databaseServ: DatabaseService) { }
+  constructor(private readonly databaseServ: DatabaseService) {}
 
   @Get('user')
   async findAll(@Headers('authorization') auth) {
@@ -202,89 +202,115 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.getCanalsOtherUsers(id);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.getCanalsOtherUsers(id);
     });
     return resp;
   }
 
   // Mute with a duration
   @Post('/mute/:id/:canalid/:time')
-  async addMuteUserTime(@Headers('authorization') auth, @Param('id') id, @Param('canalid') canalid, @Param('time') time) {
+  async addMuteUserTime(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('canalid') canalid,
+    @Param('time') time,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.addMuteUserTime(id, canalid, time);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.addMuteUserTime(id, canalid, time);
     });
   }
 
   @Post('/ban/:id/:canalid/:time')
-  async addBanUserTime(@Headers('authorization') auth, @Param('id') id, @Param('canalid') canalid, @Param('time') time) {
+  async addBanUserTime(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('canalid') canalid,
+    @Param('time') time,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.addBanUserTime(id, canalid, time);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.addBanUserTime(id, canalid, time);
     });
   }
 
   @Post('/block/:id/:blockedid')
-  async addBlockUser(@Headers('authorization') auth, @Param('id') id, @Param('blockedid') blockedid)
-  {
+  async addBlockUser(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('blockedid') blockedid,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.addBlockUser(id, +blockedid);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.addBlockUser(id, +blockedid);
     });
   }
 
   @Post('/unblock/:id/:blockedid')
-  async removeBlockUser(@Headers('authorization') auth, @Param('id') id, @Param('blockedid') blockedid) {
+  async removeBlockUser(
+    @Headers('authorization') auth,
+    @Param('id') id,
+    @Param('blockedid') blockedid,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.removeBlockUser(id, +blockedid);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.removeBlockUser(id, +blockedid);
     });
   }
 
   // /database/user/delete/:canal_id
   @Patch('/user/delete/:canal_id')
-  async deleteCanal(@Headers('authorization') auth, @Param('canal_id') canal_id) {
+  async deleteCanal(
+    @Headers('authorization') auth,
+    @Param('canal_id') canal_id,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.removeCanal(canal_id);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.removeCanal(canal_id);
     });
     return resp;
   }
 
   // /database/user/delete_one/:canal_id/:user_id
   @Patch('/user/delete_one/:canal_id/:user_id')
-  async deleteCanalForUser(@Headers('authorization') auth, @Param('canal_id') canal_id, @Param('user_id') user_id) {
+  async deleteCanalForUser(
+    @Headers('authorization') auth,
+    @Param('canal_id') canal_id,
+    @Param('user_id') user_id,
+  ) {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        console.log("wesh: ", canal_id, user_id)
-        resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
+      if (err) resp = { error: '401 Unauthorized' };
+      else console.log('wesh: ', canal_id, user_id);
+      resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
+    });
+    return resp;
+  }
+  // /database/user/add_one/:canal_id/:user_id
+  @Patch('/user/add_one/:canal_id/:user_id')
+  async addCanalForUser(
+    @Headers('authorization') auth,
+    @Param('canal_id') canal_id,
+    @Param('user_id') user_id,
+  ) {
+    const self = this;
+    let resp;
+    await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+      if (err) resp = { error: '401 Unauthorized' };
+      else console.log('wesh: ', canal_id, user_id);
+      resp = self.databaseServ.addCanalForUser(canal_id, user_id);
     });
     return resp;
   }
@@ -295,10 +321,8 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err)
-        resp = { error: '401 Unauthorized' };
-      else
-        resp = self.databaseServ.addCanal(canal_id);
+      if (err) resp = { error: '401 Unauthorized' };
+      else resp = self.databaseServ.addCanal(canal_id);
     });
     return resp;
   }

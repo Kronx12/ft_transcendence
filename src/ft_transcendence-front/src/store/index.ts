@@ -440,8 +440,10 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.post(`/canal/add_user/`, specs).then((result: any) => {
-          resolve(result.data);
-        })
+          instance.patch(
+            `/database/user/add_one/${specs.canal_id}/${specs.id}`
+          );
+        }).then(() => resolve(1))
       })
     },
     delAdminUserId: ({ commit }, specs) => {
@@ -457,7 +459,9 @@ export default createStore({
       return new Promise((resolve, reject) => {
         console.log("Here");
         instance.post(`/canal/del_user/`, specs);
-        instance.patch(`/database/user/delete_one/${specs.canal_id}/${specs.id}`);
+        instance
+          .patch(`/database/user/delete_one/${specs.canal_id}/${specs.id}`)
+          .then(() => resolve(1));
       })
     },
     muteUserIdTime: ({ commit }, specs) => {
