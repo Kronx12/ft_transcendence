@@ -30,14 +30,14 @@
         </div>
       </div>
       <hr>
-      <div class="history" style="width:100%">
+      <div class="history">
         <h1>History</h1>
-        <div class="history-box" v-for="item in history" :key="item">
-          <div :key="item" v-if="item.win == id" style="background: green">
-          {{item.p1_l}} vs {{item.p2_l}} | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
+        <div class="box-history" v-for="item in history" :key="item">
+          <div :key="item" v-if="item.win == id" class="game-history win">
+          <span class="p">{{item.p1_l}} vs {{item.p2_l}}</span> | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
           </div>
-          <div v-else style="background: red">
-          {{item.p1_l}} vs {{item.p2_l}} | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
+          <div v-else class="game-history loose">
+          <span class="p">{{item.p1_l}} vs {{item.p2_l}}</span> | Score: {{item.s1}} : {{item.s2}} | Type : {{item.type ? "Bonus" : "Standard"}}
           </div>
         </div>
       </div>
@@ -343,12 +343,6 @@ div.user-aff {
   font-size: 16px;
 }
 
-.history-box {
-  width: 30%;
-  color: white;
-  border: solid black 2px;
-}
-
 #button-block {
   background-color: red !important;
 }
@@ -358,5 +352,36 @@ div.user-aff {
 }
 
 
+.history {
+  width: 100%;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.box-history {
+  color: white;
+  font-weight: bold;
+  text-shadow: 0.1em 0.1em 0.2em black;
+}
+
+.game-history {
+  margin: 5px;
+  padding: 5px;
+  background-color: #2c3e50;
+}
+
+.win {
+  border-bottom: 2px solid green;
+  border-left: 10px solid green;
+}
+
+.loose {
+  border-bottom: 2px solid red;
+  border-left: 10px solid red;
+}
+
+.p {
+  color: gold;
+}
 
 </style>
