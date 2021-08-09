@@ -27,19 +27,19 @@
 				</a>
 				<img
 					id="chat-canal-settings"
-					v-if="chat.id == canalid"
+					v-if="isadmin && chat.id == canalid"
 					@click="updateUsers()"
 					src="../assets/user.svg"
 				/>
 				<img
 					id="chat-canal-settings"
-					v-if="chat.id == canalid"
+					v-if="isadmin && chat.id == canalid"
 					@click="updateCanal()"
 					src="../assets/settings.svg"
 				/>
 				<img
 					id="chat-canal-settings"
-					v-if="chat.id == canalid"
+					v-if="isadmin && chat.id == canalid"
 					@click="deleteCanal()"
 					src="../assets/cancel.svg"
 				/>
@@ -96,6 +96,7 @@ export default {
 			userImage: "",
 			canalname: "",
 			logged: false,
+			isadmin: false,
 		};
 	},
 	async mounted() {
@@ -152,7 +153,8 @@ export default {
 			this.userid = this.$store.state.user.id;
 			setInterval(function () {
 				if (self.$store != undefined && self.$store != null) {
-						var specs = {
+					self.isAdmin();
+					var specs = {
 						canalid: self.canalid,
 						user: null,
 					};
@@ -273,6 +275,12 @@ export default {
 			});
 			return ret;
 		},
+		isAdmin: function () {
+			let self = this;
+			this.$store.dispatch("isCanalAdmin", { user_id: this.$store.state.user.id, canal_id: this.canalid }).then(function (result) {
+				self.isadmin = result;
+			});
+		}
 	},
 };
 </script>

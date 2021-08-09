@@ -144,4 +144,12 @@ export class CanalService {
             return false;
         });
     }
+
+    isAdmin(canal_id: number, user_id: number): Promise<boolean> {
+        return this.CanalRepo.find({ where: `admins LIKE '%${user_id}%' AND id = ${canal_id}` }).then(canals => {
+            if (canals.length > 0)
+                return true;
+            return false;
+        });
+    }
 }

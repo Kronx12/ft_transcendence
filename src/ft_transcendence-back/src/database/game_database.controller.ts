@@ -13,20 +13,16 @@ export class GameDatabaseController {
 
     @Get(':id')
     async findOne(@Param('id') id: string) {
-        console.log(id)
         return this.databaseServ.findOne(+id);
     }
 
     @Get('/getid/:uuid')
     async getId(@Param('uuid') id: string) {
-        console.log(id);
         return this.databaseServ.getId(id);
     }
 
     @Post()
     async addGame(@Body() game: Games) {
-        console.log("Body:");
-        console.log(game);
         return this.databaseServ.addGame(game);
     }
 

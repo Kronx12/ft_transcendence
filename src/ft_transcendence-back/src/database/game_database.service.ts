@@ -15,7 +15,6 @@ export class GameDatabaseService {
     }
 
     findOne(id: number): Promise<Games> {
-        console.log(id)
         return this.gamesRepo.findOne({ where: `id = '${id}'` });
     }
 
@@ -24,8 +23,6 @@ export class GameDatabaseService {
     }
 
     addGame(game: Games): Promise<Games[]> {
-        console.log("Game receive : ")
-        console.log(game)
         return this.gamesRepo.save([game]);
     }
 

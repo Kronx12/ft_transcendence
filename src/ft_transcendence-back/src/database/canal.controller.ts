@@ -182,4 +182,18 @@ export class CanalController {
         });
         return resp;
     }
+
+    // /canal/is_admin/:canal_id/:user_id
+    @Get('/is_admin/:canal_id/:user_id')
+    async isAdmin(@Headers('authorization') auth, @Param('canal_id') canal_id, @Param('user_id') user_id) {
+        const self = this;
+        let resp;
+        await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
+            if (err)
+                resp = { error: '401 Unauthorized' };
+            else
+                resp = self.CanalServ.isAdmin(+canal_id, +user_id);
+        });
+        return resp;
+    }
 }

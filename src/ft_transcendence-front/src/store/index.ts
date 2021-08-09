@@ -521,6 +521,14 @@ export default createStore({
         })
       })
     },
+    isCanalAdmin: ({ commit }, data) => {
+      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      return new Promise((resolve, reject) => {
+        instance.get(`/canal/is_admin/${data.canal_id}/${data.user_id}`).then((result: any) => {
+          resolve(result.data);
+        })
+      })
+    },
 
     // >>>>>>>>>> MESSAGE SECTION
 
