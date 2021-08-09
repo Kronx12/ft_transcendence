@@ -27,9 +27,7 @@
             <div class="form-section vertical-center">
                 <div class="box">
                     <select ref="admin_select" name="users" id="admin-select" class="user-row">
-                        <div v-if="user != undefined">
-                            <option  v-for="user in users_admins" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
-                        </div>
+                        <option v-for="user in users_admins" :key="user" :value="user.intra_id">{{user.username}}</option>
                     </select>
                 </div>
                 <button @click.prevent="add_admin()" class="add-button"></button>
@@ -59,9 +57,7 @@
             <div class="form-section vertical-center">
                 <div class="box">
                     <select ref="user_select" name="users" id="user-select" class="user-row">
-                        <div v-if="user != undefined">
-                            <option v-for="user in users" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
-                        </div>
+                        <option v-for="user in users" :key="user.intra_id" :value="user.intra_id">{{user.username}}</option>
                     </select>
                 </div>
                 <button @click.prevent="add_user()" class="add-button"></button>
@@ -88,10 +84,6 @@ export default {
         }
     },
     methods: {
-		async activate() {
-			var self = this;
-			setTimeout(function() { self.refreshChat(); }, 1000);
-		},
         add_admin() {
             var self = this;
             console.log("ADD ADMIN:", this.$refs.admin_select.value);
@@ -150,6 +142,8 @@ export default {
             this.$store.dispatch("getUsersNotAdmin", this.id).then(function (result) {
                 var _self = self;
                 self.users_admins = result;
+                console.log("ADMINS:");
+                console.log(self.users_admins);
                 if (self.users_admins.length > 0) {
                     // Get users
                     self.$store.dispatch("getUsersFromIds", self.users_admins).then(function (result) {
@@ -188,7 +182,7 @@ export default {
                     // Get users admins actual
                     self.$store.dispatch("getUsersFromIds", self.users_admins_actual).then(function (result_here) {
                         _self.users_admins_actual = result_here;
-                        console.log("ACTUAL USERS:", _self.users_admins_actual);
+                        console.log("ACTUAL ADMINS USERS:", _self.users_admins_actual);
                     });
                 }
             });

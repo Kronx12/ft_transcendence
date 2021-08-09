@@ -511,13 +511,8 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
       return new Promise((resolve, reject) => {
         instance.get(`/canal/non_admin/${canalid}`).then((result: any) => {
-          const users: any[] = [];
-          if (result == undefined)
-            resolve(users);
-          result.data.forEach((e: any) => {
-            users.push(e.intra_id);
-          });
-          resolve(users);
+          console.log(result.data);
+          resolve(result.data);
         })
       })
     },

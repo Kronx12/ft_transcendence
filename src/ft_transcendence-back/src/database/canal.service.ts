@@ -46,6 +46,7 @@ export class CanalService {
                 for (let i = 0; i < users.length; i++)
                     if (admins.indexOf(users[i]) === -1)
                         nonAdmins.push(users[i]);
+                console.log(nonAdmins);
                 return nonAdmins;
             }
             return [];
