@@ -46,8 +46,6 @@
   <ChatAdmin  v-if="this.$store.state.user.id != -1 && this.admin == 1" v-bind:method="this.admin_method" v-bind:id="this.admin_id" />
   <ChatAdminUsers  v-if="this.$store.state.user.id != -1 && this.admin == 2" v-bind:id="this.admin_id" />
   <router-view />
-  <footer>
-  </footer>
 </template>
 
 <script>
