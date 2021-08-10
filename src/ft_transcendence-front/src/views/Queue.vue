@@ -46,10 +46,12 @@ export default {
 	created() {
 		const self = this;
 		
+        self.$root.connection.send(JSON.stringify({ type: "ack_user", content: { user: self.$store.state.user } }));
+		
 		this.$root.connection.onmessage = function(event) {
 			//console.log(event);
 			const data = JSON.parse(event.data);
-            
+
 			if (data.type === "ack_join_standard") {
 				//console.log("Comfirmation joining queue");
 				self.$root.in_queue = true;

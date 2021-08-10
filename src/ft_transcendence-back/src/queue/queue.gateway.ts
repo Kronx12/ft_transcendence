@@ -40,12 +40,18 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             
             // Recois le user
             if (data.type === 'ack_user') {
+                console.log(data);
                 // Si utilisateur deja dans la liste, mettre a jour le client sinon fillUser
                 if (self.getClientByUser(data.content.user) === null)
+                {
+                    console.log("1");
                     self.fillUser(client, data.content.user);
+                }
                 else
+                {
+                    console.log("2");
                     self.updateClient(data.content.user, client);
-
+                }
                 // Si il etait en timeout on le retire
                 if (self.isInTimeoutList(data.content.user)) {
                     self.removeFromTimeout(data.content.user);
@@ -251,7 +257,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
     updateClient(us: any, client: Socket): void {
         if (this.getClientByUser(us) == null)
             return;
-        this.getClientByUser(us).setSocket(client);
+        this.getClientBySocket(client).setUser(us);
         this.getClientByUser(us).setState(State.READY);
     }
 

@@ -48,18 +48,16 @@ export default {
     editUsername: function() {
       this.$store.state.user.login = this.name
       this.$store.dispatch("editUsername", {id: this.$store.state.user.id, username: this.name})
-      this.name = ''
     },
     editAvatar: function() {
       this.$store.state.user.avatarURL = this.avatar
       this.$store.dispatch("editAvatar", {id: this.$store.state.user.id, avatar: this.avatar})
-      this.avatar = ''
     },
     have2Auth: function() {
       return this.$store.state.user.auth
     },
     pair: function(secret) {
-      const self =this;
+      const self = this;
       this.$store.dispatch("pair", {username: this.$store.state.user.login, code: this.$store.state.user.secret}).then((result) =>{
         self.auth_qr = result.data.split("img src='")[1].split("'")[0];
       })
