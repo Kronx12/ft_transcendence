@@ -110,7 +110,7 @@ export default {
             self.avatar = result.data.avatar;
             self.isFriend();
             self.haveAsked();
-            console.log("history", result.data.game_history);
+            //console.log("history", result.data.game_history);
             let history = result.data.game_history.split(":");
             let schema = {
               p1: "",
@@ -126,7 +126,7 @@ export default {
             for(let x in history)
             {
                 await self.$store.dispatch("getGameById", history[x]).then(async (result) => {
-                  console.log(history[x], result)
+                  //console.log(history[x], result)
                   schema.p1 = result.player_1;
                   schema.s1 = result.score_1;
 
@@ -167,14 +167,14 @@ export default {
     blockUser: function () {
       const self = this;
        
-      console.log(self.id);
-      console.log(self.$store.state.user.id);
+      //console.log(self.id);
+      //console.log(self.$store.state.user.id);
        var specs = {
         id: self.$store.state.user.id,
         blockedid: self.id
       };
-      console.log(specs.id);
-      console.log(specs.blockedid);
+      //console.log(specs.id);
+      //console.log(specs.blockedid);
       self.$store.dispatch("blockUser", specs).then(function (result) {
         self.blocked = 1;
       })
@@ -212,7 +212,7 @@ export default {
       await this.$store
         .dispatch("getFriend", this.$store.state.user.id)
         .then((voi) => {
-          console.log(voi);
+          //console.log(voi);
         });
       this.isFriend();
       this.haveAsked();
@@ -227,7 +227,7 @@ export default {
       await this.$store
         .dispatch("getFriend", this.$store.state.user.id)
         .then((voi) => {
-          console.log(voi);
+          //console.log(voi);
         });
       this.accept = 0;
       this.add = 0;
@@ -241,7 +241,7 @@ export default {
       await this.$store
         .dispatch("getFriend", this.$store.state.user.id)
         .then((voi) => {
-          console.log(voi);
+          //console.log(voi);
         });
       this.remove = 0;
       this.add = 1;
@@ -251,12 +251,12 @@ export default {
 			setTimeout(
 				function () {
 					if (socket.readyState === 1) {
-						console.log("Connection is made")
+						//console.log("Connection is made")
 						if (callback != null){
 							callback();
 						}
 					} else {
-						console.log("wait for connection...")
+						//console.log("wait for connection...")
 						self.waitForSocketConnection(socket, callback);
 					}
 
@@ -264,14 +264,14 @@ export default {
 		},
     sendInviteClassic: function() {
       const self = this
-      console.log(this.$store.state.user.id, this.id);
+      //console.log(this.$store.state.user.id, this.id);
       this.waitForSocketConnection(self.$root.connection, function() {
         self.$root.connection.send(JSON.stringify({type: 'emit_send_invite_classic', content: { transmitter: self.$store.state.user.id, receiver: self.id }}));
       });
     },
     sendInviteBonus: function() {
       const self = this
-      console.log(this.$store.state.user.id, this.id);
+      //console.log(this.$store.state.user.id, this.id);
       this.waitForSocketConnection(self.$root.connection, function() {
         self.$root.connection.send(JSON.stringify({type: 'emit_send_invite_bonus', content: { transmitter: self.$store.state.user.id, receiver: self.id }}));
       });

@@ -28,14 +28,14 @@ export default {
         }
     },
     created: function () {
-        console.log('user data from parent component:')
-        console.log(this.type)
-        console.log('transmitter:')
-        console.log(this.transmitter)
-        console.log('receiver:')
-        console.log(this.receiver)
-        console.log('user:')
-        console.log(this.$root.$store.state.user)
+        //console.log('user data from parent component:')
+        //console.log(this.type)
+        //console.log('transmitter:')
+        //console.log(this.transmitter)
+        //console.log('receiver:')
+        //console.log(this.receiver)
+        //console.log('user:')
+        //console.log(this.$root.$store.state.user)
     },
 }
 </script>

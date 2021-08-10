@@ -42,7 +42,7 @@ export default {
     },
     methods: {
         sendForm() {
-            console.log("SEND FORM:", this.method);
+            //console.log("SEND FORM:", this.method);
             if (this.method == "create") {
                 let canal = {
                     id: null,

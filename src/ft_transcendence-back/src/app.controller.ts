@@ -17,7 +17,7 @@ export class AppController {
         code: code,
         redirect_uri: 'http://localhost:8080/login/',
       };
-      //console.log(token);
+      ////console.log(token);
       const resp = await this.httpService
         .post('https://api.intra.42.fr/oauth/token/', token)
         .toPromise();
@@ -54,7 +54,7 @@ export class AppController {
     const me = await this.httpService
       .get(' https://api.intra.42.fr/v2/me', { headers: headReq })
       .toPromise();
-    console.log('token for', me.data.login);
+    //console.log('token for', me.data.login);
     return { intra_id: me.data.id, login: me.data.login };
   }
 }

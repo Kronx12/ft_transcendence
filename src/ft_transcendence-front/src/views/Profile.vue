@@ -66,7 +66,7 @@ export default {
             self.id = result.data.intra_id;
             self.login = result.data.username;
             self.avatar = result.data.avatar;
-            console.log("history", result.data.game_history);
+            //console.log("history", result.data.game_history);
             let history = result.data.game_history.split(":");
             let schema = {
               p1: "",
@@ -84,7 +84,7 @@ export default {
             for(let x in history)
             {
                 await self.$store.dispatch("getGameById", history[x]).then(async (result) => {
-                  console.log(history[x], result)
+                  //console.log(history[x], result)
                   schema.p1 = result.player_1;
                   schema.s1 = result.score_1;
 

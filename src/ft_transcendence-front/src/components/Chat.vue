@@ -91,7 +91,7 @@
       </div>
     </div>
     <form
-      v-if="this.canalid != -1 && this.logged"
+      v-if="this.canalid != -1"
       ref="formChat"
       @submit.prevent="messageSubmit"
       id="input-chat"
@@ -140,6 +140,8 @@ export default {
     // Submit messages data to database
     messageSubmit: function () {
       if (this.inputMessage == null || this.inputMessage == "") return;
+      if(this.getVisibility() == 1 && !this.logged)
+        return;
       // Check if sender is muted
       const self = this;
       if (self.$store != undefined && self.$store != null) {
@@ -243,7 +245,7 @@ export default {
         })
         .then(function (result) {
           self.logged = result;
-          console.log("wtf",result);
+          //console.log("wtf",result);
         });
     },
     updateUsers: function () {
@@ -282,7 +284,7 @@ export default {
     },
     login: function () {
       const self = this;
-      console.log(this.$refs.password.value);
+      //console.log(this.$refs.password.value);
       if (
         this.$refs.password.value != undefined &&
         this.$refs.password.value != null
@@ -309,7 +311,7 @@ export default {
           ret = item.visibility;
         }
       });
-      console.log("return value:", ret, self.logged);
+      ////console.log("return value:", ret, self.logged);
       return ret;
     },
     isAdmin: function () {

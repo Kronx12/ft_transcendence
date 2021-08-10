@@ -56,7 +56,7 @@ export default({
             const self = this;
             await this.$store.dispatch('getLogin', token)
             .then(function(response) {
-                console.log("2", response)
+                //console.log("2", response)
                 if (response.auth)
                 {
                         self.auth = true;
@@ -69,7 +69,7 @@ export default({
                 
             })
             .catch(function(error) {
-                console.log(error)
+                //console.log(error)
                 self.connect();
             });
         },
@@ -81,7 +81,7 @@ export default({
         validate: async function() {
         const self = this;
         await this.$store.dispatch("validate", {secret: this.secret, code: this.validation}).then(async function(result) {
-        console.log(result.data);
+        //console.log(result.data);
         if (result.data == "False")
             self.incorrect = true;
         else

@@ -134,7 +134,7 @@ export default {
   methods: {
     async add_admin() {
       var self = this;
-      console.log("ADD ADMIN:", this.$refs.admin_select.value);
+      //console.log("ADD ADMIN:", this.$refs.admin_select.value);
       if (this.$refs.admin_select.value != "") {
         await this.$store.dispatch("addAdminUserId", {
           canal_id: this.id,
@@ -148,7 +148,7 @@ export default {
     },
     async add_user() {
       var self = this;
-      console.log("ADD USER:", this.$refs.user_select.value);
+      //console.log("ADD USER:", this.$refs.user_select.value);
       if (this.$refs.user_select.value != "") {
         await this.$store.dispatch("addUserId", {
           canal_id: this.id,
@@ -161,7 +161,7 @@ export default {
     },
     async del_admin(id) {
       var self = this;
-      console.log("DEL ADMIN:", id);
+      //console.log("DEL ADMIN:", id);
       await this.$store.dispatch("delAdminUserId", { canal_id: this.id, id: id }).then(async () => {
             await self.getUsers();
         })
@@ -169,7 +169,7 @@ export default {
     },
     async del_user(id) {
       var self = this;
-      console.log("DEL USER:", id);
+      //console.log("DEL USER:", id);
       await this.$store.dispatch("delUserId", { canal_id: this.id, id: id }).then(async () => {
             await self.getUsers();
         })
@@ -185,11 +185,11 @@ export default {
           time: date + 60000 * 60,
         })
         .then(function (response) {
-          console.log(
-            id + " has been muted for 1 hour from " + self.id + " channel"
-          );
+          //console.log(
+          //   id + " has been muted for 1 hour from " + self.id + " channel"
+          // );
           self.banMessage =
-            id + " has been banned for 1 hour from " + self.id + " channel";
+            id + " has been muted for 1 hour from " + self.id + " channel";
           setTimeout(function () {
             self.banMessage = "";
           }, 5000);
@@ -205,9 +205,9 @@ export default {
           time: date + 60000 * 60,
         })
         .then(function (response) {
-          console.log(
-            id + " has been banned for 1 hour from " + self.id + " channel"
-          );
+          //console.log(
+          //   id + " has been banned for 1 hour from " + self.id + " channel"
+          // );
           self.banMessage =
             id + " has been banned for 1 hour from " + self.id + " channel";
           self.del_user(id);
@@ -224,15 +224,15 @@ export default {
         .then(async function (result) {
           var _self = self;
           self.users_admins = result;
-          console.log("ADMINS:");
-          console.log(self.users_admins);
+          //console.log("ADMINS:");
+          //console.log(self.users_admins);
           if (self.users_admins.length > 0) {
             // Get users
             await self.$store
               .dispatch("getUsersFromIds", self.users_admins)
               .then(function (result) {
                 _self.users_admins = result;
-                console.log("ADMINS_USERS:", _self.users_admins);
+                //console.log("ADMINS_USERS:", _self.users_admins);
               });
           }
         });
@@ -241,15 +241,15 @@ export default {
         .then(async function (result) {
           var _self = self;
           self.users = result;
-          console.log("Not in channel");
-          console.log(result);
+          //console.log("Not in channel");
+          //console.log(result);
           if (self.users.length > 0) {
             // Get users
             await self.$store
               .dispatch("getUsersFromIds", self.users)
               .then(function (result) {
                 _self.users = result;
-                console.log("USERS:", _self.users);
+                //console.log("USERS:", _self.users);
               });
           }
         });
@@ -258,7 +258,7 @@ export default {
         .then(async function (result) {
           var _self = self;
           self.canal = result[0];
-          console.log("CANAL:", self.canal);
+          //console.log("CANAL:", self.canal);
           self.users_actual = self.deserialize(result[0].users);
           self.users_admins_actual = self.deserialize(result[0].admins);
 
@@ -268,7 +268,7 @@ export default {
               .dispatch("getUsersFromIds", self.users_actual)
               .then(function (result_here) {
                 _self.users_actual = result_here;
-                console.log("ACTUAL USERS:", _self.users_actual);
+                //console.log("ACTUAL USERS:", _self.users_actual);
               });
           }
 
@@ -278,7 +278,7 @@ export default {
               .dispatch("getUsersFromIds", self.users_admins_actual)
               .then(function (result_here) {
                 _self.users_admins_actual = result_here;
-                console.log("ACTUAL ADMINS USERS:", _self.users_admins_actual);
+                //console.log("ACTUAL ADMINS USERS:", _self.users_admins_actual);
               });
           }
         });

@@ -34,7 +34,7 @@ export default createStore({
     },
     logUser: function (state, user) {
       state.user = user;
-      console.log(state.user);
+      //console.log(state.user);
     },
     updateFriend: function (state, list) {
       state.friends = list;
@@ -52,7 +52,7 @@ export default createStore({
           .then(function (response: any) {
             commit("setStatus", "done");
             localStorage.setItem("ft_token", response.data.token);
-            console.log("token", localStorage.getItem("ft_token"));
+            //console.log("token", localStorage.getItem("ft_token"));
             resolve(response);
           })
           .catch(function (error: any) {
@@ -163,7 +163,7 @@ export default createStore({
                     });
                 } else {
                   if (user.data.auth) {
-                    console.log("need 2fa")
+                    //console.log("need 2fa")
                     resolve({ auth: true, secret: user.data.secret })
                   }
                   else {
@@ -199,7 +199,7 @@ export default createStore({
           })
           .catch(function (error: any) {
             commit("setStatus", "invalid_token");
-            console.log(error);
+            //console.log(error);
             reject(error);
           });
       });
@@ -286,7 +286,7 @@ export default createStore({
       });
     },
     pair: ({ commit }, secret) => {
-      console.log(`${secret.username}/${secret.code}`);
+      //console.log(`${secret.username}/${secret.code}`);
       return new Promise((resolve, reject) => {
         instance.get(`login/2fa/${secret.username}/${secret.code}`).then((result: any) => {
           resolve(result);
@@ -390,15 +390,15 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = generateToken()
       new Promise((resolve, reject) => {
         instance.post(`/canal/`, canal).then((result: any) => {
-          console.log(result.data);
+          //console.log(result.data);
           resolve(result.data);
           
-          console.log("canal", result.data)
+          //console.log("canal", result.data)
           if (canal.visibility != 2)
           {
           instance.patch(`/database/user/add/${result.data.id}`);
           instance.get(`/database/user/`).then((r: any) => {
-            console.log(r.data);
+            //console.log(r.data);
             r.data.forEach((e: any) => {
               instance.post(`canal/add_user`, { canal_id: result.data.id, id: e.intra_id });
             });
@@ -420,11 +420,11 @@ export default createStore({
       })
     },
     loginCanal: ({ commit }, body) => {
-      console.log(body);
+      //console.log(body);
       instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/login/`, body).then((result: any) => {
-          console.log(result.data);
+          //console.log(result.data);
           resolve(result.data);
         })
       })
@@ -435,12 +435,11 @@ export default createStore({
         instance.get(`/canal/${body.canalid}`).then((result: any) => {
           if (result.visibility == 1)
           {
-          instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
+           instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
+             //console.log("je passe ici ")
             resolve(result.data);
           })
-        } 
-          else
-            resolve(true);
+        }
         
         })
       })
@@ -474,7 +473,7 @@ export default createStore({
     delUserId: ({ commit }, specs) => {
       instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
-        console.log("Here");
+        //console.log("Here");
         instance.post(`/canal/del_user/`, specs);
         instance
           .patch(`/database/user/delete_one/${specs.canal_id}/${specs.id}`)
@@ -517,7 +516,7 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/database/other_users/${canalid}`).then((result: any) => {
-          console.log(result);
+          //console.log(result);
           const users: any[] = [];
           if (result == undefined)
             resolve(users);
@@ -533,7 +532,7 @@ export default createStore({
       instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/non_admin/${canalid}`).then((result: any) => {
-          console.log(result.data);
+          //console.log(result.data);
           resolve(result.data);
         })
       })

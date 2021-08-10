@@ -55,7 +55,7 @@ export default {
       this.reset();
       if (this.search == "")
         return;
-        console.log("search:", this.search)
+        //console.log("search:", this.search)
       await this.$store
         .dispatch("searchUser", this.search)
         .then(async (result) => {

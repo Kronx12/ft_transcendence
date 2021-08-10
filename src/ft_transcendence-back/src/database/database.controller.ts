@@ -293,7 +293,7 @@ export class DatabaseController {
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
       if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
-      else console.log('wesh: ', canal_id, user_id);
+      else //console.log('wesh: ', canal_id, user_id);
       resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
     });
     return resp;
@@ -309,7 +309,7 @@ export class DatabaseController {
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
       if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
-      else console.log('wesh: ', canal_id, user_id);
+      else //console.log('wesh: ', canal_id, user_id);
       resp = self.databaseServ.addCanalForUser(canal_id, user_id);
     });
     return resp;

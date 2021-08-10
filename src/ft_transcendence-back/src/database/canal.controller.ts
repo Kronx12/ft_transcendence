@@ -159,7 +159,7 @@ export class CanalController {
     @Post('/login/')
     async login(@Headers('authorization') auth, @Body() body) {
         const self = this;
-        console.log("HERE:", body);
+        //console.log("HERE:", body);
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
             if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")

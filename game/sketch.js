@@ -3,7 +3,7 @@
 
 screenWidth = 640*2
 screenHeight = 360*2
-speedfactor = screenWidth / 640
+speedfactor = screenWidth / 1080
 
 // ---- Racket size
 

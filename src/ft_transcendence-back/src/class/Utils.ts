@@ -186,7 +186,7 @@ export class Room {
                 if (this._start_chrono <= 0 && !this._end)
                     this._start = true;
                 else if (this._start_chrono <= 0) {
-                    console.log(this._winner);
+                    //console.log(this._winner);
                     send(this._playerb._socket, "ack_leave", { room_id: this._id });
                     send(this._playera._socket, "ack_leave", { room_id: this._id });
                     this._spectators.forEach(spec => { send(spec, "ack_leave", { room_id: this._id }); });
@@ -223,9 +223,9 @@ export class Room {
 
         this._vy = 0;
         if (rdm > 0.5) 
-            this._vx = 20;
+            this._vx = 15;
         else 
-            this._vx = -20;
+            this._vx = -15;
         this._bx = this._canvas_w / 2;
         this._by = this._canvas_h / 2;
     }
@@ -473,7 +473,7 @@ export class RoomBonus {
                 if (this._start_chrono <= 0 && !this._end)
                     this._start = true;
                 else if (this._start_chrono <= 0) {
-                    console.log(this._winner);
+                    //console.log(this._winner);
                     send(this._playerb._socket, "ack_leave", { room_id: this._id });
                     send(this._playera._socket, "ack_leave", { room_id: this._id });
                     this._spectators.forEach(spec => { send(spec, "ack_leave", { room_id: this._id }); });
@@ -563,7 +563,7 @@ export class RoomBonus {
             if (key == 40 && this._playeray + this._racket_h < this._canvas_h) // down
                 this._playeray += this._racket_speeda;
             if (space && this._cooldowna <= 0) {
-                console.log("Press Space");
+                //console.log("Press Space");
                 this._cooldowna = this._limit_cooldown;
                 this._cooldown_freeze_b = this._limit_cooldown_freeze;
             }
@@ -573,7 +573,7 @@ export class RoomBonus {
             if (key == 40 && this._playerby + this._racket_h < this._canvas_h) // down
                 this._playerby += this._racket_speedb;
             if (space && this._cooldownb <= 0) {
-                console.log("Press Space");
+                //console.log("Press Space");
                 this._cooldownb = this._limit_cooldown;
                 this._cooldown_freeze_a = this._limit_cooldown_freeze;
             }
@@ -709,7 +709,7 @@ export async function saveGame(content, uuid:string, p1:number, p2:number) {
     const response_getid = await fetch("http://localhost:3000/game_database/getid/" + uuid)
     .then(res => res.json())
     .then(json => {  
-        console.log(json)  
+        //console.log(json)  
         fetch("http://localhost:3000/database/user/game/" + p1.toString() + "/" + json.id.toString(), {
             method: 'PATCH',
             body: JSON.stringify(content),

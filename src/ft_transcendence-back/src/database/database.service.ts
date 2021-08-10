@@ -73,7 +73,7 @@ export class DatabaseService {
     if (content.hasOwnProperty('game_history'))
       user.game_history = content.game_history;
 
-    console.log('edit user ! ', content);
+    //console.log('edit user ! ', content);
     this.usersRepo.update(user.id, user);
     return { user };
   }
@@ -249,8 +249,8 @@ export class DatabaseService {
   }
 
   getCanalsOtherUsers(canalid: number) {
-    console.log('Canal id:');
-    console.log(canalid);
+    //console.log('Canal id:');
+    //console.log(canalid);
     return this.usersRepo.find({ where: `canals NOT LIKE '%${canalid}%'` });
   }
 
@@ -301,17 +301,17 @@ export class DatabaseService {
   }
 
   async addBlockUser(id: number, blockedid: number) {
-    console.log(typeof blockedid);
-    console.log(id + ' ' + blockedid);
-    console.log(typeof blockedid);
+    //console.log(typeof blockedid);
+    //console.log(id + ' ' + blockedid);
+    //console.log(typeof blockedid);
     let user: Users;
-    console.log(typeof blockedid);
+    //console.log(typeof blockedid);
     await this.usersRepo
       .findOne({ where: `intra_id = '${id}'` })
       .then(function (result) {
         user = result;
       });
-    console.log(typeof blockedid);
+    //console.log(typeof blockedid);
     user.block = this.addIdToSerializedIfNotExist(blockedid, user.block);
     this.usersRepo.save(user);
   }
@@ -325,8 +325,8 @@ export class DatabaseService {
       });
 
     user.block = this.delIdFromSerializedIfExist(blockedid, user.block);
-    console.log('le user avec ces blcoks = ' + user.block);
-    console.log('le blocked = ' + blockedid);
+    //console.log('le user avec ces blcoks = ' + user.block);
+    //console.log('le blocked = ' + blockedid);
 
     this.usersRepo.save(user);
   }
@@ -354,10 +354,10 @@ export class DatabaseService {
   }
 
   async removeCanalForUser(canal_id: number, user_id: number) {
-    console.log(user_id);
-    console.log(canal_id);
+    //console.log(user_id);
+    //console.log(canal_id);
     let users = await this.usersRepo.find({ where: { intra_id: user_id } });
-    console.log(users);
+    //console.log(users);
     for (let user of users) {
       let tmp = user.canals.split(':');
       for (let i = 0; i < tmp.length; i++) {
@@ -366,23 +366,23 @@ export class DatabaseService {
         }
       }
       user.canals = tmp.join(':');
-      console.log(user.canals);
+      //console.log(user.canals);
       this.usersRepo.update(user.id, user);
     }
 	}
 	
   async addCanalForUser(canal_id: number, user_id: number) {
-    console.log(user_id);
-    console.log(canal_id);
+    //console.log(user_id);
+    //console.log(canal_id);
     let users = await this.usersRepo.findOne({ where: { intra_id: user_id } });
-    console.log(users);
+    //console.log(users);
 	  if (users.canals != "") {
 		let tmp = users.canals.split(':');
       tmp.push(canal_id.toString());
       users.canals = tmp.join(':');
     } else users.canals = canal_id.toString();
       
-      console.log(users.canals);
+      //console.log(users.canals);
       this.usersRepo.update(users.id, users);
     }
 
@@ -425,7 +425,7 @@ export class DatabaseService {
       let tmp = user.canals == '' ? [] : this.deserialize(user.canals);
       tmp.push(canal_id);
       user.canals = this.serialize(tmp);
-      console.log('wesh', user.canals);
+      //console.log('wesh', user.canals);
       this.usersRepo.update(user.id, user);
     }
   }

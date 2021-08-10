@@ -40,7 +40,7 @@ export default {
     }
   },
   mounted: function() {
-    console.log(this.$store.state.user.id)
+    //console.log(this.$store.state.user.id)
     if (this.$store.state.user.id == -1)
       this.$router.push('/login')
   },
@@ -67,7 +67,7 @@ export default {
     validate: async function() {
     const self = this;
     await this.$store.dispatch("validate", {secret: this.$store.state.user.secret, code: this.validation}).then(async function(result) {
-      console.log(result.data);
+      //console.log(result.data);
       if (result.data == "False")
         self.incorrect = true;
       else

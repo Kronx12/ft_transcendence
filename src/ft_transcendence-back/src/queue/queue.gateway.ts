@@ -23,7 +23,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
 
     handleConnection(client: Socket) {
         const self = this;
-        console.log("CONNECTION");
+        //console.log("CONNECTION");
 
         // Add le client si le client existe pas
         if (this.getClientBySocket(client) == null)
@@ -31,7 +31,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
 
         // Demande le user si le client n'as pas de user
         if (this.getClientBySocket(client).getUser() == null) {
-            console.log("EMIT_USER");
+            //console.log("EMIT_USER");
             send(client, "emit_user");
         }
 
@@ -76,7 +76,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                         self.rooms_bonus[i].update(data.content.user, data.content.key, data.content.space);
             } else if (data.type === 'emit_checkid') {
                 let find = false;
-                console.log("EMIT CHECKID");
+                //console.log("EMIT CHECKID");
                 self.rooms.forEach(room => {
                     if (data.content.room_id === room._id) {
                         find = true;
@@ -92,13 +92,13 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                 if (!find)
                     send(client, "ack_redirect", {});
             } else if (data.type == 'emit_send_invite_classic') {
-                console.log("Invitation send");
+                //console.log("Invitation send");
                 self.invitations.push(new Invitation(data.content.transmitter, self.getClientById(data.content.transmitter), data.content.receiver, self.getClientById(data.content.receiver), GameType.NORMAL));
             } else if (data.type == 'emit_send_invite_bonus') {
-                console.log("Invitation bonus send");
+                //console.log("Invitation bonus send");
                 self.invitations.push(new Invitation(data.content.transmitter, self.getClientById(data.content.transmitter), data.content.receiver, self.getClientById(data.content.receiver), GameType.BONUS));
             } else if (data.type == 'accept_invite') {
-                console.log("Invitation accepted");
+                //console.log("Invitation accepted");
                 self.invitations.forEach(e => {
                     if (e._game_type == data.content.type && e._transmitter == data.content.transmitter && e._receiver == data.content.receiver)
                         var tmp_uuid: string = "";
@@ -122,18 +122,18 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
                         e.accept(tmp_uuid);
                 });
             } else if (data.type == 'decline_invite') {
-                console.log("Invitation declined");
+                //console.log("Invitation declined");
                 self.invitations.forEach(e => {
                     if (e._game_type == data.content.type && e._transmitter == data.content.transmitter && e._receiver == data.content.receiver)
                         e.decline();
                 });
             }
         });
-        console.log("Connecté : " + this.queue._store.length);
+        //console.log("Connecté : " + this.queue._store.length);
     }
 
     handleDisconnect(client: Socket) {
-        console.log("DISCONNECTION");
+        //console.log("DISCONNECTION");
         if (this.getClientBySocket(client) == null)
             return;
           this.getClientBySocket(client).setState(State.WAITING);
@@ -148,7 +148,7 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             else if (room._playerb._socket == client) room.stopPB();
             room.removeSpectator(client);
         });
-        console.log("Déconnecté : " + this.queue._store.length);
+        //console.log("Déconnecté : " + this.queue._store.length);
     }
 
     @Cron("* * * * * *")
@@ -191,8 +191,8 @@ export class QueueService implements OnGatewayConnection, OnGatewayDisconnect {
             this.rooms.push(new_room);
             this.queue.pop();
             this.queue.pop();
-            console.log("Create room")
-            console.log("len:", this.rooms.length)
+            //console.log("Create room")
+            //console.log("len:", this.rooms.length)
         }
         
         if (this.queue_bonus._store.length >= 2) {

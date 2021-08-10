@@ -47,22 +47,22 @@ export default {
 		const self = this;
 		
 		this.$root.connection.onmessage = function(event) {
-			console.log(event);
+			//console.log(event);
 			const data = JSON.parse(event.data);
             
 			if (data.type === "ack_join_standard") {
-				console.log("Comfirmation joining queue");
+				//console.log("Comfirmation joining queue");
 				self.$root.in_queue = true;
 				self.$root.in_bonus = false;
 			} else if (data.type === "ack_leave_standard") {
-				console.log("Comfirmation leaving queue");
+				//console.log("Comfirmation leaving queue");
 				self.$root.in_queue = false;
 			} else if (data.type === "ack_join_bonus") {
-				console.log("Comfirmation joining queue");
+				//console.log("Comfirmation joining queue");
 				self.$root.in_queue = true;
 				self.$root.in_bonus = true;
 			} else if (data.type === "ack_leave_bonus") {
-				console.log("Comfirmation leaving queue");
+				//console.log("Comfirmation leaving queue");
 				self.$root.in_queue = false;
 			} else if (data.type === "emit_count") {
 				self.count = data.content.count

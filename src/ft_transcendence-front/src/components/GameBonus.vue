@@ -155,12 +155,12 @@ export default {
 			setTimeout(
 				function () {
 					if (socket.readyState === 1) {
-						console.log("Connection is made")
+						//console.log("Connection is made")
 						if (callback != null){
 							callback();
 						}
 					} else {
-						console.log("wait for connection...")
+						//console.log("wait for connection...")
 						self.waitForSocketConnection(socket, callback);
 					}
 			}, 5);
@@ -185,7 +185,7 @@ export default {
 
 		self.waitForSocketConnection(self.$root.connection, function() {
 			self.$root.connection.send(JSON.stringify({type: 'emit_checkid', content: { room_id: self.$route.query.room_id }}));
-			console.log("EMIT CHECK CLIENT SIDE")
+			//console.log("EMIT CHECK CLIENT SIDE")
 		});
 		this.$root.connection.onmessage = function(event) {
 			const data = JSON.parse(event.data);
@@ -219,11 +219,11 @@ export default {
 				self.cooldowna = data.content.cooldowna;
 				self.cooldownb = data.content.cooldownb;
 			} else if (data.type === "ack_redirect") {
-				console.log("redirect");
+				//console.log("redirect");
 				self.$router.push({path: '/'});
 				return ;
 			} else if (data.type === "ack_leave" && data.content.room_id == self.$route.query.room_id) {
-				console.log("redirect");
+				//console.log("redirect");
 				self.$router.push({path: '/'});
 				return ;
 			}

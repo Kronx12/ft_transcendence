@@ -182,12 +182,12 @@ export default {
 
       self.connection.onopen = function (event) {
         self.state = true;
-        console.log("Connected !");
+        //console.log("Connected !");
       };
 
       self.connection.onclose = function (event) {
         self.state = false;
-        console.log("Disconnected !, Try to reconnect");
+        //console.log("Disconnected !, Try to reconnect");
         self.connection = new WebSocket(server.socketURL);
       };
       self.connection.onmessage = async function (event) {
@@ -202,18 +202,18 @@ export default {
           );
         } else if (data.type == "invitation_send") {
           let tmp = {};
-          console.log("RECEIVE INVITE");
-          console.log(self.$store.state.user.id);
-          console.log(data.content.transmitter);
+          //console.log("RECEIVE INVITE");
+          //console.log(self.$store.state.user.id);
+          //console.log(data.content.transmitter);
           if (self.$store.state.user.id == data.content.transmitter) {
-            console.log(data.content.receiver);
+            //console.log(data.content.receiver);
             await self.$store
               .dispatch("getUser", data.content.receiver)
               .then(function (d) {
                 self.result = d;
               });
-            console.log("RESULT A:");
-            console.log(self.result);
+            //console.log("RESULT A:");
+            //console.log(self.result);
             self.result.id = self.result.intra_id;
             self.result.avatarURL = self.result.avatar;
             self.result.login = self.result.username;
@@ -222,16 +222,16 @@ export default {
               transmitter: self.$store.state.user,
               receiver: self.result,
             };
-            console.log(tmp);
+            //console.log(tmp);
           } else {
-            console.log(data.content.transmitter);
+            //console.log(data.content.transmitter);
             await self.$store
               .dispatch("getUser", data.content.transmitter)
               .then(function (d) {
                 self.result = d;
               });
-            console.log("RESULT B:");
-            console.log(self.result);
+            //console.log("RESULT B:");
+            //console.log(self.result);
             self.result.id = self.result.intra_id;
             self.result.avatarURL = self.result.avatar;
             self.result.login = self.result.username;
@@ -240,11 +240,11 @@ export default {
               transmitter: self.result,
               receiver: self.$store.state.user,
             };
-            console.log(tmp);
+            //console.log(tmp);
           }
           self.invitation.push(tmp);
         } else if (data.type == "invitation_accepted") {
-          console.log("ACCEPTED");
+          //console.log("ACCEPTED");
           self.invitation = self.invitation.filter(
             (obj) =>
               obj.type !== data.content.type &&
@@ -262,8 +262,8 @@ export default {
               query: { room_id: data.content.uuid },
             });
         } else if (data.type == "invitation_declined") {
-          console.log("DECLINED");
-          console.log(data);
+          //console.log("DECLINED");
+          //console.log(data);
           self.invitation = self.invitation.filter(
             (obj) =>
               obj.type !== data.content.type &&

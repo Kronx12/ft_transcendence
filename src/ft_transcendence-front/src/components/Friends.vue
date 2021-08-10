@@ -80,7 +80,7 @@ export default {
         }
       }
       const self = this;
-      console.log({ asker: self.$store.state.user.id, asked: id });
+      //console.log({ asker: self.$store.state.user.id, asked: id });
       await self.$store.dispatch("acceptFriend", {
         id: self.$store.state.user.id,
         new: id,
