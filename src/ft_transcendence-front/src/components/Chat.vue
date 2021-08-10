@@ -138,14 +138,14 @@ export default {
       this.refreshChat();
     },
     // Submit messages data to database
-    messageSubmit: function () {
+    messageSubmit:  async function () {
       if (this.inputMessage == null || this.inputMessage == "") return;
       if(this.getVisibility() == 1 && !this.logged)
         return;
       // Check if sender is muted
       const self = this;
       if (self.$store != undefined && self.$store != null) {
-        self.$store
+        await self.$store
           .dispatch("getUser", self.$store.state.user.id)
           .then(function (result) {
             if (result.mute == null || result.mute == undefined) return;
@@ -156,21 +156,28 @@ export default {
                 let canalId = +mutes[x].split(";")[0];
                 let timestamp = +mutes[x].split(";")[1];
                 if (canalId == self.canalid && timestamp > new Date().getTime())
+                {
+                  self.inputMessage = "";
                   return;
+                }
+                 
               }
             }
           });
-      }
-      if (this.$store != undefined && this.$store != null) {
+      if (self.inputMessage == "")
+        return ;
+      if (this.$store != undefined && this.$store != null && self.inputMessage != "") {
         let msg = {
           id: null,
           author: this.$store.state.user.id,
           message: this.inputMessage,
           canalid: this.canalid,
         };
-        this.$store.dispatch("createMessage", msg);
+        await this.$store.dispatch("createMessage", msg);
       }
       this.inputMessage = "";
+      }
+     
     },
     refreshChat: function () {
       const self = this;
@@ -189,7 +196,7 @@ export default {
               specs.user = result;
               if (result == undefined)
                 return ;
-              if (result.canals != "") {
+              if (result.canals != "" && result.canals != undefined) {
                 let list = result.canals.split(":");
                 let chats = [];
                 for (let x in list) {
@@ -311,7 +318,7 @@ export default {
           ret = item.visibility;
         }
       });
-      ////console.log("return value:", ret, self.logged);
+     // console.log("return value:", ret, self.logged);
       return ret;
     },
     isAdmin: function () {
