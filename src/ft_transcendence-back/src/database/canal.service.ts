@@ -63,7 +63,7 @@ export class CanalService {
             return self.getCanalById(canal_id).then(canal => {
                 if (canal[0] !== undefined) {
                     if (canal[0].password === password) {
-                        canal[0].users = _self.addIdToSerializedIfNotExist(user_id, canal[0].users);
+                        canal[0].logged = _self.addIdToSerializedIfNotExist(user_id, canal[0].users);
                         self.CanalRepo.save(canal[0]);
                         return true;
                     } else
@@ -139,7 +139,7 @@ export class CanalService {
     }
 
     loginState(canal_id: number, user_id: number): Promise<boolean> {
-        return this.CanalRepo.find({ where: `users LIKE '%${user_id}%' AND id = ${canal_id}` }).then(canals => {
+        return this.CanalRepo.find({ where: `logged LIKE '%${user_id}%' AND id = ${canal_id}` }).then(canals => {
             if (canals.length > 0)
                 return true;
             return false;

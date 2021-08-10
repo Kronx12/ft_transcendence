@@ -91,7 +91,7 @@
       </div>
     </div>
     <form
-      v-if="this.canalid != -1"
+      v-if="this.canalid != -1 && this.logged"
       ref="formChat"
       @submit.prevent="messageSubmit"
       id="input-chat"

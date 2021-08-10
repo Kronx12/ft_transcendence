@@ -15,6 +15,9 @@ export class Canal {
   public users: string;
 
   @Column()
+  public logged: string;
+
+  @Column()
   public admins: string;
 
   @Column({default: ""})

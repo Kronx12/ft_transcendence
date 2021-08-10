@@ -49,6 +49,7 @@ export default {
                     name: this.$refs.name.value,
                     owner: this.$root.$store.state.user.id,
                     users: String(this.$root.$store.state.user.id),
+                    logged: String(this.$root.$store.state.user.id),
                     admins: String(this.$root.$store.state.user.id),
                     password: this.last_visibility == 1 ? this.$refs.password.value : "",
                     visibility: this.last_visibility,

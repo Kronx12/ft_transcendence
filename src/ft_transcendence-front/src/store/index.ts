@@ -432,8 +432,16 @@ export default createStore({
     getLogState: ({ commit }, body) => {
       instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
-        instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
-          resolve(result.data);
+        instance.get(`/canal/${body.canalid}`).then((result: any) => {
+          if (result.visibility == 1)
+          {
+          instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
+            resolve(result.data);
+          })
+        } 
+          else
+            resolve(true);
+        
         })
       })
     },
