@@ -109,7 +109,9 @@ export default {
     haveRequest: function () {
       if (this.$store.state.user.id == -1) return false;
       const friends = this.$store.state.friends.request;
-      if (friends.length == 0) return false;
+	  if (friends == undefined)
+	  	return false;
+      if (friends.length == 0 || friends == "") return false;
       return true;
     },
     updateFriend: async function () {

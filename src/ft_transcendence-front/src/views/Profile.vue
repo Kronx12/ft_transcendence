@@ -79,6 +79,8 @@ export default {
               s2: 0,
               type: 0
             }
+            if(history != "")
+            {
             for(let x in history)
             {
                 await self.$store.dispatch("getGameById", history[x]).then(async (result) => {
@@ -91,17 +93,19 @@ export default {
 
                   schema.win = result.victory;
                   await self.$store.dispatch("getUser", schema.p1).then(function (data) {
-                    if (data.username != undefined)
+                    
                       schema.p1_l = data.username
             })
-                   await self.$store.dispatch("getUser", schema.p2)
+            await self.$store.dispatch("getUser", schema.p2)
             .then(function (data) {
+              
               schema.p2_l = data.username
             })
 
               await self.$store.dispatch("getUser", schema.win)
             .then(function (data) {
-              schema.win_l = data.username
+              
+                schema.win_l = data.username
             })
                   schema.type = result.type;
 
@@ -112,6 +116,7 @@ export default {
                 })
                 self.history.push({...schema});
             }
+          }
           }
         });
     },

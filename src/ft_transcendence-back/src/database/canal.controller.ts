@@ -2,6 +2,7 @@ import { Canal } from '../entities/canal.entity';
 import { Controller, Get, Post, Delete, Param, Body, Patch, Headers } from '@nestjs/common';
 import { CanalService } from './canal.service';
 import { OffsetWithoutLimitNotSupportedError } from 'typeorm';
+import { decode } from 'punycode';
 const jwt = require('jsonwebtoken');
 
 @Controller('canal')
@@ -20,7 +21,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.getCanalById(id);
@@ -34,7 +35,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.getCanalsByUserId(user);
@@ -48,7 +49,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.deleteCanalById(id);
@@ -62,7 +63,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.createCanal(canal);
@@ -76,7 +77,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.updataCanal(canal);
@@ -90,7 +91,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = await self.CanalServ.getNonAdminUser(id);
@@ -104,7 +105,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.addAdminUserId(body.canal_id, body.id);
@@ -118,7 +119,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.addUserId(body.canal_id, body.id);
@@ -132,7 +133,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.delAdminUserId(body.canal_id, body.id);
@@ -146,7 +147,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.delUserId(body.canal_id, body.id);
@@ -161,7 +162,7 @@ export class CanalController {
         console.log("HERE:", body);
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.login(body.canal_id, body.user, body.password);
@@ -175,7 +176,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.loginState(canal_id, body.user);
@@ -189,7 +190,7 @@ export class CanalController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.CanalServ.isAdmin(+canal_id, +user_id);

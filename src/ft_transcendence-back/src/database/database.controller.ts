@@ -34,7 +34,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = {
           error: '401 Unauthorized',
         };
@@ -50,7 +50,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.searchUser(name);
@@ -64,7 +64,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         if (id != '-1') resp = self.databaseServ.getFriends(id);
@@ -87,7 +87,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.requestFriend(from, to);
@@ -105,7 +105,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.acceptFriend(id, accept);
@@ -123,7 +123,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.removeFriend(id, remove, 0);
@@ -141,7 +141,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.refuseFriend(id, refuse);
@@ -155,7 +155,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.delete(id);
@@ -173,7 +173,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) {
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") {
         resp = { error: '401 Unauthorized' };
       } else {
         resp = self.databaseServ.editUser(id, content);
@@ -202,7 +202,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.getCanalsOtherUsers(id);
     });
     return resp;
@@ -219,7 +219,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.addMuteUserTime(id, canalid, time);
     });
   }
@@ -234,7 +234,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.addBanUserTime(id, canalid, time);
     });
   }
@@ -248,7 +248,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.addBlockUser(id, +blockedid);
     });
   }
@@ -262,7 +262,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.removeBlockUser(id, +blockedid);
     });
   }
@@ -276,7 +276,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.removeCanal(canal_id);
     });
     return resp;
@@ -292,7 +292,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else console.log('wesh: ', canal_id, user_id);
       resp = self.databaseServ.removeCanalForUser(canal_id, user_id);
     });
@@ -308,7 +308,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else console.log('wesh: ', canal_id, user_id);
       resp = self.databaseServ.addCanalForUser(canal_id, user_id);
     });
@@ -321,7 +321,7 @@ export class DatabaseController {
     const self = this;
     let resp;
     await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-      if (err) resp = { error: '401 Unauthorized' };
+      if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store") resp = { error: '401 Unauthorized' };
       else resp = self.databaseServ.addCanal(canal_id);
     });
     return resp;

@@ -62,7 +62,7 @@ export default createStore({
       });
     },
     getUser: ({ commit }, id) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       if (id == undefined)
         return;
       return new Promise((resolve, reject) => {
@@ -205,21 +205,21 @@ export default createStore({
       });
     },
     editUsername: ({ commit }, params) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.patch(`/database/user/${params.id}`, {
         username: params.username,
       });
     },
     editAvatar: ({ commit }, params) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.patch(`/database/user/${params.id}`, { avatar: params.avatar });
     },
     editStatus: ({ commit }, params) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.patch(`/database/user/${params.id}`, { status: params.status });
     },
     searchUser: ({ commit }, name) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/database/user/search/${name}`).then((result: any) => {
           const response = {
@@ -234,11 +234,11 @@ export default createStore({
       });
     },
     askFriend: ({ commit }, request) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.post(`/database/ask/${request.asker}/${request.asked}`);
     },
     acceptFriend: ({ commit }, request) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance
           .post(`/database/accept/${request.id}/${request.new}`)
@@ -260,15 +260,15 @@ export default createStore({
       });
     },
     removeFriend: ({ commit }, request) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.post(`/database/remove/${request.id}/${request.new}`);
     },
     refuseFriend: ({ commit }, request) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.post(`/database/refuse/${request.id}/${request.new}`);
     },
     getFriend: ({ commit }, asker) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance
           .get(`/database/friends/${asker}`)
@@ -301,7 +301,7 @@ export default createStore({
       })
     },
     activateAuth: ({ commit }, user) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       instance.patch(`/database/user/${user.id}`, { auth: true });
       commit("setAuth", true);
     },
@@ -309,7 +309,7 @@ export default createStore({
     // >>>>>>>>>> USER LOGIN >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
     getUsersFromIds: ({ commit }, ids) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/database/users/`, ids).then((result: any) => {
           resolve(result.data);
@@ -322,7 +322,7 @@ export default createStore({
 
     // >>>>>>>>>> CANAL SECTION
     getCanals: ({ commit }) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/`).then((result: any) => {
           const canals: any[] = [];
@@ -344,7 +344,7 @@ export default createStore({
       })
     },
     getCanalById: ({ commit }, canalid) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/${canalid}`).then((result: any) => {
           resolve(result.data);
@@ -352,7 +352,7 @@ export default createStore({
       })
     },
     getCanalsByUserId: ({ commit }, userid) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/search/${userid}`).then((result: any) => {
           const canals: any[] = [];
@@ -380,18 +380,22 @@ export default createStore({
       })
     },
     deleteCanal: ({ commit }, canalid) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.delete(`/canal/${canalid}`);
         instance.patch(`/database/user/delete/${canalid}`);
       })
     },
     createCanal: ({ commit }, canal) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       new Promise((resolve, reject) => {
         instance.post(`/canal/`, canal).then((result: any) => {
           console.log(result.data);
           resolve(result.data);
+          
+          console.log("canal", result.data)
+          if (canal.visibility != 2)
+          {
           instance.patch(`/database/user/add/${result.data.id}`);
           instance.get(`/database/user/`).then((r: any) => {
             console.log(r.data);
@@ -399,11 +403,16 @@ export default createStore({
               instance.post(`canal/add_user`, { canal_id: result.data.id, id: e.intra_id });
             });
           });
+          }
+          else
+          {
+            instance.patch(`/database/user/add_one/${result.data.id}/${canal.owner}`);
+          }
         })
       })
     },
     updateCanal: ({ commit }, canal) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.patch(`/canal/`, canal).then((result: any) => {
           resolve(result.data);
@@ -412,7 +421,7 @@ export default createStore({
     },
     loginCanal: ({ commit }, body) => {
       console.log(body);
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/login/`, body).then((result: any) => {
           console.log(result.data);
@@ -421,7 +430,7 @@ export default createStore({
       })
     },
     getLogState: ({ commit }, body) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/login/state/${body.canalid}`, { user: body.value }).then((result: any) => {
           resolve(result.data);
@@ -429,7 +438,7 @@ export default createStore({
       })
     },
     addAdminUserId: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/add_admin/`, specs).then((result: any) => {
           resolve(result.data);
@@ -437,7 +446,7 @@ export default createStore({
       })
     },
     addUserId: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/add_user/`, specs).then((result: any) => {
           instance.patch(
@@ -447,7 +456,7 @@ export default createStore({
       })
     },
     delAdminUserId: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/canal/del_admin/`, specs).then((result: any) => {
           resolve(result.data);
@@ -455,7 +464,7 @@ export default createStore({
       })
     },
     delUserId: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         console.log("Here");
         instance.post(`/canal/del_user/`, specs);
@@ -465,7 +474,7 @@ export default createStore({
       })
     },
     muteUserIdTime: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/database/mute/${specs.id}/${specs.canalid}/${specs.time}`).then((result: any) => {
           resolve(result.data);
@@ -473,7 +482,7 @@ export default createStore({
       })
     },
     banUserIdTime: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/database/ban/${specs.id}/${specs.canalid}/${specs.time}`).then((result: any) => {
           resolve(result.data);
@@ -481,7 +490,7 @@ export default createStore({
       })
     },
     blockUser: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/database/block/${specs.id}/${specs.blockedid}`).then((result: any) => {
           resolve(result.data);
@@ -489,7 +498,7 @@ export default createStore({
       })
     },
     unblockUser: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/database/unblock/${specs.id}/${specs.blockedid}`).then((result: any) => {
           resolve(result.data);
@@ -497,7 +506,7 @@ export default createStore({
       })
     },
     getUsersNotInCanal: ({ commit }, canalid) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/database/other_users/${canalid}`).then((result: any) => {
           console.log(result);
@@ -513,7 +522,7 @@ export default createStore({
     },
 
     getUsersNotAdmin: ({ commit }, canalid) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/non_admin/${canalid}`).then((result: any) => {
           console.log(result.data);
@@ -522,7 +531,7 @@ export default createStore({
       })
     },
     isCanalAdmin: ({ commit }, data) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/canal/is_admin/${data.canal_id}/${data.user_id}`).then((result: any) => {
           resolve(result.data);
@@ -533,7 +542,7 @@ export default createStore({
     // >>>>>>>>>> MESSAGE SECTION
 
     getMessages: ({ commit }) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/message/`).then((result: any) => {
           const messages: any[] = [];
@@ -552,7 +561,7 @@ export default createStore({
       })
     },
     getMessagesByCanalId: ({ commit }, specs) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/message/${specs.canalid}`).then((result: any) => {
           const messages: any[] = [];
@@ -575,7 +584,7 @@ export default createStore({
     createMessage: ({ commit }, msg) => {
       if (msg.author == undefined || msg.author == null)
         return ;
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.post(`/message/${msg.message}/${msg.author}/${msg.canalid}`).then((result: any) => {
           resolve(result.data);
@@ -585,7 +594,7 @@ export default createStore({
     // ==================================== END CHAT SECTION ===================
     // ==================================== GAME SECRETION =====================
     getGameById: ({ commit }, id) => {
-      instance.defaults.headers.common["Authorization"] = localStorage.getItem("jwtToken");
+      instance.defaults.headers.common["Authorization"] = generateToken()
       return new Promise((resolve, reject) => {
         instance.get(`/game_database/${id}`).then((result: any) => {
           resolve(result.data);
@@ -605,4 +614,16 @@ function makeid(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+function generateToken(){
+  const token = jwt.sign(
+    {
+      id: makeid(16),
+      provider: "store"
+    },
+    "shhhhh",
+    { expiresIn: "10s" }
+  );
+  return token;
 }

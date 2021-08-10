@@ -2,7 +2,7 @@
     <div>
         <div v-if="auth">
             <label>2FA Verification code: </label><br>
-            <input type="text" id="verif_qr" v-model="validation"><br>
+            <input v-on:keyup.enter="validate()" type="text" id="verif_qr" v-model="validation"><br>
               <label v-if="incorrect" style="color: red;">Incorrect !</label><br v-if="incorrect">
             <button @click="validate()" >Pair the account</button>
         </div>
@@ -92,9 +92,21 @@ export default({
             localStorage.setItem('ft_token', '')
         }
         })
+        },
+        check: function() {
+            const self = this;
+            const inte = setInterval(function() {
+                if (self.$store.state.user.id != -1)
+                {
+                    self.$router.push({path: "/"});
+                    clearInterval(inte)
+                    return;
+                }
+            }, 1000)
         }
     },
     mounted() {
+        this.check()
         if(this.$store.state.user.id == -1)
         {
             if (this.$route.query.code)
@@ -105,12 +117,8 @@ export default({
             if(localStorage.getItem("ft_token") != "")
                 this.tokenAuth(localStorage.getItem("ft_token"))
         }
-    },
-    updated() {
-        this.$nextTick(function () {
-            if (this.$store.state.user.id != -1)
-                this.$router.push({path: "/"});
-        })
+        else
+            this.$router.push({path: "/"});
     },
 })
 

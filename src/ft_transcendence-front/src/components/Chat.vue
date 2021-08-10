@@ -47,7 +47,7 @@
     </div>
     <div
       id="messages-box-chat"
-      v-if="!this.logged && this.getVisibility() == 1"
+      v-if="this.getVisibility() == 1 && !this.logged"
     >
       <input
         ref="password"
@@ -185,6 +185,8 @@ export default {
             .dispatch("getUser", self.$store.state.user.id)
             .then(async function (result) {
               specs.user = result;
+              if (result == undefined)
+                return ;
               if (result.canals != "") {
                 let list = result.canals.split(":");
                 let chats = [];
@@ -241,7 +243,7 @@ export default {
         })
         .then(function (result) {
           self.logged = result;
-          console.log(result);
+          console.log("wtf",result);
         });
     },
     updateUsers: function () {
@@ -307,6 +309,7 @@ export default {
           ret = item.visibility;
         }
       });
+      console.log("return value:", ret, self.logged);
       return ret;
     },
     isAdmin: function () {

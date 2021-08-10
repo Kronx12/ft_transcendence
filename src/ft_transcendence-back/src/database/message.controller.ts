@@ -13,7 +13,7 @@ export class MessageController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.messageServ.getAllMessages();
@@ -27,7 +27,7 @@ export class MessageController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.messageServ.getMessagesByCanalId(id);
@@ -41,7 +41,7 @@ export class MessageController {
         const self = this;
         let resp;
         await jwt.verify(auth, 'shhhhh', async function (err, decoded) {
-            if (err)
+            if (err || decoded.provider == undefined || decoded.id == undefined || decoded.provider != "store")
                 resp = { error: '401 Unauthorized' };
             else
                 resp = self.messageServ.createMessage(mess, +author, +canalid);
