@@ -161,9 +161,14 @@ export default {
           self.$store.state.user.id = decoded.id;
           self.$store.state.user.login = decoded.login;
           self.$store.state.user.avatarURL = decoded.avatarURL;
+          await self.$store.dispatch("getUser",decoded.id).then((result) => {
+          self.$store.state.user.login = result.username;
+          self.$store.state.user.avatarURL = result.avatar;
+          });
+          
           self.$store.state.user.auth = decoded.auth;
           self.$store.state.user.secret = decoded.secret;
-          self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
+          await self.$store.dispatch("editStatus", { id: decoded.id, status: 1 });
           await self.$store.dispatch("getFriend", self.$store.state.user.id);
           await self.$refs.friend.updateFriend();
         }

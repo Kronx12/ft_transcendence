@@ -72,12 +72,7 @@
         >
           <img
             class="user-image"
-            v-bind:src="
-              'https://cdn.intra.42.fr/users/small_' +
-              getUserImage(message.author) +
-              '.jpg'
-            "
-            v-bind:alt="getUserImage(message.author)"
+            v-bind:src="getUserImage(message.author)"
           />
           <div class="content" :key="message">
             {{ message.message }}
@@ -270,7 +265,7 @@ export default {
         id != undefined
       ) {
         self.$store.dispatch("getUser", id).then(function (result) {
-          self.userImage = result.username;
+          self.userImage = result.avatar;
         });
         return self.userImage;
       }

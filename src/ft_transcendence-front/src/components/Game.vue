@@ -197,6 +197,7 @@ export default {
 				
 				self.isA = data.content.isA;
 				self.isB = data.content.isB;
+				console.log(self.win);
 			} else if (data.type === "ack_redirect") {
 				//console.log("redirect");
 				self.$router.push({path: '/'});
