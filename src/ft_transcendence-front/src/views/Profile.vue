@@ -198,7 +198,7 @@ div.user-aff {
 .hoverImage {
   position: absolute;
   top: 225px;
-  right: 890px;
+  right: 1215px;
   font-weight: 600;
   color: white;
   border: solid black 1px;

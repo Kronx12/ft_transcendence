@@ -3,12 +3,12 @@
         <h1>Settings</h1>
 
         <label for="username" style="margin-right: 10px">New Username: </label>
-        <input type="text" id="username " v-model="name" style="margin-right: 10px"/>
+        <input v-on:keyup.enter="editUsername()" type="text" id="username " v-model="name" style="margin-right: 10px"/>
         <button @click="editUsername()" >Edit</button>
         <br>
         <br>
         <label for="avatar-url" style="margin-right: 10px">New Avatar: </label>
-        <input type="text" id="avatar-url" style="margin-right: 10px" v-model="avatar"/>
+        <input v-on:keyup.enter="editAvatar()" type="text" id="avatar-url" style="margin-right: 10px" v-model="avatar"/>
         <button @click="editAvatar()" >Edit</button>
         <br>
         <br>
@@ -46,10 +46,14 @@ export default {
   },
   methods: {
     editUsername: function() {
+      if (this.name == "")
+        return;
       this.$store.state.user.login = this.name
       this.$store.dispatch("editUsername", {id: this.$store.state.user.id, username: this.name})
     },
     editAvatar: function() {
+      if (this.avatar == "")
+        return;
       this.$store.state.user.avatarURL = this.avatar
       this.$store.dispatch("editAvatar", {id: this.$store.state.user.id, avatar: this.avatar})
     },
